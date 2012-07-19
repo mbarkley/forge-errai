@@ -1,4 +1,4 @@
-package ${package}.client.local;
+package client.local;
 
 import org.jboss.errai.ioc.client.Container;
 import org.jboss.errai.bus.client.tests.AbstractErraiTest;

@@ -1,11 +1,14 @@
 package client.local;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.jboss.errai.bus.client.framework.ClientMessageBus;
-import org.jboss.errai.bus.client.framework.MessageBus;
+import org.jboss.errai.enterprise.client.cdi.api.CDI;
 import org.jboss.errai.ioc.client.api.EntryPoint;
+
+import ${package}.client.shared.HelloMessage;
+import ${package}.client.shared.Response;
 
 import com.google.gwt.user.client.Timer;
 
@@ -16,7 +19,7 @@ import com.google.gwt.user.client.Timer;
  * code:
  * 
  * <pre>
- *   ErraiIocTestHelper.instance.<i>injectedFieldName</i>
+ *   CDITestHelper.instance.<i>injectedFieldName</i>
  * </pre>
  * <p>
  * You can also set up CDI event producers and observers here if your test needs
@@ -35,42 +38,72 @@ import com.google.gwt.user.client.Timer;
  * @author Jonathan Fuerth <jfuerth@gmail.com>
  */
 @EntryPoint
-public class ErraiIocTestHelper {
+public class CDITestHelper {
 
-  static ErraiIocTestHelper instance;
+  static CDITestHelper instance;
 
-  static boolean busInitialized = false;
-  
-  @Inject HelloWorldClient client;
-  @Inject MessageBus bus;
-  
+  static int messageEventCount = 0;
+  static int responseEventCount = 0;
+  static boolean cdiInitialized = false;
+
+  @Inject App app;
+
   @PostConstruct
-  void saveStaticReference() {
+  public void saveStaticReference() {
+    System.out.println("Saving static reference to CDITestHelper.instance");
     instance = this;
+  }
+
+  public void countMessageEvent(@Observes HelloMessage message) {
+    ++messageEventCount;
+  }
+  
+  public void countResponseEvent(@Observes Response response) {
+    ++responseEventCount;
+  }
+  
+  public static void afterResponseEvent(final Runnable runnable) {
+    final int origResponseEventCount = responseEventCount;
+    final Timer t = new Timer() {
+      @Override
+      public void run() {
+        if (responseEventCount > origResponseEventCount) {
+          runnable.run();
+        } else {
+          // poll again later
+          schedule(500);
+        }
+      }
+    };
+    t.schedule(500);
   }
 
   /**
    * Runs the given runnable in the browser's JavaScript thread once the Errai
-   * bus has finished its initialization phase and the client is connected to
-   * the server. Once the runnable is executed, all {@link EntryPoint} classes
-   * will have been created and have their dependencies injected, and all
-   * components listening for it will have received the BusReady event.
+   * CDI context has finished its initialization phase. Once the runnable is
+   * executed, all {@link EntryPoint} classes will have been created and have
+   * their dependencies injected, and all components listening for it will have
+   * received the BusReady event.
    * 
    * @param runnable
    *          The code to run once Errai CDI is up and running in the context of
    *          the web page.
    */
-  public static void afterBusInitialized(final Runnable runnable) {
+  public static void afterCdiInitialized(final Runnable runnable) {
+    cdiInitialized = false;
+    CDI.addPostInitTask(new Runnable() {
+      @Override
+      public void run() {
+        cdiInitialized = true;
+      }
+    });
     final Timer t = new Timer() {
       @Override
       public void run() {
-        ClientMessageBus bus = (ClientMessageBus) instance.bus;
-        if (bus != null && bus.isInitialized()) {
-          System.out.println("Bus initialized. Running test... (bus=" + bus + ")");
+        if (cdiInitialized) {
           runnable.run();
         } else {
           // poll again later
-          System.out.println("Bus not initialized yet (bus=" + bus + ")");
           schedule(500);
         }
       }
