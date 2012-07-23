@@ -1,12 +1,17 @@
 package org.jboss.errai.forge;
 
+import java.util.Arrays;
+
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import org.jboss.errai.forge.facet.ErraiBaseFacet;
+import org.jboss.errai.forge.facet.ErraiFacets;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.facets.events.InstallFacets;
 import org.jboss.forge.shell.ShellColor;
 import org.jboss.forge.shell.ShellMessages;
+import org.jboss.forge.shell.ShellPrompt;
 import org.jboss.forge.shell.plugins.Alias;
 import org.jboss.forge.shell.plugins.Command;
 import org.jboss.forge.shell.plugins.DefaultCommand;
@@ -24,6 +29,10 @@ public class ErraiPlugin implements Plugin {
 
     private final Project project;
     private final Event<InstallFacets> installFacets;
+    
+    @Inject
+    private ShellPrompt prompt;
+    
 
     @Inject
     public ErraiPlugin(final Project project, final Event<InstallFacets> event) {
@@ -41,7 +50,7 @@ public class ErraiPlugin implements Plugin {
 
 	@DefaultCommand
     public void status(final PipeOut out) {
-        if (project.hasFacet(ErraiFacet.class)) {
+        if (project.hasFacet(ErraiBaseFacet.class)) {
             out.println("Errai is installed.");
         } else {
             out.println("Errai is not installed. Use 'errai setup' to get started.");
@@ -51,12 +60,27 @@ public class ErraiPlugin implements Plugin {
     // confirmed working
     @Command("setup")
     public void setup(final PipeOut out) {
-        if (!project.hasFacet(ErraiFacet.class)) {
-            installFacets.fire(new InstallFacets(ErraiFacet.class));
-        }
-        if (project.hasFacet(ErraiFacet.class)) {
-            ShellMessages.success(out, "ErraiFacet is configured.");
-        }
+//        if (!project.hasFacet(ErraiFacet.class)) {
+//            installFacets.fire(new InstallFacets(ErraiFacet.class));
+//        }
+//        if (project.hasFacet(ErraiFacet.class)) {
+//            ShellMessages.success(out, "ErraiFacet is configured.");
+//        }
+    	
+		ErraiFacets module = prompt.promptChoiceTyped("Which Errai module to install?",
+        Arrays.asList(ErraiFacets.values()), ErraiFacets.ERRAI_BUS_FACET);
+		
+		if (!project.hasFacet(module.getFacet())) {
+		     installFacets.fire(new InstallFacets(module.getFacet()));
+		}
+		if (project.hasFacet(module.getFacet())) {
+			 ShellMessages.success(out, module + " is configured.");
+		}
+		
+		//TODO implement here logic for istalling only one facet at the time, once one facet is isntalled the others
+		// won't be used 
+		
+    	
     }
 
     @Command("help")
@@ -75,5 +99,11 @@ public class ErraiPlugin implements Plugin {
     public void installErraiCdiExample(final PipeOut pipeOut) {
         new ErraiCdiExample(this, pipeOut); 
     }
+    
+    @Command("install-errai-jaxrs-example")
+    public void installErraiJaxrsExample(final PipeOut pipeOut) {
+        new ErraiJaxrsExample(this, pipeOut); 
+    }
+    
     
 }

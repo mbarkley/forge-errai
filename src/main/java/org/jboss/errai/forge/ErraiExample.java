@@ -1,5 +1,6 @@
 package org.jboss.errai.forge;
 
+import org.jboss.errai.forge.facet.ErraiBaseFacet;
 import org.jboss.forge.shell.plugins.PipeOut;
 
 public abstract class ErraiExample {
@@ -46,7 +47,7 @@ public abstract class ErraiExample {
     
     
     private void assertInstalled() {
-        if (!plugin.getProject().hasFacet(ErraiFacet.class)) {
+        if (!plugin.getProject().hasFacet(ErraiBaseFacet.class)) {
             throw new RuntimeException("ErraiFacet is not installed. Use 'errai setup' to get started.");
         }
     }
