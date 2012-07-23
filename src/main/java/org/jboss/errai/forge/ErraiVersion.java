@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.jboss.forge.project.dependencies.Dependency;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.project.dependencies.ScopeType;
 
 /**
  * @author pslegr

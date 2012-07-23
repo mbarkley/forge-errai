@@ -2,6 +2,7 @@ package org.jboss.errai.forge;
 
 import java.io.InputStream;
 
+import org.jboss.errai.forge.facet.ErraiBaseFacet;
 import org.jboss.forge.project.facets.JavaSourceFacet;
 import org.jboss.forge.project.facets.ResourceFacet;
 import org.jboss.forge.project.facets.WebResourceFacet;
@@ -26,19 +27,19 @@ public class ErraiBusExample extends ErraiExample{
         FileResource<?> wiPage = (FileResource<?>) wiDirectory.getChild("web.xml");
         InputStream stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/webapp/WEB-INF/web.xml");
         wiPage.setContents(stream);
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "WEB-INF/web.xml", "file"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "WEB-INF/web.xml", "file"));
 
         // create App.css
         FileResource<?> appPage = (FileResource<?>) webRoot.getChild("App.css");
         stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/webapp/App.css");
         appPage.setContents(stream);
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "App.css", "file"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "App.css", "file"));
 
         // create App.html
         FileResource<?> apphPage = (FileResource<?>) webRoot.getChild("App.html");
         stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/webapp/App.html");
         apphPage.setContents(stream);
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "App.html", "file"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "App.html", "file"));
     }
 
     /* (non-Javadoc)
@@ -56,19 +57,19 @@ public class ErraiBusExample extends ErraiExample{
         FileResource<?> clientIndexPage = (FileResource<?>) clDirectory.getChild("HelloWorldClient.java");
         InputStream cStream = ErraiPlugin.class.getResourceAsStream("/errai-bus/java/client/local/HelloWorldClient.java.txt");
         clientIndexPage.setContents(Utils.replacePackageName(cStream,plugin.getProject()));
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "HelloWorldClient", "class"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "HelloWorldClient", "class"));
         
         //create server class
         FileResource<?> serverIndexPage = (FileResource<?>) srvDirectory.getChild("HelloWorldService.java");
         InputStream sStream = ErraiPlugin.class.getResourceAsStream("/errai-bus/java/server/HelloWorldService.java.txt");
         serverIndexPage.setContents(Utils.replacePackageName(sStream,plugin.getProject()));
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "HelloWorldService", "class"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "HelloWorldService", "class"));
 
         //create App.gwt config file
         FileResource<?> confIndexPage = (FileResource<?>) sourceRoot.getChild("App.gwt.xml");
         InputStream cfStream = ErraiPlugin.class.getResourceAsStream("/errai-bus/java/App.gwt.xml.txt");
         confIndexPage.setContents(cfStream);
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "App.gwt.xml", "file"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "App.gwt.xml", "file"));
         
     }
     
@@ -82,19 +83,19 @@ public class ErraiBusExample extends ErraiExample{
         FileResource<?> appIndexPage = (FileResource<?>) sourceRoot.getChild("ErraiApp.properties");
         InputStream stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/resources/ErraiApp.properties");
         appIndexPage.setContents(stream);
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "ErraiApp.properties", "file"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "ErraiApp.properties", "file"));
         
         //create Service props
         FileResource<?> serviceIndexPage = (FileResource<?>) sourceRoot.getChild("ErraiService.properties");
         stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/resources/ErraiService.properties");
         serviceIndexPage.setContents(stream);
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "ErraiService.properties", "file"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "ErraiService.properties", "file"));
         
         //create log4j props
         FileResource<?> log4jIndexPage = (FileResource<?>) sourceRoot.getChild("log4j.properties");
         stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/resources/log4j.properties");
         log4jIndexPage.setContents(stream);
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "log4j.properties", "file"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "log4j.properties", "file"));
         
     }    
     
@@ -108,7 +109,7 @@ public class ErraiBusExample extends ErraiExample{
         FileResource<?> appIndexPage = (FileResource<?>) resourceRoot.getChild("ErraiApp.properties");
         InputStream stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/resources/ErraiApp.properties");
         appIndexPage.setContents(stream);
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "ErraiApp.properties", "file"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "ErraiApp.properties", "file"));
         
         DirectoryResource javaRoot = plugin.getProject().getFacet(JavaSourceFacet.class).getTestSourceFolder();
         
@@ -119,13 +120,13 @@ public class ErraiBusExample extends ErraiExample{
         FileResource<?> cl1IndexPage = (FileResource<?>) clDirectory.getChild("ErraiIocTestHelper.java");
         InputStream c1Stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/test/ErraiIocTestHelper.java.txt");
         cl1IndexPage.setContents(Utils.replacePackageName(c1Stream, plugin.getProject()));
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "ErraiIocTestHelper.java", "class"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "ErraiIocTestHelper.java", "class"));
         
         //create client class
         FileResource<?> cl2IndexPage = (FileResource<?>) clDirectory.getChild("HelloWorldClientTest.java");
         InputStream c2Stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/test/HelloWorldClientTest.java.txt");
         cl2IndexPage.setContents(Utils.replacePackageName(c2Stream,plugin.getProject()));
-        pipeOut.println(ShellColor.YELLOW, String.format(ErraiFacet.SUCCESS_MSG_FMT, "HelloWorldClientTest.java", "class"));
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "HelloWorldClientTest.java", "class"));
     }
     
 }
