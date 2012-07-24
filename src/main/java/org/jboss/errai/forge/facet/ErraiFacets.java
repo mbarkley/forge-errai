@@ -7,7 +7,7 @@ package org.jboss.errai.forge.facet;
 public enum ErraiFacets {
     ERRAI_BUS_FACET("Errai Bus Facet",ErraiBusFacet.class),
     ERRAI_CDI_FACET("Errai CDI Facet",ErraiCDIFacet.class),
-    ERRAI_JAXRS_FACET("Errai Jaxrs Facet",ErraiBusFacet.class);
+    ERRAI_JAXRS_FACET("Errai Jaxrs Facet",ErraiJaxrsFacet.class);
     		
     private String name;
     private Class<? extends ErraiBaseFacet> facet;

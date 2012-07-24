@@ -140,4 +140,31 @@ public class ErraiJaxrsExample extends ErraiExample{
         pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "ErraiIocTestHelper.java", "class"));
     }
     
+    //TODO implement uninstall methods
+    
+
+	@Override
+	void deleteWebappFiles(PipeOut pipeOut) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	void deleteAppFiles(PipeOut pipeOut) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	void deleteResourceFiles(PipeOut pipeOut) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	void deleteTestFiles(PipeOut pipeOut) {
+		// TODO Auto-generated method stub
+		
+	}
+    
 }
