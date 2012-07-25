@@ -25,6 +25,7 @@ public class ErraiCDIFacet extends ErraiBaseFacet{
 
 	@Override
 	void installErraiDeps() {
+		  String erraiVersion = Versions.getInstance().getErrai_version();
 		//TODO list here all the CDI dependencies
 	      List<? extends Dependency> dependencies = Arrays.asList(
 	              DependencyBuilder.create("javax.servlet:servlet-api:2.5").setScopeType("provided"),
@@ -34,11 +35,13 @@ public class ErraiCDIFacet extends ErraiBaseFacet{
 	              DependencyBuilder.create("org.jboss.ejb3:jboss-ejb3-api:3.1.0").setScopeType("provided"),
 	              DependencyBuilder.create("javax.enterprise:cdi-api:1.0-SP4").setScopeType("provided"),
 	              DependencyBuilder.create("org.mvel:mvel2:2.1.Beta8"),
+
 	              // CDI Integration
-	              DependencyBuilder.create("org.jboss.errai:errai-cdi-client:2.1-SNAPSHOT"),	              
-	              DependencyBuilder.create("org.jboss.errai:errai-javax-enterprise:2.1-SNAPSHOT"),	              
-	              DependencyBuilder.create("org.jboss.errai:errai-weld-integration:2.1-SNAPSHOT"),	              
-	              DependencyBuilder.create("org.jboss.errai:errai-cdi-jetty:2.1-SNAPSHOT"),
+	              DependencyBuilder.create("org.jboss.errai:errai-cdi-client:" + erraiVersion),	              
+	              DependencyBuilder.create("org.jboss.errai:errai-javax-enterprise:" + erraiVersion),	              
+	              DependencyBuilder.create("org.jboss.errai:errai-weld-integration:" + erraiVersion),	              
+	              DependencyBuilder.create("org.jboss.errai:errai-cdi-jetty:" + erraiVersion),
+
 	              //Jetty & Weld
 	              //TODO resolve dependency problem with jetty
 //	              DependencyBuilder.create("org.mortbay.jetty:6.1.25"),

@@ -53,13 +53,14 @@ public abstract class ErraiBaseFacet extends BaseFacet
     */
    private void installBaseErraiDependencies()
    {
-	   
+	  String erraiVersion = Versions.getInstance().getErrai_version();
+	  String gwtVersion= Versions.getInstance().getGwt_version();
       List<? extends Dependency> dependencies = Arrays.asList(
-              DependencyBuilder.create("org.jboss.errai:errai-bus:2.1-SNAPSHOT"),
-              DependencyBuilder.create("org.jboss.errai:errai-ioc:2.1-SNAPSHOT"),
-              DependencyBuilder.create("org.jboss.errai:errai-tools:2.1-SNAPSHOT"),
-              DependencyBuilder.create("com.google.gwt:gwt-servlet:2.4.0"),
-              DependencyBuilder.create("com.google.gwt:gwt-user:2.4.0")
+              DependencyBuilder.create("org.jboss.errai:errai-bus:" + erraiVersion),
+              DependencyBuilder.create("org.jboss.errai:errai-ioc:" + erraiVersion),
+              DependencyBuilder.create("org.jboss.errai:errai-tools:" + erraiVersion),
+              DependencyBuilder.create("com.google.gwt:gwt-servlet:" + gwtVersion),
+              DependencyBuilder.create("com.google.gwt:gwt-user:" + gwtVersion)
       );
 
 	   

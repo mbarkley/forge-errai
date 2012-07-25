@@ -15,10 +15,11 @@ public class ErraiJaxrsFacet extends ErraiBaseFacet{
 
 	@Override
 	void installErraiDeps() {
+		  String erraiVersion = Versions.getInstance().getErrai_version();
 	      List<? extends Dependency> dependencies = Arrays.asList(
-	              DependencyBuilder.create("org.jboss.errai:errai-common:2.1-SNAPSHOT"),
-	              DependencyBuilder.create("org.jboss.errai:errai-jaxrs-client:2.1-SNAPSHOT").setScopeType("provided"),
-	              DependencyBuilder.create("org.jboss.errai:errai-jaxrs-provider:2.1-SNAPSHOT"),
+	              DependencyBuilder.create("org.jboss.errai:errai-common:" + erraiVersion),
+	              DependencyBuilder.create("org.jboss.errai:errai-jaxrs-client:" + erraiVersion).setScopeType("provided"),
+	              DependencyBuilder.create("org.jboss.errai:errai-jaxrs-provider:" + erraiVersion),
 	              DependencyBuilder.create("javax.enterprise:cdi-api:1.0-SP4"),
 	              DependencyBuilder.create("org.jboss.resteasy:resteasy-jaxrs:2.2.3.GA")
 	      );
