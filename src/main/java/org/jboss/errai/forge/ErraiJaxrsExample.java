@@ -107,7 +107,6 @@ public class ErraiJaxrsExample extends ErraiExample{
         stream = ErraiPlugin.class.getResourceAsStream("/errai-jaxrs/resources/log4j.properties");
         log4jIndexPage.setContents(stream);
         pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "log4j.properties", "file"));
-        
     }    
     
     /* (non-Javadoc)
@@ -145,26 +144,56 @@ public class ErraiJaxrsExample extends ErraiExample{
 
 	@Override
 	void deleteWebappFiles(PipeOut pipeOut) {
-		// TODO Auto-generated method stub
-		
+        DirectoryResource webRoot = plugin.getProject().getFacet(WebResourceFacet.class).getWebRootDirectory();
+        
+        DirectoryResource wiDirectory = webRoot.getOrCreateChildDirectory("WEB-INF");
+        wiDirectory.delete(true);
+        
+        FileResource<?> appPage = (FileResource<?>) webRoot.getChild("App.css");
+        appPage.delete();
+
+        FileResource<?> apphPage = (FileResource<?>) webRoot.getChild("App.html");
+        apphPage.delete();
 	}
 
 	@Override
 	void deleteAppFiles(PipeOut pipeOut) {
-		// TODO Auto-generated method stub
-		
+        JavaSourceFacet source = plugin.getProject().getFacet(JavaSourceFacet.class);
+        DirectoryResource sourceRoot = source.getBasePackageResource();
+        
+        DirectoryResource clientDirectory = sourceRoot.getOrCreateChildDirectory("client");
+        clientDirectory.delete(true);
+        DirectoryResource srvDirectory = sourceRoot.getOrCreateChildDirectory("server");
+        srvDirectory.delete(true);
+
+        FileResource<?> confIndexPage = (FileResource<?>) sourceRoot.getChild("App.gwt.xml");
+        confIndexPage.delete(true);
 	}
 
 	@Override
 	void deleteResourceFiles(PipeOut pipeOut) {
-		// TODO Auto-generated method stub
-		
+        DirectoryResource sourceRoot = plugin.getProject().getFacet(ResourceFacet.class).getResourceFolder();
+        
+        FileResource<?> appIndexPage = (FileResource<?>) sourceRoot.getChild("ErraiApp.properties");
+        appIndexPage.delete();
+        
+        FileResource<?> serviceIndexPage = (FileResource<?>) sourceRoot.getChild("ErraiService.properties");
+        serviceIndexPage.delete();
+        
+        FileResource<?> log4jIndexPage = (FileResource<?>) sourceRoot.getChild("log4j.properties");
+        log4jIndexPage.delete();
 	}
 
 	@Override
 	void deleteTestFiles(PipeOut pipeOut) {
-		// TODO Auto-generated method stub
-		
+        DirectoryResource resourceRoot = plugin.getProject().getFacet(ResourceFacet.class).getTestResourceFolder();
+        
+        FileResource<?> appIndexPage = (FileResource<?>) resourceRoot.getChild("ErraiApp.properties");
+        appIndexPage.delete();
+        
+        DirectoryResource javaRoot = plugin.getProject().getFacet(JavaSourceFacet.class).getTestSourceFolder();
+        DirectoryResource clDirectory = javaRoot.getOrCreateChildDirectory("client");
+        clDirectory.delete(true);
 	}
     
 }

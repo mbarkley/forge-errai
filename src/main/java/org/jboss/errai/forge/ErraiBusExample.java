@@ -134,25 +134,57 @@ public class ErraiBusExample extends ErraiExample{
 	@Override
 	void deleteWebappFiles(PipeOut pipeOut) {
 		// TODO Auto-generated method stub
+        DirectoryResource webRoot = plugin.getProject().getFacet(WebResourceFacet.class).getWebRootDirectory();
+        DirectoryResource wiDirectory = webRoot.getOrCreateChildDirectory("WEB-INF");
+        wiDirectory.delete(true);
+
+        FileResource<?> appPage = (FileResource<?>) webRoot.getChild("App.css");
+        appPage.delete();
+
+        FileResource<?> apphPage = (FileResource<?>) webRoot.getChild("App.html");
+        apphPage.delete();
 		
 	}
 
 	@Override
 	void deleteAppFiles(PipeOut pipeOut) {
 		// TODO Auto-generated method stub
+        JavaSourceFacet source = plugin.getProject().getFacet(JavaSourceFacet.class);
+        DirectoryResource sourceRoot = source.getBasePackageResource();
+        
+        DirectoryResource clDirectory = sourceRoot.getOrCreateChildDirectory("client");
+        DirectoryResource srvDirectory = sourceRoot.getOrCreateChildDirectory("server");
+        clDirectory.delete(true);
+        srvDirectory.delete(true);
+        
+        FileResource<?> confIndexPage = (FileResource<?>) sourceRoot.getChild("App.gwt.xml");
+        confIndexPage.delete();
 		
 	}
 
 	@Override
 	void deleteResourceFiles(PipeOut pipeOut) {
-		// TODO Auto-generated method stub
-		
+        DirectoryResource sourceRoot = plugin.getProject().getFacet(ResourceFacet.class).getResourceFolder();
+        
+        FileResource<?> appIndexPage = (FileResource<?>) sourceRoot.getChild("ErraiApp.properties");
+        appIndexPage.delete();
+        
+        FileResource<?> serviceIndexPage = (FileResource<?>) sourceRoot.getChild("ErraiService.properties");
+        serviceIndexPage.delete();
+        
+        FileResource<?> log4jIndexPage = (FileResource<?>) sourceRoot.getChild("log4j.properties");
+        log4jIndexPage.delete();
 	}
 
 	@Override
 	void deleteTestFiles(PipeOut pipeOut) {
-		// TODO Auto-generated method stub
-		
+        DirectoryResource resourceRoot = plugin.getProject().getFacet(ResourceFacet.class).getTestResourceFolder();
+        
+        FileResource<?> appIndexPage = (FileResource<?>) resourceRoot.getChild("ErraiApp.properties");
+        appIndexPage.delete();
+        
+        DirectoryResource javaRoot = plugin.getProject().getFacet(JavaSourceFacet.class).getTestSourceFolder();
+        DirectoryResource clDirectory = javaRoot.getOrCreateChildDirectory("client");
+        clDirectory.delete(true);
 	}
-    
 }
