@@ -85,6 +85,7 @@ public class ErraiPlugin implements Plugin {
 		if (project.hasFacet(module.getFacet())) {
 			 ShellMessages.success(out, module + " is configured.");
 		}
+		this.setModuleInstalled(false);		
 		
 		//TODO implement here logic for istalling only one facet at the time, once one facet is isntalled the others
 		// won't be used 
