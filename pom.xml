@@ -5,70 +5,98 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jboss.errai.forge</groupId>
-    <artifactId>forge-errai</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>errai-forge-plugin</artifactId>
+    <version>1.0.0.CR1</version>
 
+	<properties>
+	    <forge.api.version>1.0.5.Final</forge.api.version>
+	    <!-- Place version for plugin here - those will be placed into 
+	         org/jboss/errai/forge/facet/versions.properties and taken
+	         into the plugin facets
+	      -->
+		<plugin.errai.version>2.1-SNAPSHOT</plugin.errai.version>
+		<plugin.gwt.version>2.4.0</plugin.gwt.version>	      
+	</properties>
+	
+	<build>
+		<plugins>
+	      <plugin>
+	        <artifactId>maven-resources-plugin</artifactId>
+	        <version>2.5</version>
+	        <executions>
+	          <execution>
+	            <id>copy-resources</id>
+	            <!-- here the phase you need -->
+	            <phase>validate</phase>
+	            <goals>
+	              <goal>copy-resources</goal>
+	            </goals>
+	            <configuration>
+	              <outputDirectory>${basedir}/target/classes/org/jboss/errai/forge/facet</outputDirectory>
+	              <resources>          
+				    <resource>
+				        <directory>src/main/java/org/jboss/errai/forge/facet</directory>
+						<includes>
+		                	<include>versions.properties</include>
+		            	</includes>
+				        <filtering>true</filtering>
+				    </resource>
+	              </resources>              
+	            </configuration>            
+	          </execution>
+	        </executions>
+	      </plugin>
+	    </plugins>
+	</build>
+	
     <dependencies>
         <dependency>
             <groupId>org.jboss.forge</groupId>
             <artifactId>forge-shell</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${forge.api.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.forge</groupId>
             <artifactId>forge-shell-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${forge.api.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.forge</groupId>
             <artifactId>forge-scaffold-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${forge.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+		<dependency>
+		    <groupId>org.jboss.forge</groupId>
+		    <artifactId>forge-test-harness</artifactId>
+		    <version>${forge.api.version}</version>
+		    <scope>test</scope>
+		</dependency>        
+        
+        <dependency>
+            <groupId>org.jboss.forge</groupId>
+            <artifactId>forge-javaee-api</artifactId>
+            <version>${forge.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.jboss.forge</groupId>
+            <artifactId>forge-maven-api</artifactId>
+            <version>${forge.api.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <repositories>
-        <repository>
-            <id>jboss-snapshots-repository</id>
-            <name>JBoss Snapshots Repository</name>
-            <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>codehaus</id>
-            <url>http://snapshots.repository.codehaus.org/</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
+	    <repository>
+	      <id>JBOSS_NEXUS</id>
+	      <url>http://repository.jboss.org/nexus/content/groups/public</url>
+	    </repository>
     </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>jboss-releases-repository</id>
-            <name>JBoss Releases Repository</name>
-            <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
-        </repository>
-
-        <snapshotRepository>
-            <id>jboss-snapshots-repository</id>
-            <name>JBoss Snapshots Repository</name>
-            <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
