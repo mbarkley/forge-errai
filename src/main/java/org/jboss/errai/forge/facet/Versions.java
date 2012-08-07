@@ -8,6 +8,7 @@ public class Versions {
 	
 	private String errai_version;
 	private String gwt_version;
+	private String javaee_version;
 	
 	private static Versions instance;
 	
@@ -21,6 +22,7 @@ public class Versions {
         }
 		this.errai_version = configProp.getProperty("errai.version");
 		this.gwt_version = configProp.getProperty("gwt.version");
+		this.javaee_version = configProp.getProperty("javaee.version");
 	}
 
 	public static Versions getInstance(){
@@ -35,5 +37,9 @@ public class Versions {
 
 	public String getGwt_version() {
 		return gwt_version;
+	}
+
+	public String getJavaee_version() {
+		return javaee_version;
 	}
 }
