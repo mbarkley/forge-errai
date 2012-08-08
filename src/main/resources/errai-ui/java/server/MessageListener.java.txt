@@ -20,8 +20,8 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.jboss.errai.ui.demo.client.shared.Message;
-import org.jboss.errai.ui.demo.client.shared.Response;
+import ${package}.client.shared.Message;
+import ${package}.client.shared.Response;
 
 
 /**

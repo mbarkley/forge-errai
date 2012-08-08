@@ -20,7 +20,7 @@ public class ErraiUIFacet extends ErraiBaseFacet{
 		  
 	      List<? extends Dependency> dependencies = Arrays.asList(
 	              DependencyBuilder.create("org.jboss.errai:errai-javaee-all:" + erraiVersion),
-	              DependencyBuilder.create("org.jboss.spec:jboss-javaee-6.0:" + javaeeVersion).setScopeType("provided")
+	              DependencyBuilder.create("org.jboss.spec:jboss-javaee-6.0:" + javaeeVersion).setScopeType("provided").setPackagingType("pom")
 	      );
 
 		   
