@@ -1,7 +1,5 @@
 package org.jboss.errai.forge;
 
-import java.util.Arrays;
-
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
@@ -20,6 +18,7 @@ import org.jboss.forge.shell.plugins.Option;
 import org.jboss.forge.shell.plugins.PipeOut;
 import org.jboss.forge.shell.plugins.Plugin;
 import org.jboss.forge.shell.plugins.RequiresProject;
+import org.jboss.forge.shell.plugins.SetupCommand;
 
 /**
  * @author pslegr
@@ -66,19 +65,8 @@ public class ErraiPlugin implements Plugin {
         }
     }
 
-    // confirmed working
-    @Command("setup")
-    public void setup(final PipeOut out) {
-//        if (!project.hasFacet(ErraiFacet.class)) {
-//            installFacets.fire(new InstallFacets(ErraiFacet.class));
-//        }
-//        if (project.hasFacet(ErraiFacet.class)) {
-//            ShellMessages.success(out, "ErraiFacet is configured.");
-//        }
-    	
-		ErraiFacets module = prompt.promptChoiceTyped("Which Errai module to install?",
-        Arrays.asList(ErraiFacets.values()), ErraiFacets.ERRAI_BUS_FACET);
-		
+    @SetupCommand
+    public void setup(@Option final ErraiFacets module, final PipeOut out) {
 		if (!project.hasFacet(module.getFacet())) {
 		     installFacets.fire(new InstallFacets(module.getFacet()));
 		}
@@ -86,11 +74,6 @@ public class ErraiPlugin implements Plugin {
 			 ShellMessages.success(out, module + " is configured.");
 		}
 		this.setModuleInstalled(false);		
-		
-		//TODO implement here logic for istalling only one facet at the time, once one facet is isntalled the others
-		// won't be used 
-		
-    	
     }
 
     @Command("help")

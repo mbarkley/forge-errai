@@ -19,18 +19,12 @@ new-project --named [name of project] --topLevelPackage [your project package] -
 Example:
 [no project] bin $ new-project --named errai-bus --topLevelPackage org.jboss.errai --projectFolder /home/pslegr/wfk-development/FORGE/test-projects/errai-bus
 
-4. Run the "errai setup" command to install the ErraiFacets.
-You can choose from currenly available 4 Errai Facets
+4. Type "errai setup" command and hit Enter to 
+complete with appropriate errai module to set up.
+
 Example:
-[errai-bus] errai-bus $ errai setup 
-Which Errai module to install?
-
-  1 - [Errai Bus Facet]*
-  2 - [Errai CDI Facet]
-  3 - [Errai Jaxrs Facet]
-  4 - [Errai UI Facet]
-
- ? Choose an option by typing the number of the selection [*-default]  [0] 
+[errai-bus] errai-bus $ errai setup errai-
+errai-bus      errai-cdi      errai-jaxrs    errai-ui 
 
 Note:Each of Facet introduces a different Errai module, which will be installed. By selecting one of the facets a basic project folder structure
 is set up and pom.xml for project is built up.   
