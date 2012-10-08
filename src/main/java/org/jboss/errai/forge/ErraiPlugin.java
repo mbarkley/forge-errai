@@ -16,6 +16,7 @@ import org.jboss.errai.forge.facet.ErraiExamplesCommandsEnum;
 import org.jboss.errai.forge.facet.ErraiFacetsEnum;
 import org.jboss.errai.forge.facet.ErraiGeneratorCommandsEnum;
 import org.jboss.errai.forge.facet.ErraiInstalled;
+import org.jboss.errai.forge.facet.ErraiMarshalingCommandsEnum;
 import org.jboss.errai.forge.gen.Generator;
 import org.jboss.errai.forge.template.Velocity;
 import org.jboss.forge.project.Project;
@@ -107,7 +108,8 @@ public class ErraiPlugin implements Plugin {
 //examples
 	
 	@Command("examples")
-    public void errai_examples_setup(@Option final ErraiExamplesCommandsEnum command, final PipeOut out) {
+    public void errai_examples_setup(
+    		@Option final ErraiExamplesCommandsEnum command, final PipeOut out) {
 		
 		//setup examples facet
 		switch (command) {
@@ -158,7 +160,9 @@ public class ErraiPlugin implements Plugin {
 	
 	//errai-bus
 	@Command("bus")
-    public void errai_bus_setup(@Option final ErraiBusCommandsEnum command,@Option(name="from") String from, final PipeOut out) {
+    public void errai_bus_setup(
+    		@Option final ErraiBusCommandsEnum command,
+    		@Option(name="from") String from, final PipeOut out) {
 		
 		//setup bus facet
 		switch (command) {
@@ -198,6 +202,47 @@ public class ErraiPlugin implements Plugin {
 	        out.println(ShellColor.BLUE, "do rpc invoke:");
 		}
     }
+	
+	//errai-marshaling
+	@Command("marshaling")
+    public void errai_marshaling_setup(
+    		@Option final ErraiMarshalingCommandsEnum command,
+    		@Option(name="from") String from, 
+    		@Option(name="recursive", defaultValue="false") boolean recursive, final PipeOut out) {
+		
+		//setup bus facet
+		switch (command) {
+		case ERRAI_MARSHALING_SETUP:
+			installFacets.fire(new InstallFacets(ErraiBusFacet.class));
+			return;
+		}
+		
+		//check marshaling facet installation
+        if (!getProject().hasFacet(ErraiFacetsEnum.ERRAI_BUS.getFacet())) {
+        	out.println("Errai Marshaling Facet is not installed. Use 'errai marshaling setup' to get started.");
+        	return;
+        }
+		
+        // commands
+		if(command.equals(ErraiMarshalingCommandsEnum.ERRAI_MARSHALING_SET_PORTABLE)){
+			// generate @Portable for defined classes
+			if(recursive == true) {
+				generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_SET_PORTABLE_RECURSIVE);
+			}
+			else {
+				generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_SET_PORTABLE);				
+			}
+		}
+		if(command.equals(ErraiMarshalingCommandsEnum.ERRAI_MARSHALING_IMMUTABLE_BUILDER)){
+			if(recursive == true) {
+				generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_IMMUTABLE_BUILDER_RECURSIVE);
+			}
+			else {
+				generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_IMMUTABLE_BUILDER);				
+			}
+		}
+    }
+	
 
 	
 }
