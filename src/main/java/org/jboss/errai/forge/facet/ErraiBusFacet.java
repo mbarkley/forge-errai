@@ -9,7 +9,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 public class ErraiBusFacet extends ErraiBaseFacet{
 
 	@Override
-	void installErraiDeps() {
+	void installErraiFacetSpecifics() {
 		// TODO Auto-generated method stub
 		
 	}

@@ -14,7 +14,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 public class ErraiUIFacet extends ErraiBaseFacet{
 
 	@Override
-	void installErraiDeps() {
+	void installErraiFacetSpecifics() {
 		  String erraiVersion = Versions.getInstance().getErrai_version();
 		  String javaeeVersion = Versions.getInstance().getJavaee_version();
 		  

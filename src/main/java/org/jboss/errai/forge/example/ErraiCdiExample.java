@@ -1,27 +1,22 @@
-package org.jboss.errai.forge;
+package org.jboss.errai.forge.example;
 
 import java.io.InputStream;
 
+import org.jboss.errai.forge.ErraiPlugin;
+import org.jboss.errai.forge.Utils;
 import org.jboss.errai.forge.facet.ErraiBaseFacet;
-import org.jboss.forge.project.facets.JavaSourceFacet;
-import org.jboss.forge.project.facets.ResourceFacet;
-import org.jboss.forge.project.facets.WebResourceFacet;
 import org.jboss.forge.resources.DirectoryResource;
 import org.jboss.forge.resources.FileResource;
 import org.jboss.forge.shell.ShellColor;
 import org.jboss.forge.shell.plugins.PipeOut;
 
-public class ErraiCdiExample extends ErraiExample{
+public class ErraiCdiExample extends AbstractExample{
 	
-	public ErraiCdiExample(ErraiPlugin plugin, final PipeOut pipeOut) {
-		super(plugin, pipeOut);
-   }
+	public ErraiCdiExample(final ErraiPlugin plugin, final PipeOut pipeOut) {
+		super(plugin,pipeOut,ErraiExampleEnum.ERRAI_CDI_EXAMPLE);   }
 	
-    /* (non-Javadoc)
-     * @see org.jboss.errai.forge.ErraiExample#createWebappFiles(org.jboss.forge.shell.plugins.PipeOut)
-     */
     void createWebappFiles(final PipeOut pipeOut) {
-        DirectoryResource webRoot = plugin.getProject().getFacet(WebResourceFacet.class).getWebRootDirectory();
+        DirectoryResource webRoot = erraiExampleFacet.getWebRootDirectory();
         // create WEB-INF/web.xml
         DirectoryResource wiDirectory = webRoot.getOrCreateChildDirectory("WEB-INF");
         FileResource<?> wiPage = (FileResource<?>) wiDirectory.getChild("web.xml");
@@ -60,12 +55,8 @@ public class ErraiCdiExample extends ErraiExample{
         
     }
 
-    /* (non-Javadoc)
-     * @see org.jboss.errai.forge.ErraiExample#createAppFiles(org.jboss.forge.shell.plugins.PipeOut)
-     */
     void createAppFiles(final PipeOut pipeOut) {
-        JavaSourceFacet source = plugin.getProject().getFacet(JavaSourceFacet.class);
-        DirectoryResource sourceRoot = source.getBasePackageResource();
+        DirectoryResource sourceRoot = erraiExampleFacet.getBasePackageDirectory();
         
         DirectoryResource clientDirectory = sourceRoot.getOrCreateChildDirectory("client");
         DirectoryResource localDirectory = clientDirectory.getOrCreateChildDirectory("local");
@@ -102,11 +93,8 @@ public class ErraiCdiExample extends ErraiExample{
         
     }
     
-    /* (non-Javadoc)
-     * @see org.jboss.errai.forge.ErraiExample#createResourceFiles(org.jboss.forge.shell.plugins.PipeOut)
-     */
     void createResourceFiles(final PipeOut pipeOut) {
-        DirectoryResource sourceRoot = plugin.getProject().getFacet(ResourceFacet.class).getResourceFolder();
+        DirectoryResource sourceRoot = erraiExampleFacet.getResourceDirectory();
         
         //create App props
         FileResource<?> appIndexPage = (FileResource<?>) sourceRoot.getChild("ErraiApp.properties");
@@ -145,11 +133,8 @@ public class ErraiCdiExample extends ErraiExample{
         pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "users.properties", "file"));
     }    
     
-    /* (non-Javadoc)
-     * @see org.jboss.errai.forge.ErraiExample#createTestFiles(org.jboss.forge.shell.plugins.PipeOut)
-     */
     void createTestFiles(final PipeOut pipeOut) {
-        DirectoryResource resourceRoot = plugin.getProject().getFacet(ResourceFacet.class).getTestResourceFolder();
+        DirectoryResource resourceRoot = erraiExampleFacet.getTestResourceDirectory();
         
         //create App props
         FileResource<?> appIndexPage = (FileResource<?>) resourceRoot.getChild("ErraiApp.properties");
@@ -168,7 +153,7 @@ public class ErraiCdiExample extends ErraiExample{
         pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "jndi.properties", "file"));
 
         //create Test classes
-        DirectoryResource javaRoot = plugin.getProject().getFacet(JavaSourceFacet.class).getTestSourceFolder();
+        DirectoryResource javaRoot = erraiExampleFacet.getTestBasePackageDirectory();
         DirectoryResource clDirectory = javaRoot.getOrCreateChildDirectory("client");
         clDirectory = clDirectory.getOrCreateChildDirectory("local");
         
@@ -184,83 +169,4 @@ public class ErraiCdiExample extends ErraiExample{
         cl2IndexPage.setContents(Utils.replacePackageName(c2Stream,plugin.getProject()));
         pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "CDITestHelper.java", "class"));
     }
-    
-    //TODO implement uninstall methods
-
-
-	@Override
-	void deleteWebappFiles(PipeOut pipeOut) {
-        DirectoryResource webRoot = plugin.getProject().getFacet(WebResourceFacet.class).getWebRootDirectory();
-        // create WEB-INF/web.xml
-        DirectoryResource wiDirectory = webRoot.getOrCreateChildDirectory("WEB-INF");
-        wiDirectory.delete(true);
-
-        FileResource<?> appPage = (FileResource<?>) webRoot.getChild("App.css");
-        appPage.delete(true);
-
-        FileResource<?> apphPage = (FileResource<?>) webRoot.getChild("App.html");
-        apphPage.delete(true);
-        
-        FileResource<?> indexPage = (FileResource<?>) webRoot.getChild("index.html");
-        indexPage.delete(true);
-	}
-
-	@Override
-	void deleteAppFiles(PipeOut pipeOut) {
-        JavaSourceFacet source = plugin.getProject().getFacet(JavaSourceFacet.class);
-        DirectoryResource sourceRoot = source.getBasePackageResource();
-        
-        DirectoryResource clientDirectory = sourceRoot.getOrCreateChildDirectory("client");
-        clientDirectory.delete(true);
-        DirectoryResource srvDirectory = sourceRoot.getOrCreateChildDirectory("server");
-        srvDirectory.delete(true);
-        
-        FileResource<?> confIndexPage = (FileResource<?>) sourceRoot.getChild("App.gwt.xml");
-        confIndexPage.delete(true);
-	}
-
-	@Override
-	void deleteResourceFiles(PipeOut pipeOut) {
-        DirectoryResource sourceRoot = plugin.getProject().getFacet(ResourceFacet.class).getResourceFolder();
-        
-        FileResource<?> appIndexPage = (FileResource<?>) sourceRoot.getChild("ErraiApp.properties");
-        appIndexPage.delete(true);
-        
-        FileResource<?> serviceIndexPage = (FileResource<?>) sourceRoot.getChild("ErraiService.properties");
-        serviceIndexPage.delete(true);
-        
-        FileResource<?> log4jIndexPage = (FileResource<?>) sourceRoot.getChild("log4j.properties");
-        log4jIndexPage.delete(true);
-        
-        FileResource<?> loginIndexPage = (FileResource<?>) sourceRoot.getChild("login.config");
-        loginIndexPage.delete(true);
-        
-        FileResource<?> rolesIndexPage = (FileResource<?>) sourceRoot.getChild("roles.properties");
-        rolesIndexPage.delete(true);
-        
-        FileResource<?> usersIndexPage = (FileResource<?>) sourceRoot.getChild("users.properties");
-        usersIndexPage.delete(true);
-	}
-
-	@Override
-	void deleteTestFiles(PipeOut pipeOut) {
-        DirectoryResource resourceRoot = plugin.getProject().getFacet(ResourceFacet.class).getTestResourceFolder();
-        
-        //create App props
-        FileResource<?> appIndexPage = (FileResource<?>) resourceRoot.getChild("ErraiApp.properties");
-        appIndexPage.delete(true);
-        
-        FileResource<?> appsIndexPage = (FileResource<?>) resourceRoot.getChild("ErraiService.properties");
-        appsIndexPage.delete(true);
-        
-        FileResource<?> jndiIndexPage = (FileResource<?>) resourceRoot.getChild("jndi.properties");
-        jndiIndexPage.delete(true);
-
-        //create Test classes
-        DirectoryResource javaRoot = plugin.getProject().getFacet(JavaSourceFacet.class).getTestSourceFolder();
-        DirectoryResource clDirectory = javaRoot.getOrCreateChildDirectory("client");
-        clDirectory.delete(true);
-        
-	}
-    
 }

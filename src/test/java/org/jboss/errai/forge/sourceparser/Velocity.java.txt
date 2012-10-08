@@ -1,0 +1,209 @@
+package org.jboss.errai.forge.sourceparser;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.jboss.errai.forge.facet.ErraiBaseFacet;
+import org.jboss.forge.parser.JavaParser;
+import org.jboss.forge.parser.java.JavaType;
+import org.jboss.forge.project.Project;
+import org.jboss.forge.project.facets.JavaSourceFacet;
+import org.jboss.forge.resources.DirectoryResource;
+import org.jboss.forge.resources.java.JavaResource;
+
+public class Velocity {
+	
+	Project project;
+	
+	private static final String UTF_8 = "UTF-8";
+	private final VelocityEngine velocityEngine;
+	private static final VelocityUtil VELOCITY_UTIL = new VelocityUtil();
+	
+	
+	private final static String TEMPLATE_FILES="code-templates/files/";
+	private final static String TEMPLATE_TEMPLATES="code-templates/templates";
+	private final static String TEMPLATE_FILES_SUFF=".vm";
+	private final static String TEMPLATE_TEMPLATES_SUFF=".tmp";
+	
+	List<File> resources;
+	String searchString;
+    
+	
+	
+	public Velocity(Project project) {
+		this.project = project;
+		
+        velocityEngine = new VelocityEngine();
+		velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER,
+				"classpath");
+		velocityEngine.setProperty("classpath.resource.loader.class",
+				ClasspathResourceLoader.class.getName());
+		velocityEngine.setProperty(
+				RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+				"org.apache.velocity.runtime.log.JdkLogChute");        
+		
+	}
+	
+	private VelocityContext createVelocityContext(
+			Map<String, Object> parameter) {
+		if (parameter == null) {
+			parameter = new HashMap<String, Object>();
+		}
+		JavaSourceFacet java = project.getFacet(JavaSourceFacet.class);
+		ErraiBaseFacet erraiFacet = project.getFacet(ErraiBaseFacet.class);
+		VelocityContext velocityContext = new VelocityContext(parameter);
+
+		String classPrefix = getClassPrefix();
+		velocityContext.put("classPrefix", classPrefix);
+		velocityContext.put("basePackage", java.getBasePackage());
+		velocityContext.put("errai", erraiFacet);
+		velocityContext.put("java", java);
+		velocityContext.put("util", VELOCITY_UTIL);
+		return velocityContext;
+	}
+	
+	public final void createJavaSource(String template) {
+		createJavaSource(template, new HashMap<String, Object>());
+	}
+	
+	public void createJavaSource(String template, int i) {
+		createJavaSource(template, new HashMap<String, Object>());
+	}
+	
+	public void createJavaSource(String template, int i,Object o) {
+		createJavaSource(template, new HashMap<String, Object>());
+	}
+	
+	public void createJavaSource(Boolean template, int i,Object o) {
+		createJavaSource(template, new HashMap<String, Object>());
+	}
+	
+	
+	
+	
+	public JavaResource createJavaSource(String template,
+			Map<String, Object> parameter) {
+		JavaSourceFacet java = project.getFacet(JavaSourceFacet.class);
+		VelocityContext velocityContext = createVelocityContext(parameter);
+		
+		StringWriter stringWriter = new StringWriter();
+		velocityEngine.mergeTemplate(this.adjustTemplatePath(template), UTF_8, velocityContext,
+				stringWriter);
+
+		JavaType<?> serviceClass = JavaParser.parse(JavaType.class,
+				stringWriter.toString());
+		
+		String className = getClassNameFromTemplateName(template);
+		serviceClass.setName(className);
+		try {
+			JavaResource saveJavaSource = java.saveJavaSource(serviceClass);
+			return saveJavaSource;
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public JavaResource parseJavaSourceTemplate(String template,
+			Map<String, Object> parameter) {
+		JavaSourceFacet java = project.getFacet(JavaSourceFacet.class);
+		VelocityContext velocityContext = createVelocityContext(parameter);
+		
+		StringWriter stringWriter = new StringWriter();
+		velocityEngine.mergeTemplate(this.adjustTemplatePath(template), UTF_8, velocityContext,
+				stringWriter);
+
+		JavaType<?> serviceClass = JavaParser.parse(JavaType.class,
+				stringWriter.toString());
+		
+		String className = getClassNameFromTemplateName(template);
+		serviceClass.setName(className);
+		try {
+			JavaResource saveJavaSource = java.saveJavaSource(serviceClass);
+			return saveJavaSource;
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private String adjustTemplatePath(String template) {
+		if(template.endsWith(Velocity.TEMPLATE_FILES_SUFF))
+			return Velocity.TEMPLATE_FILES + template;
+		
+		if(template.endsWith(Velocity.TEMPLATE_TEMPLATES_SUFF))
+			return Velocity.TEMPLATE_TEMPLATES + template;
+		
+		return template;
+		
+	}
+	
+	private String getClassPrefix() {
+		String artifactId = getSaveProjectName();
+		return StringUtils.capitalize(artifactId);
+	}
+	
+	public String getSaveProjectName() {
+		final JavaSourceFacet javaSourceFacet = project
+				.getFacet(JavaSourceFacet.class);
+		String basePackage = javaSourceFacet.getBasePackage();
+		
+		return StringUtils.substring(basePackage,
+				StringUtils.lastIndexOf(basePackage, ".") + 1);
+	}
+	
+	public String getClassNameFromTemplateName(String templateName) {
+		return StringUtils.substringBefore(templateName,".");		
+	}
+	
+	public List<File> searchForAllResources(ResourcesEnum resources){
+		this.resources = new ArrayList<File>();
+		this.searchString = resources.toString();
+		DirectoryResource root = project.getProjectRoot();
+		File[] files = root.getUnderlyingResourceObject().listFiles();
+		iterateFiles(files);
+		return this.resources;
+		
+	}
+		
+	private void iterateFiles(File[] files) {
+	    for (File file : files) {
+	        if (file.isDirectory()) {
+	            iterateFiles(file.listFiles()); // Calls same method again.
+	        } else {
+	        	if(find(file,this.searchString)){
+	        		this.resources.add(file);
+	        	}
+	        }
+	    }
+	}
+	
+	private boolean find(File f, String searchString) {
+        boolean result = false;
+        Scanner in = null;
+        try {
+            in = new Scanner(new FileReader(f));
+            while(in.hasNextLine() && !result) {
+                result = in.nextLine().indexOf(searchString) >= 0;
+            }
+        }
+        catch(IOException e) {
+            e.printStackTrace();      
+        }
+        finally {
+            try { in.close() ; } catch(Exception e) { /* ignore */ }  
+        }
+        return result;
+    }
+}

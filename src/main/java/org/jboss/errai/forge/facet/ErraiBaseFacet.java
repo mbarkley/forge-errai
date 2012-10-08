@@ -6,8 +6,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.jboss.forge.maven.MavenPluginFacet;
-import org.jboss.forge.maven.plugins.ExecutionBuilder;
-import org.jboss.forge.maven.plugins.MavenPluginBuilder;
 import org.jboss.forge.project.dependencies.Dependency;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.DependencyInstaller;
@@ -30,14 +28,19 @@ public abstract class ErraiBaseFacet extends BaseFacet
 	@Inject
 	public DependencyInstaller installer;
 	
-	
-	abstract void installErraiDeps();
+	abstract void installErraiFacetSpecifics();
 	abstract boolean isFacetInstalled();
 
 	public boolean install() {
-		installBaseErraiDependencies();
-		installGWTPlugin();
-		installErraiDeps();
+		
+	    if (!ErraiInstalled.getInstance().isInstalled()) {
+			installBaseErraiDependencies();
+			installGWTPlugin();
+	    }
+	    else{
+	    	ErraiInstalled.getInstance().setInstalled(true);
+	    }
+		installErraiFacetSpecifics();
 		return true;
 	}
 
@@ -71,51 +74,9 @@ public abstract class ErraiBaseFacet extends BaseFacet
    }
    
    public void  installGWTPlugin() {
-	   String gwtVersion = "";
-	   for(Dependency dep : project.getFacet(DependencyFacet.class).getDependencies()){
-		   if(dep.getGroupId().startsWith("com.google.gwt")){
-			   gwtVersion = dep.getVersion();
-		   }
-	   } 
-	    
-	    DependencyBuilder gwtDependencyBuilder = DependencyBuilder.create()
-			    .setGroupId("org.codehaus.mojo")
-			    .setArtifactId("gwt-maven-plugin")
-			    .setVersion(gwtVersion);
-			     
-	    ExecutionBuilder execution = ExecutionBuilder.create()
-	    		.addGoal("resources")
-	    		.addGoal("compile");
-	    MavenPluginBuilder gwtPlugin = MavenPluginBuilder.create()
-	    		.setDependency(gwtDependencyBuilder)
-			    .createConfiguration()
-			    .createConfigurationElement("logLevel")
-			    .setText("INFO")
-			    .getParentPluginConfig().getOrigin()
-			    .createConfiguration()
-			    .createConfigurationElement("runTarget")
-			    .setText("App.html")
-			    .getParentPluginConfig().getOrigin()
-			    .createConfiguration()
-			    .createConfigurationElement("extraJvmArgs")
-			    .setText("-Xmx512m")
-			    .getParentPluginConfig().getOrigin()
-			    .createConfiguration()
-			    .createConfigurationElement("soyc")
-			    .setText("false")
-			    .getParentPluginConfig().getOrigin()
-			    .createConfiguration()
-			    .createConfigurationElement("hostedWebapp")
-			    .setText("src/main/webapp/")
-			    .getParentPluginConfig().getOrigin()
-			    .createConfiguration()
-			    .createConfigurationElement("treeLogger")
-			    .setText("true")
-			    .getParentPluginConfig().getOrigin()
-			    .addExecution(execution);	    
-	    
+	   	ErraiGWTPlugin erraiGWTPlugin = new ErraiGWTPlugin();
 	    MavenPluginFacet pluginFacet = project.getFacet(MavenPluginFacet.class);
-	    pluginFacet.addPlugin(gwtPlugin);
+	    pluginFacet.addPlugin(erraiGWTPlugin.getGwtPlugin());
 	   
    }
 	
