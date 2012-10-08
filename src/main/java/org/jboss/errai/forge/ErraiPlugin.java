@@ -51,6 +51,9 @@ public class ErraiPlugin implements Plugin {
     
     private Generator generator;
     
+    //config
+    private boolean default_portable = false;
+    
 	public void setModuleInstalled(boolean isModuleInstalled) {
 		ErraiInstalled.getInstance().setInstalled(isModuleInstalled);
 	}
@@ -93,8 +96,16 @@ public class ErraiPlugin implements Plugin {
 			 ShellMessages.success(out, module + " is configured.");
 		}
     }
+
+// config	
 	
-    //examples
+	@Command("config")
+    public void setup(@Option(name="DEFAULT_PORTABLE") boolean default_portable, final PipeOut out) {
+		this.default_portable = default_portable;
+    }
+
+//examples
+	
 	@Command("examples")
     public void errai_examples_setup(@Option final ErraiExamplesCommandsEnum command, final PipeOut out) {
 		
