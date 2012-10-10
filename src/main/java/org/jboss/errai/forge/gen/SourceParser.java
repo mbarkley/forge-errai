@@ -5,6 +5,7 @@ import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.ImportDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.TypeDeclaration;
+import japa.parser.ast.expr.AnnotationExpr;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 
 import java.io.File;
@@ -23,9 +24,10 @@ public class SourceParser {
 	List<TypeDeclaration> types = new ArrayList<TypeDeclaration>();
 	List<String> interfaces = new ArrayList<String>();
 	String classname;
+	List<AnnotationExpr> typeAnnotations = new ArrayList<AnnotationExpr>(); 
 	
 	
-    public void parse(File file) throws Exception {
+    public CompilationUnit parse(File file) throws Exception {
         // creates an input stream for the file to be parsed
         FileInputStream in = new FileInputStream(file);
 
@@ -38,6 +40,7 @@ public class SourceParser {
             classname = types.get(0).getName();
             // extract interfaces from types
             TypeDeclaration type = types.get(0);
+            typeAnnotations = type.getAnnotations();
             String typeStr = type.toString();
             String identf = "class " + classname + " implements ";
             if(typeStr.contains(identf)) {
@@ -57,6 +60,7 @@ public class SourceParser {
 
         // visit and print the methods names
         new MethodVisitor().visit(cu, null);
+        return cu;
     }
 
     /**
@@ -111,5 +115,9 @@ public class SourceParser {
 
 	public String getClassname() {
 		return classname;
+	}
+
+	public List<AnnotationExpr> getTypeAnnotations() {
+		return typeAnnotations;
 	}
 }

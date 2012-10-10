@@ -37,5 +37,31 @@ public class Utils {
         return new File(buf.toString());
     	
     }
+    
+    public static final File getSourcePackage(Project project, String sourcePackage) throws Exception{
+		DirectoryResource root = project.getProjectRoot();
+		root = root.getOrCreateChildDirectory("src").getOrCreateChildDirectory("main").getOrCreateChildDirectory("java");		
+    	String rootPath = root.getUnderlyingResourceObject().getPath();
+    	StringBuffer buf = new StringBuffer(rootPath);
+    	StringTokenizer tokenizer = new StringTokenizer(sourcePackage,".");
+        while (tokenizer.hasMoreElements()) {
+        	buf.append(System.getProperty("file.separator"));
+			buf.append(tokenizer.nextToken().trim());
+		}
+        System.out.println("sourcePackage: " + buf.toString());
+        return new File(buf.toString());
+    }
+    
+    public static final DirectoryResource getSourcePackageAsDirResource(Project project, String sourcePackage) throws Exception{
+		DirectoryResource root = project.getProjectRoot();
+		root = root.getOrCreateChildDirectory("src").getOrCreateChildDirectory("main").getOrCreateChildDirectory("java");
+    	StringTokenizer tokenizer = new StringTokenizer(sourcePackage,".");
+        while (tokenizer.hasMoreElements()) {
+        	root.getOrCreateChildDirectory(tokenizer.nextToken().trim());
+		}
+        return root;
+    }
+    
+    
 
 }

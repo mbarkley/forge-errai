@@ -1,7 +1,6 @@
 package org.jboss.errai.forge.gen;
 
 import java.io.File;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +27,12 @@ public class Generator {
 		case ERRAI_BUS_GENERATE_REMOTES_FROM_ALL_SERVICE_CLASSES: 
 			try {
 				// find resources we want generate from
-				List<File> resources = new SourceResolver(project,ResourcesEnum.SERVICE_REMOTE).getResources();
+				SourceResolver sourceResolver = new SourceResolver(project);
+				sourceResolver.searchForAllResources(ResourcesEnum.SERVICE_REMOTE);
+				List<File> resources = sourceResolver.getResources();
 				// extract methods 
 				for (File file : resources) {
+					// extract methods 
 					this.generateRemoteFromService(file, command);
 				}
 			} catch (Exception e) {
@@ -40,20 +42,44 @@ public class Generator {
 		}
 	}
 	
-	public void generate(ErraiGeneratorCommandsEnum command, String sourceClass) {
+	public void generate(ErraiGeneratorCommandsEnum command, String source) {
 		switch (command) {
 		case ERRAI_BUS_GENERATE_REMOTE_FROM_SERVICE_CLASS: 
 				try {
 					// get resource we want generate from
-					File file = Utils.getSourceFileForClass(project, sourceClass);
+					File file = Utils.getSourceFileForClass(project, source);
 					// extract methods 
 					this.generateRemoteFromService(file, command);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				break;
+		case ERRAI_MARSHALING_SET_PORTABLE_RECURSIVE: 
+			try {
+				// find resources we want generate from
+				SourceResolver sourceResolver = new SourceResolver(project);
+				sourceResolver.searchForAllResources(source);
+				List<File> resources = sourceResolver.getResources();
+				// extract methods 
+				for (File file : resources) {
+					this.addPortable(file);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
+			
+		case ERRAI_MARSHALING_SET_PORTABLE: 
+			try {
+				// get resource we want generate from
+				File file = Utils.getSourceFileForClass(project, source);
+				// extract methods 
+				this.addPortable(file);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
 		}
-		
 	}
 
 	
@@ -83,6 +109,21 @@ public class Generator {
 //		}
 		
 		
+	}
+	
+	private void addPortable(File file) throws Exception{
+		SourceBuilder builder = new SourceBuilder();
+		List<String> sourceLines = builder.readSource(file);
+		int lineToAdd = 0;
+		for(String line : sourceLines) {
+			if(line.contains("public class")) {
+				lineToAdd = sourceLines.indexOf(line) - 1;
+			}
+		}
+		if(lineToAdd > 0){
+			sourceLines.add(lineToAdd, "@Portable");
+			builder.writeSource(sourceLines, file);
+		}
 	}
 
 }

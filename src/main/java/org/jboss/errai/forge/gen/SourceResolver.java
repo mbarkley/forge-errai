@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import org.jboss.errai.forge.Utils;
 import org.jboss.errai.forge.template.ResourcesEnum;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.resources.DirectoryResource;
@@ -17,12 +18,11 @@ public class SourceResolver {
 	List<File> resources;
 	String searchString;
 	
-	public SourceResolver(Project project, ResourcesEnum reEnum) {
+	public SourceResolver(Project project) {
 		this.project = project;
-		this.resources = searchForAllResources(reEnum);
 	}
 	
-	private List<File> searchForAllResources(ResourcesEnum resources){
+	public List<File> searchForAllResources(ResourcesEnum resources){
 		this.resources = new ArrayList<File>();
 		this.searchString = resources.toString();
 		DirectoryResource root = project.getProjectRoot();
@@ -31,6 +31,22 @@ public class SourceResolver {
 		return this.resources;
 		
 	}
+	
+	public List<File> searchForAllResources(String sourcePackage){
+		try {
+			this.resources = new ArrayList<File>();
+			this.searchString = resources.toString();
+			DirectoryResource root = Utils.getSourcePackageAsDirResource(project, sourcePackage);
+			File[] files = root.getUnderlyingResourceObject().listFiles();
+			iterateFiles(files);
+			return this.resources;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 		
 	private void iterateFiles(File[] files) {
 	    for (File file : files) {

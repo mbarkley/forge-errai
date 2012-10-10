@@ -17,6 +17,7 @@ import org.jboss.errai.forge.facet.ErraiFacetsEnum;
 import org.jboss.errai.forge.facet.ErraiGeneratorCommandsEnum;
 import org.jboss.errai.forge.facet.ErraiInstalled;
 import org.jboss.errai.forge.facet.ErraiMarshalingCommandsEnum;
+import org.jboss.errai.forge.facet.ErraiViaDefinitionEnum;
 import org.jboss.errai.forge.gen.Generator;
 import org.jboss.errai.forge.template.Velocity;
 import org.jboss.forge.project.Project;
@@ -208,7 +209,8 @@ public class ErraiPlugin implements Plugin {
     public void errai_marshaling_setup(
     		@Option final ErraiMarshalingCommandsEnum command,
     		@Option(name="from") String from, 
-    		@Option(name="recursive", defaultValue="false") boolean recursive, final PipeOut out) {
+    		@Option(name="recursive", defaultValue="false") boolean recursive,
+    		@Option(name="via", defaultValue="ANNOTATION") final ErraiViaDefinitionEnum via, final PipeOut out) {
 		
 		//setup bus facet
 		switch (command) {
@@ -226,19 +228,25 @@ public class ErraiPlugin implements Plugin {
         // commands
 		if(command.equals(ErraiMarshalingCommandsEnum.ERRAI_MARSHALING_SET_PORTABLE)){
 			// generate @Portable for defined classes
-			if(recursive == true) {
-				generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_SET_PORTABLE_RECURSIVE);
+			if(via.toString().equals(ErraiViaDefinitionEnum.ANNOTATION.toString())) {
+				//use annotation inside classes
+				if(recursive == true) {
+					generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_SET_PORTABLE_RECURSIVE, from);
+				}
+				else {
+					generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_SET_PORTABLE, from);				
+				}
 			}
 			else {
-				generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_SET_PORTABLE);				
+				// use definitions inside ErraiApp.properties
 			}
 		}
 		if(command.equals(ErraiMarshalingCommandsEnum.ERRAI_MARSHALING_IMMUTABLE_BUILDER)){
 			if(recursive == true) {
-				generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_IMMUTABLE_BUILDER_RECURSIVE);
+				generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_IMMUTABLE_BUILDER_RECURSIVE, from);
 			}
 			else {
-				generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_IMMUTABLE_BUILDER);				
+				generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_IMMUTABLE_BUILDER, from);				
 			}
 		}
     }
