@@ -99,9 +99,11 @@ public class ErraiPlugin implements Plugin {
         pipeOut.println(ShellColor.BLUE, "install-errai-bus: an example of simple Errai application");
         pipeOut.println(ShellColor.BLUE, "install-errai-cdi: an example of Errai CDI-based application");
         pipeOut.println(ShellColor.BLUE, "install-errai-jaxrs: an example of Errai Jaxrs applicatiton");
+        pipeOut.println(ShellColor.BLUE, "install-errai-ui: an example of Errai UI applicatiton");
         pipeOut.println(ShellColor.BLUE, "uninstall-errai-bus: uninstall simple Errai Bus application");
         pipeOut.println(ShellColor.BLUE, "uninstall-errai-cdi: uninstal Errai CDI-based application");
         pipeOut.println(ShellColor.BLUE, "uninstall-errai-jaxrs: unistall Errai Jaxrs application");
+        pipeOut.println(ShellColor.BLUE, "uninstall-errai-ui: unistall Errai UI application");
     }
     
     //install modules
@@ -148,6 +150,21 @@ public class ErraiPlugin implements Plugin {
         }
     }
     
+    @Command("install-errai-ui")
+    public void installErraiUI(final PipeOut pipeOut) {
+        if (project.hasFacet(ErraiFacets.ERRAI_UI_FACET.getFacet())) {
+        	if(!this.isModuleInstalled()){
+        		new ErraiUIExample(this, pipeOut).install();
+        	}
+        	else {
+        		pipeOut.println("Errai UI is installed.");
+        	}
+        } else {
+            pipeOut.println("Errai UI Facet is not installed. Use 'errai setup' to get started.");
+        }
+    }
+    
+    
     //uninstall modules
     
     @Command("uninstall-errai-bus")
@@ -191,4 +208,19 @@ public class ErraiPlugin implements Plugin {
             pipeOut.println("Errai Jaxrs Facet is not installed. Use 'errai setup' to get started.");
         }
     }
+    
+    @Command("uninstall-errai-ui")
+    public void uninstallErraiUI(final PipeOut pipeOut) {
+        if (project.hasFacet(ErraiFacets.ERRAI_UI_FACET.getFacet())) {
+        	if(this.isModuleInstalled()){
+        		new ErraiUIExample(this, pipeOut).uninstall();
+        	}
+        	else {
+        		pipeOut.println("Errai UI is is not installed, can not uninstall.");
+        	}
+        } else {
+            pipeOut.println("Errai UI Facet is not installed. Use 'errai setup' to get started.");
+        }
+    }
+    
 }

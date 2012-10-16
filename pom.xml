@@ -6,7 +6,7 @@
 
     <groupId>org.jboss.errai.forge</groupId>
     <artifactId>errai-forge-plugin</artifactId>
-    <version>1.0.0.CR1</version>
+    <version>1.0.0.FINAL</version>
 
 	<properties>
 	    <forge.api.version>1.0.5.Final</forge.api.version>
@@ -16,6 +16,7 @@
 	      -->
 		<plugin.errai.version>2.1-SNAPSHOT</plugin.errai.version>
 		<plugin.gwt.version>2.4.0</plugin.gwt.version>	      
+		<plugin.javaee.version>3.0.1.Final</plugin.javaee.version>	      
 	</properties>
 	
 	<build>

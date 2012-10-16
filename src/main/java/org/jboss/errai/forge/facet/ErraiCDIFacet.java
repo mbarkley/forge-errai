@@ -43,12 +43,11 @@ public class ErraiCDIFacet extends ErraiBaseFacet{
 	              DependencyBuilder.create("org.jboss.errai:errai-cdi-jetty:" + erraiVersion),
 
 	              //Jetty & Weld
-	              //TODO resolve dependency problem with jetty
-//	              DependencyBuilder.create("org.mortbay.jetty:6.1.25"),
-//	              DependencyBuilder.create("org.mortbay.jetty-plus:6.1.25"),
-//	              DependencyBuilder.create("org.mortbay.jetty-naming:6.1.25"),
+	              DependencyBuilder.create("org.mortbay.jetty:jetty:6.1.25"),
+	              DependencyBuilder.create("org.mortbay.jetty:jetty-plus:6.1.25"),
+	              DependencyBuilder.create("org.mortbay.jetty:jetty-naming:6.1.25"),
 	              DependencyBuilder.create("org.jboss.weld.se:weld-se-core:1.1.6.Final"),
-	              DependencyBuilder.create("org.jboss.weld.se:weld-servlet:1.1.6.Final"),
+	              DependencyBuilder.create("org.jboss.weld.servlet:weld-servlet:1.1.6.Final"),
 	              DependencyBuilder.create("org.jboss.logging:jboss-logging:3.0.0.Beta4")
 	              
 	      );
