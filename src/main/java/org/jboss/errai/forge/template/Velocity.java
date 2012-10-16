@@ -2,16 +2,10 @@ package org.jboss.errai.forge.template;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -19,13 +13,10 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.jboss.errai.forge.facet.ErraiBaseFacet;
-import org.jboss.errai.forge.gen.Method;
-import org.jboss.errai.forge.gen.SourceParser;
 import org.jboss.forge.parser.JavaParser;
 import org.jboss.forge.parser.java.JavaType;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.facets.JavaSourceFacet;
-import org.jboss.forge.resources.DirectoryResource;
 import org.jboss.forge.resources.java.JavaResource;
 
 public class Velocity {
@@ -119,47 +110,47 @@ public class Velocity {
 		}
 	}
 	
-	public JavaResource extractJavaSourceFromTemplate(String template,
-			Map<String, Object> parameter ) throws Exception {
-		JavaSourceFacet java = project.getFacet(JavaSourceFacet.class);
-		VelocityContext velocityContext = createVelocityContext(parameter);
-		
-		
-		// extract methods 
-		for (File file : resources) {
-			SourceParser sourceParser = new SourceParser();
-			sourceParser.parse(file);
-			System.out.println("--- PUBLIC METHODS ---");
-			for (Method method : sourceParser.getPublicMethods()) {
-				String name = method.getName();
-				System.out.println("METHOD: "+ 
-						Modifier.toString(method.getModifiers())+" "+
-						method.getType()+" "+ 
-						method.getName()+"("+
-						method.getParameters()+")");
-				//System.out.println(method);				
-			}
-		}
-		
-		
-		
-		
-		StringWriter stringWriter = new StringWriter();
-		velocityEngine.mergeTemplate(this.adjustTemplatePath(template), UTF_8, velocityContext,
-				stringWriter);
-
-		JavaType<?> serviceClass = JavaParser.parse(JavaType.class,
-				stringWriter.toString());
-		
-		String className = getClassNameFromTemplateName(template);
-		serviceClass.setName(className);
-		try {
-			JavaResource saveJavaSource = java.saveJavaSource(serviceClass);
-			return saveJavaSource;
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
+//	public JavaResource extractJavaSourceFromTemplate(String template,
+//			Map<String, Object> parameter ) throws Exception {
+//		JavaSourceFacet java = project.getFacet(JavaSourceFacet.class);
+//		VelocityContext velocityContext = createVelocityContext(parameter);
+//		
+//		
+//		// extract methods 
+//		for (File file : resources) {
+//			SourceParser sourceParser = new SourceParser();
+//			sourceParser.parse(file);
+//			System.out.println("--- PUBLIC METHODS ---");
+//			for (Method method : sourceParser.getPublicMethods()) {
+//				String name = method.getName();
+//				System.out.println("METHOD: "+ 
+//						Modifier.toString(method.getModifiers())+" "+
+//						method.getType()+" "+ 
+//						method.getName()+"("+
+//						method.getParameters()+")");
+//				//System.out.println(method);				
+//			}
+//		}
+//		
+//		
+//		
+//		
+//		StringWriter stringWriter = new StringWriter();
+//		velocityEngine.mergeTemplate(this.adjustTemplatePath(template), UTF_8, velocityContext,
+//				stringWriter);
+//
+//		JavaType<?> serviceClass = JavaParser.parse(JavaType.class,
+//				stringWriter.toString());
+//		
+//		String className = getClassNameFromTemplateName(template);
+//		serviceClass.setName(className);
+//		try {
+//			JavaResource saveJavaSource = java.saveJavaSource(serviceClass);
+//			return saveJavaSource;
+//		} catch (FileNotFoundException e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
 	
 	private String adjustTemplatePath(String template) {
 		if(template.endsWith(Velocity.TEMPLATE_FILES_SUFF))

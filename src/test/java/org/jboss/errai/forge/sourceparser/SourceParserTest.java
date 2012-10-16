@@ -1,12 +1,13 @@
 package org.jboss.errai.forge.sourceparser;
 
 import java.io.File;
-import java.lang.reflect.Modifier;
-
-import org.jboss.errai.forge.gen.Method;
-import org.jboss.errai.forge.gen.SourceParser;
 
 import junit.framework.TestCase;
+
+import org.jboss.errai.forge.gen.JavaClassTypeHolder;
+import org.jboss.errai.forge.gen.SourceParser;
+import org.jboss.forge.parser.java.JavaClass;
+import org.jboss.forge.parser.java.Method;
 
 public class SourceParserTest  extends TestCase{
 	
@@ -21,18 +22,18 @@ public class SourceParserTest  extends TestCase{
 	public void testMethod(){
 		File file = new File("src/test/java/org/jboss/errai/forge/sourceparser/SimpleServiceImpl.java.txt");
 		try {
-			sourceParser.parse(file);
-			assertNotNull(sourceParser.getMethods());
-			assertEquals(14,sourceParser.getMethods().size());
-			assertEquals(9,sourceParser.getPublicMethods().size());
+			JavaClassTypeHolder jcth = sourceParser.parseJavaClass(file);
+			assertNotNull(jcth.getMethods());
+			assertEquals(4,jcth.getMethods().size());
+			assertEquals(3,jcth.getPublicMethods().size());
 			System.out.println("--- PUBLIC METHODS ---");
-			for (Method method : sourceParser.getPublicMethods()) {
+			for (Method<JavaClass> method : jcth.getPublicMethods()) {
 				String name = method.getName();
 				System.out.println("METHOD: "+ 
-						Modifier.toString(method.getModifiers())+" "+
-						method.getType()+" "+ 
+						method.getVisibility()+" "+
+						method.getReturnType()+" "+ 
 						method.getName()+"("+
-						method.getParametersAsString()+")");
+						method.getParameters()+")");
 				//System.out.println(method);				
 			}
 			

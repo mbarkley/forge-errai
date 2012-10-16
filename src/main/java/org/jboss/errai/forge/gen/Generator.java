@@ -9,6 +9,8 @@ import org.jboss.errai.forge.Utils;
 import org.jboss.errai.forge.facet.ErraiGeneratorCommandsEnum;
 import org.jboss.errai.forge.template.ResourcesEnum;
 import org.jboss.errai.forge.template.Velocity;
+import org.jboss.forge.parser.java.JavaClass;
+import org.jboss.forge.parser.java.Method;
 import org.jboss.forge.project.Project;
 
 public class Generator {
@@ -85,15 +87,15 @@ public class Generator {
 	
 	private void generateRemoteFromService(File file, ErraiGeneratorCommandsEnum command) throws Exception{
 		SourceParser sourceParser = new SourceParser();
-		sourceParser.parse(file);
+		JavaClassTypeHolder jsth = sourceParser.parseJavaClass(file);
 		
 		// generate source
-		List<Method> serviceMethods = sourceParser.getPublicMethods();
 		Map<String, Object> contextParam = new HashMap<String, Object>();
-		String serviceName = sourceParser.interfaces.get(0);
-		contextParam.put("className", serviceName);
+		String typeName = jsth.getInterfaces().get(0);
+		List<String> serviceMethods = jsth.getPublicMethodsSignaturesAsString();
+		contextParam.put("className", typeName);
 		contextParam.put("serviceMethods", serviceMethods);
-		contextParam.put("imports", sourceParser.imports);
+		contextParam.put("imports", jsth.getImports());
 		velocity.createJavaSource(command.getTemplateFQName(),contextParam, false);						
 		
 		

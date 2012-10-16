@@ -17,12 +17,12 @@
 package ${basePackage};
 
 #foreach( $import in $imports )
-$import
+import $import.getQualifiedName()
 #end
 
 @Remote
 public interface $ {
 #foreach( $serviceMethod in $serviceMethods )
-    public $serviceMethod.type $serviceMethod.name ($serviceMethod.parametersAsString);
+    $serviceMethod
 #end
 }

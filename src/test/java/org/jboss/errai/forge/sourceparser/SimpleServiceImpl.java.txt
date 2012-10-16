@@ -23,7 +23,7 @@ import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.bus.server.annotations.Service;
 
 @Service
-public class SimpleServiceImpl 
+public class SimpleServiceImpl implements SimpleRemoteService
 {
    public boolean simpleService()
    {
@@ -38,6 +38,10 @@ public class SimpleServiceImpl
    public boolean three(Integer number)
    {
       return;
+   }
+   
+   private void onePrivateTestMethod(){
+   	return;
    }
    
    class innerClass {

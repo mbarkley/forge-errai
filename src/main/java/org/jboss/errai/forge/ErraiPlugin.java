@@ -208,9 +208,9 @@ public class ErraiPlugin implements Plugin {
 	@Command("marshaling")
     public void errai_marshaling_setup(
     		@Option final ErraiMarshalingCommandsEnum command,
-    		@Option(name="from") String from, 
-    		@Option(name="recursive", defaultValue="false") boolean recursive,
-    		@Option(name="via", defaultValue="ANNOTATION") final ErraiViaDefinitionEnum via, final PipeOut out) {
+    		@Option(name="from", required=true) String from, 
+    		@Option(name="recursive", defaultValue="false", required=true) boolean recursive,
+    		@Option(name="via", defaultValue="ANNOTATION", required=true) final ErraiViaDefinitionEnum via, final PipeOut out) {
 		
 		//setup bus facet
 		switch (command) {
