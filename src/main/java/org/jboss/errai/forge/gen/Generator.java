@@ -6,11 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.errai.forge.Utils;
-import org.jboss.errai.forge.facet.ErraiGeneratorCommandsEnum;
-import org.jboss.errai.forge.template.ResourcesEnum;
+import org.jboss.errai.forge.enums.ErraiGeneratorCommandsEnum;
+import org.jboss.errai.forge.enums.ResourcesEnum;
 import org.jboss.errai.forge.template.Velocity;
-import org.jboss.forge.parser.java.JavaClass;
-import org.jboss.forge.parser.java.Method;
 import org.jboss.forge.project.Project;
 
 public class Generator {
@@ -81,6 +79,12 @@ public class Generator {
 				e.printStackTrace();
 			}
 			break;
+		case ERRAI_MARSHALING_IMMUTABLE_BUILDER_RECURSIVE:
+			// TODO implement here
+			break;
+		case ERRAI_MARSHALING_IMMUTABLE_BUILDER:
+			// TODO implement here
+			break;
 		}
 	}
 
@@ -97,20 +101,6 @@ public class Generator {
 		contextParam.put("serviceMethods", serviceMethods);
 		contextParam.put("imports", jsth.getImports());
 		velocity.createJavaSource(command.getTemplateFQName(),contextParam, false);						
-		
-		
-		// print.out for methods
-//		System.out.println("--- PUBLIC METHODS ---");
-//		for (Method serviceMethod : sourceParser.getPublicMethods()) {
-//			String name = serviceMethod.getName();
-//			System.out.println("METHOD: "+ 
-//					Modifier.toString(serviceMethod.getModifiers())+" "+
-//					serviceMethod.getType()+" "+ 
-//					serviceMethod.getName()+"("+
-//					serviceMethod.getParametersAsString()+")");
-//		}
-		
-		
 	}
 	
 	private void addPortable(File file) throws Exception{
@@ -127,5 +117,4 @@ public class Generator {
 			builder.writeSource(sourceLines, file);
 		}
 	}
-
 }

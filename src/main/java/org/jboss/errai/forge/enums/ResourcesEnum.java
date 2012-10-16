@@ -1,4 +1,4 @@
-package org.jboss.errai.forge.template;
+package org.jboss.errai.forge.enums;
 
 
 /**

@@ -1,7 +1,7 @@
 package org.jboss.errai.forge.example;
 
 import org.jboss.errai.forge.ErraiPlugin;
-import org.jboss.errai.forge.facet.ErraiFacetsEnum;
+import org.jboss.errai.forge.enums.ErraiFacetsEnum;
 import org.jboss.forge.shell.ShellColor;
 import org.jboss.forge.shell.plugins.Command;
 import org.jboss.forge.shell.plugins.Option;

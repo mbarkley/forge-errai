@@ -1,4 +1,4 @@
-package org.jboss.errai.forge.facet;
+package org.jboss.errai.forge.enums;
 
 import org.jboss.errai.forge.template.Velocity;
 

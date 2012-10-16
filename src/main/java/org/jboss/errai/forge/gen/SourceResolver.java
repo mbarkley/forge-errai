@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.jboss.errai.forge.Utils;
-import org.jboss.errai.forge.template.ResourcesEnum;
+import org.jboss.errai.forge.enums.ResourcesEnum;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.resources.DirectoryResource;
 

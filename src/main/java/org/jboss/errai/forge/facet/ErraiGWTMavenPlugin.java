@@ -4,14 +4,14 @@ import org.jboss.forge.maven.plugins.ExecutionBuilder;
 import org.jboss.forge.maven.plugins.MavenPluginBuilder;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 
-public class ErraiGWTPlugin {
+public class ErraiGWTMavenPlugin {
 	
 	private String gwtPluginVersion;
 	private DependencyBuilder gwtDependencyBuilder;
 	private ExecutionBuilder execution;
 	private MavenPluginBuilder gwtPlugin;
 	
-	public ErraiGWTPlugin() {
+	public ErraiGWTMavenPlugin() {
 		    
 		  String gwtVersion= Versions.getInstance().getGwt_version();
 		

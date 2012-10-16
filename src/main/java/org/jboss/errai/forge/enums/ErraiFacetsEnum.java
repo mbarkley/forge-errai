@@ -1,5 +1,7 @@
-package org.jboss.errai.forge.facet;
+package org.jboss.errai.forge.enums;
 
+import org.jboss.errai.forge.facet.ErraiBusFacet;
+import org.jboss.errai.forge.facet.ErraiExampleFacet;
 import org.jboss.forge.project.facets.BaseFacet;
 
 

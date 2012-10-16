@@ -1,7 +1,5 @@
 package org.jboss.errai.forge;
 
-import java.io.File;
-
 import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;

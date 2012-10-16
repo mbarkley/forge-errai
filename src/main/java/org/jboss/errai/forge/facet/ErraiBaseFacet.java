@@ -74,7 +74,7 @@ public abstract class ErraiBaseFacet extends BaseFacet
    }
    
    public void  installGWTPlugin() {
-	   	ErraiGWTPlugin erraiGWTPlugin = new ErraiGWTPlugin();
+	   	ErraiGWTMavenPlugin erraiGWTPlugin = new ErraiGWTMavenPlugin();
 	    MavenPluginFacet pluginFacet = project.getFacet(MavenPluginFacet.class);
 	    pluginFacet.addPlugin(erraiGWTPlugin.getGwtPlugin());
 	   
