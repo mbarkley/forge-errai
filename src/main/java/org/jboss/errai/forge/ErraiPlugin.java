@@ -1,5 +1,7 @@
 package org.jboss.errai.forge;
 
+import java.io.InputStream;
+
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
@@ -22,6 +24,8 @@ import org.jboss.errai.forge.gen.Generator;
 import org.jboss.errai.forge.template.Velocity;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.facets.events.InstallFacets;
+import org.jboss.forge.resources.DirectoryResource;
+import org.jboss.forge.resources.FileResource;
 import org.jboss.forge.shell.ShellColor;
 import org.jboss.forge.shell.ShellMessages;
 import org.jboss.forge.shell.ShellPrompt;
@@ -167,9 +171,29 @@ public class ErraiPlugin implements Plugin {
 		
 		//setup bus facet
 		switch (command) {
-		case ERRAI_BUS_SETUP:
-			installFacets.fire(new InstallFacets(ErraiBusFacet.class));
-			return;
+			case ERRAI_BUS_SETUP_FACET:
+				installFacets.fire(new InstallFacets(ErraiBusFacet.class));
+				return;
+			case ERRAI_BUS_SETUP_PROPS:
+				DirectoryResource projectRoot = project.getProjectRoot();				
+		        DirectoryResource sourceRoot = projectRoot.getOrCreateChildDirectory("src").
+		        		getOrCreateChildDirectory("main").getOrCreateChildDirectory("resources");
+		        //create App props
+		        FileResource<?> appIndexPage = (FileResource<?>) sourceRoot.getChild("ErraiApp.properties");
+		        InputStream stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/resources/ErraiApp.properties");
+		        appIndexPage.setContents(stream);
+		        out.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "ErraiApp.properties", "file"));
+		        break;
+			case ERRAI_BUS_SETUP_LOG:
+				projectRoot = project.getProjectRoot();				
+		        sourceRoot = projectRoot.getOrCreateChildDirectory("src").
+		        		getOrCreateChildDirectory("main").getOrCreateChildDirectory("resources");
+		        //create log4j props
+		        FileResource<?> log4jIndexPage = (FileResource<?>) sourceRoot.getChild("log4j.properties");
+		        stream = ErraiPlugin.class.getResourceAsStream("/errai-bus/resources/log4j.properties");
+		        log4jIndexPage.setContents(stream);
+		        out.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "log4j.properties", "file"));
+		        break;
 		}
 		
 		//check bus facet installation
@@ -200,6 +224,7 @@ public class ErraiPlugin implements Plugin {
 		}
 		if(command.equals(ErraiBusCommandsEnum.ERRAI_BUS_RPC_INVOKE_ENDPOINT)){
 			// do rpc invoke
+			// TODO generate here service call with optional success/error callbacks
 	        out.println(ShellColor.BLUE, "do rpc invoke:");
 		}
     }
@@ -239,6 +264,12 @@ public class ErraiPlugin implements Plugin {
 			}
 			else {
 				// use definitions inside ErraiApp.properties
+				if(recursive == true) {
+					generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_SET_PORTABLE_RECURSIVE_VIA_CONFIG, from);
+				}
+				else {
+					generator.generate(ErraiGeneratorCommandsEnum.ERRAI_MARSHALING_SET_PORTABLE_VIA_CONFIG, from);				
+				}
 			}
 		}
 		if(command.equals(ErraiMarshalingCommandsEnum.ERRAI_MARSHALING_IMMUTABLE_BUILDER)){

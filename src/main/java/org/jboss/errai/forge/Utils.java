@@ -22,22 +22,6 @@ public class Utils {
         }
     }	
 
-    public static final File getSourceFileForClass(Project project, String sourceClass) throws Exception{
-		DirectoryResource root = project.getProjectRoot();
-		root = root.getOrCreateChildDirectory("src").getOrCreateChildDirectory("main").getOrCreateChildDirectory("java");		
-    	String rootPath = root.getUnderlyingResourceObject().getPath();
-    	StringBuffer buf = new StringBuffer(rootPath);
-    	StringTokenizer tokenizer = new StringTokenizer(sourceClass,".");
-        while (tokenizer.hasMoreElements()) {
-        	buf.append(System.getProperty("file.separator"));
-			buf.append(tokenizer.nextToken().trim());
-		}
-        buf.append(".java");
-        System.out.println("sourceFilePath: " + buf.toString());
-        return new File(buf.toString());
-    	
-    }
-    
     public static final File getSourcePackage(Project project, String sourcePackage) throws Exception{
 		DirectoryResource root = project.getProjectRoot();
 		root = root.getOrCreateChildDirectory("src").getOrCreateChildDirectory("main").getOrCreateChildDirectory("java");		
@@ -57,10 +41,26 @@ public class Utils {
 		root = root.getOrCreateChildDirectory("src").getOrCreateChildDirectory("main").getOrCreateChildDirectory("java");
     	StringTokenizer tokenizer = new StringTokenizer(sourcePackage,".");
         while (tokenizer.hasMoreElements()) {
-        	root.getOrCreateChildDirectory(tokenizer.nextToken().trim());
+        	root = root.getOrCreateChildDirectory(tokenizer.nextToken().trim());
 		}
         return root;
     }
+
+	public static final File getSourceFileForClass(Project project, String sourceClass) throws Exception{
+		DirectoryResource root = project.getProjectRoot();
+		root = root.getOrCreateChildDirectory("src").getOrCreateChildDirectory("main").getOrCreateChildDirectory("java");		
+		String rootPath = root.getUnderlyingResourceObject().getPath();
+		StringBuffer buf = new StringBuffer(rootPath);
+		StringTokenizer tokenizer = new StringTokenizer(sourceClass,".");
+	    while (tokenizer.hasMoreElements()) {
+	    	buf.append(System.getProperty("file.separator"));
+			buf.append(tokenizer.nextToken().trim());
+		}
+	    buf.append(".java");
+	    System.out.println("sourceFilePath: " + buf.toString());
+	    return new File(buf.toString());
+		
+	}
     
     
 

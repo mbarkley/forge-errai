@@ -12,6 +12,8 @@ public enum ErraiGeneratorCommandsEnum {
     // no template for marshaling @Portable generation
     ERRAI_MARSHALING_SET_PORTABLE_RECURSIVE("set-portable-recursive",""),
     ERRAI_MARSHALING_SET_PORTABLE("set-portable",""),
+    ERRAI_MARSHALING_SET_PORTABLE_RECURSIVE_VIA_CONFIG("set-portable-recursive",""),
+    ERRAI_MARSHALING_SET_PORTABLE_VIA_CONFIG("set-portable",""),
     ERRAI_MARSHALING_IMMUTABLE_BUILDER_RECURSIVE("immutable-builder-recursive",""),
     ERRAI_MARSHALING_IMMUTABLE_BUILDER("immutable-builder","");
 
