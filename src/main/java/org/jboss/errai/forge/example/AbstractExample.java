@@ -18,8 +18,8 @@ public abstract class AbstractExample {
 	public AbstractExample(ErraiPlugin plugin, final PipeOut pipeOut, ErraiExampleEnum example) {
 		this.plugin = plugin;
 		this.pipeOut = pipeOut;
-		this.erraiExampleFacet = plugin.getProject().getFacet(ErraiExampleFacet.class);		
-		this.erraiExampleFacet.setSelectedExample(example);		
+		this.erraiExampleFacet = plugin.getProject().getFacet(ErraiExampleFacet.class);
+		this.erraiExampleFacet.setSelectedExample(example);
     }
 	
 	public void install (){
@@ -28,6 +28,7 @@ public abstract class AbstractExample {
 	    createAppFiles(pipeOut);
 	    createResourceFiles(pipeOut);
 	    createTestFiles(pipeOut);
+	    generatePOMFile(pipeOut);
 		pipeOut.println("Sucesfully installed... :)");
 	}
 	
@@ -59,11 +60,19 @@ public abstract class AbstractExample {
     abstract void createResourceFiles(final PipeOut pipeOut);    
     
     /**
-     * Create an errai-bus example client & server files 
+     * Create an example client & server files 
      *
      * @param pipeOut
      */
     abstract void createTestFiles(final PipeOut pipeOut);
+    
+    /**
+     * Create an example pom file 
+     *
+     * @param pipeOut
+     */
+    abstract void generatePOMFile(final PipeOut pipeOut);
+    
     
     
     // uninstall 

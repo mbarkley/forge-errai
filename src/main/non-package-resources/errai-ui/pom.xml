@@ -4,43 +4,48 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jboss.errai</groupId>
   <artifactId>errai-bus</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>${plugin.project.version}</version>
   <packaging>war</packaging>
   <dependencies>
+  	<!-- Errai related dependencies -->
     <dependency>
       <groupId>org.jboss.errai</groupId>
       <artifactId>errai-bus</artifactId>
-      <version>2.1-SNAPSHOT</version>
+      <version>${plugin.errai.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.errai</groupId>
       <artifactId>errai-ioc</artifactId>
-      <version>2.1-SNAPSHOT</version>
+      <version>${plugin.errai.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.errai</groupId>
       <artifactId>errai-tools</artifactId>
-      <version>2.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-servlet</artifactId>
-      <version>2.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>2.4.0</version>
+      <version>${plugin.errai.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.errai</groupId>
       <artifactId>errai-javaee-all</artifactId>
-      <version>2.1-SNAPSHOT</version>
+      <version>${plugin.errai.version}</version>
     </dependency>
+    
+    <!-- GWT dependencies -->
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-servlet</artifactId>
+      <version>${plugin.gwt.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${plugin.gwt.version}</version>
+    </dependency>
+    
+    <!-- Other dependencies -->
     <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-6.0</artifactId>
-      <version>3.0.1.Final</version>
+      <version>${plugin.javaee.version}</version>
       <type>pom</type>
       <scope>provided</scope>
     </dependency>
@@ -74,7 +79,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>2.4.0</version>
+        <version>${plugin.gwt.version}</version>
         <extensions>false</extensions>
         <executions>
           <execution>

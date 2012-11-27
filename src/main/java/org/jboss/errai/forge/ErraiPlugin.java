@@ -13,7 +13,6 @@ import org.jboss.errai.forge.enums.ErraiMarshalingCommandsEnum;
 import org.jboss.errai.forge.enums.ErraiViaDefinitionEnum;
 import org.jboss.errai.forge.example.ErraiBusExample;
 import org.jboss.errai.forge.example.ErraiCdiExample;
-import org.jboss.errai.forge.example.ErraiExamplePlugin;
 import org.jboss.errai.forge.example.ErraiJaxrsExample;
 import org.jboss.errai.forge.example.ErraiUIExample;
 import org.jboss.errai.forge.facet.ErraiBaseFacet;
@@ -48,8 +47,6 @@ public class ErraiPlugin implements Plugin {
     final Project project;
     final Event<InstallFacets> installFacets;
     
-    final ErraiExamplePlugin examplePlugin;
-    
     @Inject
     private ShellPrompt prompt;
     
@@ -69,7 +66,6 @@ public class ErraiPlugin implements Plugin {
     public ErraiPlugin(final Project project, final Event<InstallFacets> event) {
         this.project = project;
         this.installFacets = event;
-        this.examplePlugin = new ErraiExamplePlugin(this);
         this.velocity = new Velocity(this.getProject());
         this.generator = new Generator(project, velocity);
         

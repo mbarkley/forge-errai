@@ -123,4 +123,14 @@ public class ErraiJaxrsExample extends AbstractExample{
         cl2IndexPage.setContents(Utils.replacePackageName(c2Stream,plugin.getProject()));
         pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "ErraiIocTestHelper.java", "class"));
     }
+
+	@Override
+	void generatePOMFile(PipeOut pipeOut) {
+        DirectoryResource exampleRoot = erraiExampleFacet.getExampleRootDirectory();
+        //create pom file
+        FileResource<?> appIndexPage = (FileResource<?>) exampleRoot.getChild("pom.xml");
+        InputStream stream = ErraiPlugin.class.getResourceAsStream("/errai-jaxrs/pom.xml");
+        appIndexPage.setContents(stream);
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "pom.xml", "file"));
+	}
 }

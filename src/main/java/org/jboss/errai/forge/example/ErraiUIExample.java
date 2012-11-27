@@ -133,4 +133,14 @@ public class ErraiUIExample extends AbstractExample{
     
     void createTestFiles(final PipeOut pipeOut) {
     }
+
+	@Override
+	void generatePOMFile(PipeOut pipeOut) {
+        DirectoryResource exampleRoot = erraiExampleFacet.getExampleRootDirectory();
+        //create pom file
+        FileResource<?> appIndexPage = (FileResource<?>) exampleRoot.getChild("pom.xml");
+        InputStream stream = ErraiPlugin.class.getResourceAsStream("/errai-ui/pom.xml");
+        appIndexPage.setContents(stream);
+        pipeOut.println(ShellColor.YELLOW, String.format(ErraiBaseFacet.SUCCESS_MSG_FMT, "pom.xml", "file"));
+	}
 }

@@ -1,142 +1,140 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <groupId>org.jboss.errai.forge</groupId>
-    <artifactId>errai-forge-plugin</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
-
-	<properties>
-	    <forge.api.version>1.1.1.Final</forge.api.version>
-	    <!-- Place version for plugin here - those will be placed into 
-	         org/jboss/errai/forge/facet/versions.properties and taken
-	         into the plugin facets
-	      -->
-		<plugin.errai.version>2.1-SNAPSHOT</plugin.errai.version>
-		<plugin.gwt.version>2.4.0</plugin.gwt.version>	      
-		<plugin.javaee.version>3.0.1.Final</plugin.javaee.version>	      
-	</properties>
-	
-	<build>
-		<plugins>
-	      <plugin>
-	        <artifactId>maven-resources-plugin</artifactId>
-	        <version>2.5</version>
-	        <executions>
-	          <execution>
-	            <id>copy-resources</id>
-	            <!-- here the phase you need -->
-	            <phase>validate</phase>
-	            <goals>
-	              <goal>copy-resources</goal>
-	            </goals>
-	            <configuration>
-	              <outputDirectory>${basedir}/target/classes/org/jboss/errai/forge/facet</outputDirectory>
-	              <resources>          
-				    <resource>
-				        <directory>src/main/java/org/jboss/errai/forge/facet</directory>
-						<includes>
-		                	<include>versions.properties</include>
-		            	</includes>
-				        <filtering>true</filtering>
-				    </resource>
-	              </resources>              
-	            </configuration>            
-	          </execution>
-	        </executions>
-	      </plugin>
-		  <!-- plugin>
-	        <groupId>org.codehaus.mojo</groupId>
-	        <artifactId>antlr3-maven-plugin</artifactId>
-	        <version>1.0</version>
-	        <executions>
-	          <execution>
-	            <goals>
-	              <goal>antlr</goal>
-	            </goals>
-	          </execution>
-	        </executions>
-	      </plugin-->
-	    </plugins>
-	</build>
-	
-    <dependencies>
-		<dependency>
-	      <groupId>org.antlr</groupId>
-	      <artifactId>antlr-runtime</artifactId>
-	      <version>3.1.3</version>
-	    </dependency>    
-	    
-        <dependency>
-            <groupId>org.jboss.forge</groupId>
-            <artifactId>forge-shell</artifactId>
-            <version>${forge.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.jboss.forge</groupId>
-            <artifactId>forge-parser-java-api</artifactId>
-            <version>${forge.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.forge</groupId>
-            <artifactId>forge-shell-api</artifactId>
-            <version>${forge.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.forge</groupId>
-            <artifactId>forge-scaffold-api</artifactId>
-            <version>${forge.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-		<dependency>
-		    <groupId>org.jboss.forge</groupId>
-		    <artifactId>forge-test-harness</artifactId>
-		    <version>${forge.api.version}</version>
-		    <scope>test</scope>
-		</dependency>        
-        
-        <dependency>
-            <groupId>org.jboss.forge</groupId>
-            <artifactId>forge-javaee-api</artifactId>
-            <version>${forge.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.jboss.forge</groupId>
-            <artifactId>forge-maven-api</artifactId>
-            <version>${forge.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-            <version>1.7</version>
-        </dependency>
-        
-	    <dependency>
-	      <groupId>org.apache.commons</groupId>
-	      <artifactId>commons-lang3</artifactId>
-	      <version>3.0.1</version>
-	    </dependency>
-        
-        
-    </dependencies>
-
-    <repositories>
-	    <repository>
-	      <id>JBOSS_NEXUS</id>
-	      <url>http://repository.jboss.org/nexus/content/groups/public</url>
-	    </repository>
-    </repositories>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.jboss.errai.forge</groupId>
+  <artifactId>errai-forge-plugin</artifactId>
+  <version>2.0.0-SNAPSHOT</version>
+  <properties>
+  	<!-- Project properties -->
+    <forge.api.version>1.1.1.Final</forge.api.version>
+    <maven.version>3.0.3</maven.version>
+    
+  	<!-- Plugin specific properties -->
+    <plugin.javaee.version>3.0.1.Final</plugin.javaee.version>
+    <plugin.project.version>${project.version}</plugin.project.version>
+    <plugin.errai.version>2.2-SNAPSHOT</plugin.errai.version>
+    <plugin.gwt.version>2.5.0</plugin.gwt.version>
+    <plugin.servlet-api.version>2.5</plugin.servlet-api.version>
+    <plugin.jsp-api.version>2.0</plugin.jsp-api.version>
+    <plugin.ejb3-api.version>3.1.0</plugin.ejb3-api.version>
+    <plugin.cdi-api.version>1.0-SP4</plugin.cdi-api.version>
+    <plugin.jetty.version>6.1.25</plugin.jetty.version>
+    <plugin.weld.version>1.6.1.Final</plugin.weld.version>
+    <plugin.resteasy.version>2.2.3.GA</plugin.resteasy.version>
+    <plugin.jboss-logging.version>1.6.1.Final</plugin.jboss-logging.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr-runtime</artifactId>
+      <version>3.1.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge</groupId>
+      <artifactId>forge-shell</artifactId>
+      <version>${forge.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge</groupId>
+      <artifactId>forge-parser-java-api</artifactId>
+      <version>${forge.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge</groupId>
+      <artifactId>forge-shell-api</artifactId>
+      <version>${forge.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge</groupId>
+      <artifactId>forge-scaffold-api</artifactId>
+      <version>${forge.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge</groupId>
+      <artifactId>forge-test-harness</artifactId>
+      <version>${forge.api.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge</groupId>
+      <artifactId>forge-javaee-api</artifactId>
+      <version>${forge.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge</groupId>
+      <artifactId>forge-maven-api</artifactId>
+      <version>${forge.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.0.1</version>
+    </dependency>
+  </dependencies>
+  <repositories>
+    <repository>
+      <id>JBOSS_NEXUS</id>
+      <url>http://repository.jboss.org/nexus/content/groups/public</url>
+    </repository>
+  </repositories>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>copy-version-props</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/org/jboss/errai/forge/facet</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/java/org/jboss/errai/forge/facet</directory>
+                  <includes>
+                    <include>versions.properties</include>
+                  </includes>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/non-package-resources</directory>
+                  <includes>
+                    <include>**/pom.xml</include>
+                  </includes>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
