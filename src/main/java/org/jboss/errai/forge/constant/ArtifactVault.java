@@ -3,9 +3,9 @@ package org.jboss.errai.forge.constant;
 
 public final class ArtifactVault {
   
-  public static final String GROUP_ID = "org.jboss.errai";
+  public static final String ERRAI_GROUP_ID = "org.jboss.errai";
   
-  public static enum ArtifactId {
+  public static enum DependencyArtifact {
     // Non-errai
     GwtUser("gwt-user", "com.google.gwt"),
     Guava("guava", "com.google.guava"),
@@ -23,13 +23,38 @@ public final class ArtifactVault {
     private final String artifactId;
     private final String groupId;
     
-    private ArtifactId(final String artifactId, final String groupId) {
+    private DependencyArtifact(final String artifactId, final String groupId) {
       this.artifactId = artifactId;
       this.groupId = groupId;
     }
 
-    private ArtifactId(final String id) {
-      this(id, GROUP_ID);
+    private DependencyArtifact(final String id) {
+      this(id, ERRAI_GROUP_ID);
+    }
+    
+    public String getArtifactId() {
+      return artifactId;
+    }
+    
+    public String getGroupId() {
+      return groupId;
+    }
+    
+    @Override
+    public String toString() {
+      return String.format("%s:%s", groupId, artifactId);
+    }
+  }
+  
+  public static enum PluginArtifact {
+    Clean("maven-clean-plugin", "org.apache.maven.plugins");
+    
+    private String artifactId;
+    private String groupId;
+
+    private PluginArtifact(final String artifactId, final String groupId) {
+      this.artifactId = artifactId;
+      this.groupId = groupId;
     }
     
     public String getArtifactId() {

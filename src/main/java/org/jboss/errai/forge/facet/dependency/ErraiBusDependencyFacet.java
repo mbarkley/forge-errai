@@ -1,6 +1,6 @@
 package org.jboss.errai.forge.facet.dependency;
 
-import static org.jboss.errai.forge.constant.ArtifactVault.ArtifactId.*;
+import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.*;
 
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.ScopeType;

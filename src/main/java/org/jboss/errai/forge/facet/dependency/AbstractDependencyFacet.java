@@ -36,21 +36,22 @@ abstract class AbstractDependencyFacet extends BaseFacet {
 
   @Inject
   protected Shell shell;
+  
+  protected VersionOracle oracle = new VersionOracle(getProject());
 
   @Override
   public boolean install() {
     // TODO error handling and reversion
 
     final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
-    final String version = VersionOracle.get(getProject()).resolveVersion();
 
     // Add dev mode build dependencies
     for (DependencyBuilder dep : coreDependencies) {
-      depFacet.addDirectDependency(dep.setVersion(version));
+      depFacet.addDirectDependency(dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId())));
     }
     // Create profiles
     for (Entry<String, Collection<DependencyBuilder>> entry : profileDependencies.entrySet()) {
-      createNewProfile(entry.getKey(), entry.getValue(), version);
+      createNewProfile(entry.getKey(), entry.getValue(), oracle);
     }
 
     return true;
@@ -110,7 +111,8 @@ abstract class AbstractDependencyFacet extends BaseFacet {
     return retVal;
   }
 
-  protected boolean createNewProfile(final String name, final Collection<DependencyBuilder> deps, final String version) {
+  protected boolean createNewProfile(final String name, final Collection<DependencyBuilder> deps,
+          final VersionOracle versionOracle) {
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     final Model pom = coreFacet.getPOM();
 
@@ -122,6 +124,8 @@ abstract class AbstractDependencyFacet extends BaseFacet {
     }
 
     for (DependencyBuilder dep : deps) {
+      if (dep.getVersion() == null || dep.getVersion().equals(""))
+        dep.setVersion(versionOracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
       profile.addDependency(convert(dep));
     }
 
@@ -137,5 +141,5 @@ abstract class AbstractDependencyFacet extends BaseFacet {
   protected void setProfileDependencies(final String name, final DependencyBuilder... deps) {
     profileDependencies.put(name, Arrays.asList(deps));
   }
-  
+
 }

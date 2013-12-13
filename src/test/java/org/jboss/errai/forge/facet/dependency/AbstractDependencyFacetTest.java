@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.jboss.errai.forge.constant.ArtifactVault.ArtifactId;
+import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.dependency.AbstractDependencyFacet;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.profiles.ProfileBuilder;
@@ -23,7 +23,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
 
   public static class NoProfileDependencyFacet extends AbstractDependencyFacet {
     public NoProfileDependencyFacet() {
-      coreDependencies = Arrays.asList(new DependencyBuilder[] { DependencyBuilder.create(ArtifactId.ErraiCommon
+      coreDependencies = Arrays.asList(new DependencyBuilder[] { DependencyBuilder.create(DependencyArtifact.ErraiCommon
               .toString()) });
       profileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
     }
@@ -34,7 +34,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
       coreDependencies = Arrays.asList(new DependencyBuilder[0]);
       profileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
       profileDependencies.put("myProfile",
-              Arrays.asList(new DependencyBuilder[] { DependencyBuilder.create(ArtifactId.ErraiCommon.toString()) }));
+              Arrays.asList(new DependencyBuilder[] { DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString()) }));
     }
   }
 
@@ -47,7 +47,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
 
     assertTrue(project.hasFacet(NoProfileDependencyFacet.class));
     assertTrue(project.getFacet(DependencyFacet.class).hasDirectDependency(
-            DependencyBuilder.create(ArtifactId.ErraiCommon.toString() + ":3.0-SNAPSHOT")));
+            DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":3.0-SNAPSHOT")));
   }
 
   @Test
@@ -62,7 +62,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertEquals(1, profiles.size());
     assertEquals("myProfile", profiles.get(0).getId());
     assertEquals(1, profiles.get(0).getDependencies().size());
-    assertEquals(ArtifactId.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(0).getArtifactId());
+    assertEquals(DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(0).getArtifactId());
   }
 
   @Test
@@ -83,7 +83,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertEquals("myProfile", profiles.get(0).getId());
     assertEquals(2, profiles.get(0).getDependencies().size());
     assertEquals("errai-ui", profiles.get(0).getDependencies().get(0).getArtifactId());
-    assertEquals(ArtifactId.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(1).getArtifactId());
+    assertEquals(DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(1).getArtifactId());
   }
 
 }
