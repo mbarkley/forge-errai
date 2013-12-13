@@ -27,6 +27,11 @@ public final class ErraiArtifact {
     public String getGroupId() {
       return groupId;
     }
+    
+    @Override
+    public String toString() {
+      return String.format("%s:%s", groupId, artifactId);
+    }
   }
 
 }

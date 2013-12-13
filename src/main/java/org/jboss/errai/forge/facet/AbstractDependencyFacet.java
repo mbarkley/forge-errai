@@ -1,20 +1,22 @@
 package org.jboss.errai.forge.facet;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeSet;
 
 import javax.inject.Inject;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.jboss.errai.forge.constant.ErraiArtifact;
+import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.profiles.ProfileBuilder;
-import org.jboss.forge.project.dependencies.Dependency;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.project.dependencies.DependencyFilter;
-import org.jboss.forge.project.dependencies.DependencyQueryBuilder;
+import org.jboss.forge.project.dependencies.ScopeType;
 import org.jboss.forge.project.facets.BaseFacet;
 import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.shell.Shell;
@@ -22,6 +24,8 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 
 @RequiresFacet({DependencyFacet.class, MavenCoreFacet.class})
 abstract class AbstractDependencyFacet extends BaseFacet {
+  
+  protected static final String PRODUCTION_PROFILE = "production";
 
   /**
    * Version-less.
@@ -37,7 +41,7 @@ abstract class AbstractDependencyFacet extends BaseFacet {
     // TODO error handling and reversion
     
     final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
-    final String version = resolveVersion(depFacet);
+    final String version = VersionOracle.get(getProject()).resolveVersion();
 
     // Add dev mode build dependencies
     for (DependencyBuilder dep : coreDependencies) {
@@ -73,44 +77,56 @@ abstract class AbstractDependencyFacet extends BaseFacet {
   public boolean isInstalled() {
     return getProject().hasFacet(getClass());
   }
+  
+  private Profile getProfile(final String name, final List<Profile> profiles) {
+    for (final Profile profile : profiles) {
+      if (profile.getId().equals(name))
+        return profile;
+    }
+    
+    return null;
+  }
+  
+  private static Dependency convert(org.jboss.forge.project.dependencies.Dependency forgeDep) {
+    Dependency retVal = new Dependency();
+    
+    retVal.setArtifactId(forgeDep.getArtifactId());
+    retVal.setGroupId(forgeDep.getGroupId());
+    retVal.setVersion(forgeDep.getVersion());
+    retVal.setScope(forgeDep.getScopeType());
+    if (ScopeType.SYSTEM.equals(forgeDep.getScopeTypeEnum()))
+      retVal.setSystemPath(forgeDep.getSystemPath());
+    retVal.setClassifier(forgeDep.getClassifier());
+    retVal.setType(forgeDep.getPackagingType());
+    
+    for (org.jboss.forge.project.dependencies.Dependency dep : forgeDep.getExcludedDependencies()) {
+      Exclusion exclude = new Exclusion();
+      exclude.setArtifactId(dep.getArtifactId());
+      exclude.setGroupId(dep.getGroupId());
+      retVal.addExclusion(exclude);
+    }
+    
+    return retVal;
+  }
 
   protected boolean createNewProfile(final String name, final Collection<DependencyBuilder> deps, final String version) {
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    ProfileBuilder profile = ProfileBuilder.create().setId(name);
+    final Model pom = coreFacet.getPOM();
+    
+    Profile profile = getProfile(name, pom.getProfiles());
+    
+    if (profile == null) {
+      profile = ProfileBuilder.create().setId(name).getAsMavenProfile();
+      pom.addProfile(profile);
+    }
+    
     for (DependencyBuilder dep : deps) {
-      profile.addDependency(dep.setVersion(version));
+      profile.addDependency(convert(dep));
     }
+    
+    coreFacet.setPOM(pom);
 
-    coreFacet.getPOM().addProfile(profile.getAsMavenProfile());
-
-    return coreFacet.getPOM().getProfiles().contains(profile.getAsMavenProfile());
+    return true;
   }
 
-  protected String resolveVersion(DependencyFacet depFacet) {
-    // First check if there is already an errai dependency
-    Dependency testDep = DependencyBuilder.create().setGroupId(ErraiArtifact.GROUP_ID);
-    DependencyQueryBuilder query = DependencyQueryBuilder.create(testDep);
-    DependencyFilter filter = query.getDependencyFilter();
-    TreeSet<String> versions = new TreeSet<String>();
-    for (Dependency dep : depFacet.getDependencies()) {
-      if (filter.accept(dep)) {
-        versions.add(dep.getVersion());
-      }
-    }
-
-    if (versions.isEmpty()) {
-      // prompt user
-      Dependency version = shell.promptChoiceTyped("Please select a version to install.",
-              depFacet.resolveAvailableVersions(query));
-      return version.getVersion();
-    }
-    else if (versions.size() == 1) {
-      return versions.last();
-    }
-    else {
-      // Go with highest versions
-      // TODO log warning about multiple versions
-      return versions.last();
-    }
-  }
 }
