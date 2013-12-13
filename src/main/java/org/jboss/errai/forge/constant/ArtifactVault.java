@@ -11,6 +11,7 @@ public final class ArtifactVault {
     Guava("guava", "com.google.guava"),
     Hsq("hsqldb", "hsqldb"),
     JUnit("junit", "junit"),
+    GwtSlf4j("gwt-slf4j", "de.benediktmeurer.gwt-slf4j"),
     
     // errai
     ErraiNetty("netty", "org.jboss.errai.io.netty"),

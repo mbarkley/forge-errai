@@ -6,16 +6,16 @@ import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.ScopeType;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
-@RequiresFacet({ErraiBuildDependencyFacet.class, ErraiCommonDepdencyFacet.class})
-public class ErraiBusDependencyFacet extends AbstractDependencyFacet {
-  
-  public ErraiBusDependencyFacet() {
+@RequiresFacet({ErraiBuildDependencyFacet.class})
+public class ErraiCommonDepdencyFacet extends AbstractDependencyFacet {
+
+  public ErraiCommonDepdencyFacet() {
     setCoreDependencies(
-            DependencyBuilder.create(ErraiBus.toString())
+            DependencyBuilder.create(ErraiCommon.toString())
     );
     setProfileDependencies(PRODUCTION_PROFILE,
-            DependencyBuilder.create(Guava.toString()).setScopeType(ScopeType.PROVIDED)
+            DependencyBuilder.create(GwtSlf4j.toString()).setScopeType(ScopeType.PROVIDED)
     );
   }
-
+  
 }
