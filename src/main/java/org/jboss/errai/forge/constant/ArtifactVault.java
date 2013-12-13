@@ -1,12 +1,23 @@
 package org.jboss.errai.forge.constant;
 
 
-public final class ErraiArtifact {
+public final class ArtifactVault {
   
   public static final String GROUP_ID = "org.jboss.errai";
   
   public static enum ArtifactId {
-    ErraiCommon("errai-common");
+    // Non-errai
+    GwtUser("gwt-user", "com.google.gwt"),
+    Guava("guava", "com.google.guava"),
+    Hsq("hsqldb", "hsqldb"),
+    JUnit("junit", "junit"),
+    
+    // errai
+    ErraiNetty("netty", "org.jboss.errai.io.netty"),
+    ErraiJboss("errai-cdi-jboss"),
+    ErraiCommon("errai-common"),
+    ErraiTools("errai-tools"),
+    ErraiBus("errai-bus");
     
     private final String artifactId;
     private final String groupId;
