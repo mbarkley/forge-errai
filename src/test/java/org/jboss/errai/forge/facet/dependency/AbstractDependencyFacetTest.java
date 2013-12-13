@@ -1,4 +1,4 @@
-package org.jboss.errai.forge.facet;
+package org.jboss.errai.forge.facet.dependency;
 
 import static org.junit.Assert.*;
 
@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault.ArtifactId;
+import org.jboss.errai.forge.facet.dependency.AbstractDependencyFacet;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.profiles.ProfileBuilder;
 import org.jboss.forge.project.Project;

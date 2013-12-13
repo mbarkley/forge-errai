@@ -1,4 +1,4 @@
-package org.jboss.errai.forge.facet;
+package org.jboss.errai.forge.facet.dependency;
 
 import static org.jboss.errai.forge.constant.ArtifactVault.ArtifactId.*;
 

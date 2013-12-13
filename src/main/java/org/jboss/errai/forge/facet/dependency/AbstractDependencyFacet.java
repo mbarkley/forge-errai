@@ -1,4 +1,4 @@
-package org.jboss.errai.forge.facet;
+package org.jboss.errai.forge.facet.dependency;
 
 import java.util.Arrays;
 import java.util.Collection;
