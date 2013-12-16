@@ -18,6 +18,7 @@ public final class ArtifactVault {
     
     // plugins
     Clean("maven-clean-plugin", "org.apache.maven.plugins"),
+    Dependency("maven-dependency-plugin", "org.apache.maven.plugins"),
     
     // errai
     ErraiNetty("netty", "org.jboss.errai.io.netty"),
