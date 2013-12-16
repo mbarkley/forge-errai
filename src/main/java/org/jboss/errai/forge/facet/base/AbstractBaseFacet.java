@@ -13,9 +13,13 @@ import org.jboss.forge.maven.profiles.ProfileBuilder;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.ScopeType;
 import org.jboss.forge.project.facets.BaseFacet;
+import org.jboss.forge.shell.plugins.RequiresFacet;
 
+@RequiresFacet({MavenCoreFacet.class})
 public abstract class AbstractBaseFacet extends BaseFacet {
 
+  protected static final String PRODUCTION_PROFILE = "production";
+  
   @Override
   public boolean isInstalled() {
     return getProject().hasFacet(getClass());

@@ -17,10 +17,8 @@ import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.shell.Shell;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
-@RequiresFacet({ DependencyFacet.class, MavenCoreFacet.class })
+@RequiresFacet({ DependencyFacet.class })
 abstract class AbstractDependencyFacet extends AbstractBaseFacet {
-
-  protected static final String PRODUCTION_PROFILE = "production";
 
   /**
    * Version-less.
