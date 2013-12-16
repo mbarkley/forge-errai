@@ -20,6 +20,7 @@ public final class ArtifactVault {
     Clean("maven-clean-plugin", "org.apache.maven.plugins"),
     Dependency("maven-dependency-plugin", "org.apache.maven.plugins"),
     Compiler("maven-compiler-plugin", "org.apache.maven.plugins"),
+    Gwt("gwt-maven-plugin", "org.codehaus.mojo"),
     
     // errai
     ErraiNetty("netty", "org.jboss.errai.io.netty"),
