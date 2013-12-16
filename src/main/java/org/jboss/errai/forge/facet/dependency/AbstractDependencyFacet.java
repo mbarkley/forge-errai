@@ -37,13 +37,12 @@ abstract class AbstractDependencyFacet extends BaseFacet {
   @Inject
   protected Shell shell;
   
-  protected VersionOracle oracle = new VersionOracle(getProject());
-
   @Override
   public boolean install() {
     // TODO error handling and reversion
 
     final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
+    final VersionOracle oracle = new VersionOracle(depFacet);
 
     // Add dev mode build dependencies
     for (DependencyBuilder dep : coreDependencies) {

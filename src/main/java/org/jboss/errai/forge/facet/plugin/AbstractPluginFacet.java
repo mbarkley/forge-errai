@@ -2,8 +2,6 @@ package org.jboss.errai.forge.facet.plugin;
 
 import java.util.Collection;
 
-import javax.inject.Inject;
-
 import org.jboss.errai.forge.constant.ArtifactVault.PluginArtifact;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenPluginFacet;
@@ -14,9 +12,10 @@ import org.jboss.forge.maven.plugins.MavenPluginBuilder;
 import org.jboss.forge.project.dependencies.Dependency;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.BaseFacet;
+import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
-@RequiresFacet({ MavenPluginFacet.class })
+@RequiresFacet({ MavenPluginFacet.class, DependencyFacet.class })
 abstract class AbstractPluginFacet extends BaseFacet {
 
   protected PluginArtifact pluginArtifact;
@@ -24,13 +23,13 @@ abstract class AbstractPluginFacet extends BaseFacet {
   protected Collection<DependencyBuilder> dependencies;
   protected Collection<Execution> executions;
   
-  private VersionOracle oracle = new VersionOracle(getProject());
-
   @Override
   public boolean install() {
     // TODO logging and error-handling
     
     final MavenPluginFacet pluginFacet = getProject().getFacet(MavenPluginFacet.class);
+    final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
+    final VersionOracle oracle = new VersionOracle(depFacet);
     final Dependency pluginDep = DependencyBuilder.create(pluginArtifact.toString()).setVersion(
             oracle.resolveVersion(pluginArtifact));
     final MavenPluginBuilder plugin;
