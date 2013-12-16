@@ -26,7 +26,8 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
   protected Collection<DependencyBuilder> dependencies;
   protected Collection<ConfigurationElement> configurations;
   protected Collection<PluginExecution> executions;
-
+  protected boolean extensions = true;
+  
   @Override
   public boolean install() {
     getOrMakeProfile(PRODUCTION_PROFILE, dependencies, new VersionOracle(getProject().getFacet(DependencyFacet.class)));
@@ -54,6 +55,7 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
     for (final PluginExecution exec : executions) {
       adapter.addExecution(exec);
     }
+    adapter.setExtensions(extensions);
     
     coreFacet.setPOM(pom);
 

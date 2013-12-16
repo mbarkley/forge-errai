@@ -21,6 +21,8 @@ public final class ArtifactVault {
     Dependency("maven-dependency-plugin", "org.apache.maven.plugins"),
     Compiler("maven-compiler-plugin", "org.apache.maven.plugins"),
     Gwt("gwt-maven-plugin", "org.codehaus.mojo"),
+    War("maven-war-plugin", "org.apache.maven.plugins"),
+    JbossPlugin("jboss-as-maven-plugin", "org.jboss.as.plugins"),
     
     // errai
     ErraiNetty("netty", "org.jboss.errai.io.netty"),
