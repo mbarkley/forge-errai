@@ -1,5 +1,8 @@
 package org.jboss.errai.forge.constant;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public final class ArtifactVault {
   
@@ -12,6 +15,9 @@ public final class ArtifactVault {
     Hsq("hsqldb", "hsqldb"),
     JUnit("junit", "junit"),
     GwtSlf4j("gwt-slf4j", "de.benediktmeurer.gwt-slf4j"),
+    
+    // plugins
+    Clean("maven-clean-plugin", "org.apache.maven.plugins"),
     
     // errai
     ErraiNetty("netty", "org.jboss.errai.io.netty"),
@@ -44,31 +50,18 @@ public final class ArtifactVault {
     public String toString() {
       return String.format("%s:%s", groupId, artifactId);
     }
+    
+    private static Map<String, DependencyArtifact> artifacts = new HashMap<String, ArtifactVault.DependencyArtifact>();
+    
+    static {
+      for (final DependencyArtifact artifact : DependencyArtifact.values()) {
+        artifacts.put(artifact.getGroupId() + ":" + artifact.getArtifactId(), artifact);
+      }
+    }
+    
+    public static DependencyArtifact valueOf(String groupId, String artifactId) {
+      return artifacts.get(groupId + ":" + artifactId);
+    }
   }
   
-  public static enum PluginArtifact {
-    Clean("maven-clean-plugin", "org.apache.maven.plugins");
-    
-    private String artifactId;
-    private String groupId;
-
-    private PluginArtifact(final String artifactId, final String groupId) {
-      this.artifactId = artifactId;
-      this.groupId = groupId;
-    }
-    
-    public String getArtifactId() {
-      return artifactId;
-    }
-    
-    public String getGroupId() {
-      return groupId;
-    }
-    
-    @Override
-    public String toString() {
-      return String.format("%s:%s", groupId, artifactId);
-    }
-  }
-
 }

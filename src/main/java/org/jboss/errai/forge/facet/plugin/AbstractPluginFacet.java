@@ -2,7 +2,7 @@ package org.jboss.errai.forge.facet.plugin;
 
 import java.util.Collection;
 
-import org.jboss.errai.forge.constant.ArtifactVault.PluginArtifact;
+import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenPluginFacet;
 import org.jboss.forge.maven.plugins.Configuration;
@@ -18,7 +18,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 @RequiresFacet({ MavenPluginFacet.class, DependencyFacet.class })
 abstract class AbstractPluginFacet extends BaseFacet {
 
-  protected PluginArtifact pluginArtifact;
+  protected DependencyArtifact pluginArtifact;
   protected Collection<ConfigurationElement> configurations;
   protected Collection<DependencyBuilder> dependencies;
   protected Collection<Execution> executions;

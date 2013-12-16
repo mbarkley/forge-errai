@@ -4,30 +4,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.project.artifact.PluginArtifact;
 import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
-import org.jboss.errai.forge.constant.ArtifactVault.PluginArtifact;
 import org.jboss.forge.project.dependencies.Dependency;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.DependencyFacet;
 
 public class VersionOracle {
 
-  private static class ArtifactPair {
-    private String groupId;
-    private String artifactId;
-    private ArtifactPair(String groupId, String artifactId) {
-      this.groupId = groupId;
-      this.artifactId = artifactId;
-    }
-    @Override
-    public int hashCode() {
-      return groupId.hashCode() + artifactId.hashCode();
-    }
-  }
-  
   private DependencyFacet depFacet;
-  private static final Map<ArtifactPair, String> versionMap = new ConcurrentHashMap<VersionOracle.ArtifactPair, String>();
+  private static final Map<String, String> versionMap = new ConcurrentHashMap<String, String>();
 
   public VersionOracle(DependencyFacet facet) {
     depFacet = facet;
@@ -66,11 +53,11 @@ public class VersionOracle {
   }
 
   private String getStaticVersion(String groupId, String artifactId) {
-    return versionMap.get(new ArtifactPair(groupId, artifactId));
+    return versionMap.get(groupId + ":" + artifactId);
   }
 
   public String resolveErraiVersion() {
-    DependencyArtifact common = ArtifactVault.DependencyArtifact.ErraiCommon;
+    DependencyArtifact common = DependencyArtifact.ErraiCommon;
     return getHighestStableVersion(common.getGroupId(), common.getArtifactId());
   }
 
