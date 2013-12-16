@@ -52,7 +52,7 @@ public class VersionOracle {
     
     String maxVersion = null;
     for (final Dependency versionDep : availVersions) {
-      if (maxVersion == null || versionDep.getVersion().compareTo(maxVersion) > 0 && !versionDep.isSnapshot()) {
+      if (!versionDep.isSnapshot() && (maxVersion == null || versionDep.getVersion().compareTo(maxVersion) > 0)) {
         maxVersion = versionDep.getVersion();
       }
     }
