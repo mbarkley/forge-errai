@@ -16,6 +16,14 @@ public class VersionOracle {
   private DependencyFacet depFacet;
   private static final Map<String, String> versionMap = new ConcurrentHashMap<String, String>();
 
+  static {
+    // Plugin versions
+    versionMap.put(DependencyArtifact.Clean.toString(), "2.4.1");
+    versionMap.put(DependencyArtifact.Compiler.toString(), "2.3.2");
+    versionMap.put(DependencyArtifact.Dependency.toString(), "2.8");
+    versionMap.put(DependencyArtifact.Gwt.toString(), "2.5.1");
+  }
+  
   public VersionOracle(DependencyFacet facet) {
     depFacet = facet;
   }
