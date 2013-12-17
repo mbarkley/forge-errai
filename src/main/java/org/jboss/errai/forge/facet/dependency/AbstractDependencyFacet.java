@@ -42,7 +42,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     }
     // Create profiles
     for (Entry<String, Collection<DependencyBuilder>> entry : profileDependencies.entrySet()) {
-      getOrMakeProfile(entry.getKey(), entry.getValue(), oracle);
+      makeProfile(entry.getKey(), entry.getValue(), oracle);
     }
 
     return true;

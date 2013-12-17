@@ -1,6 +1,7 @@
 package org.jboss.errai.forge.facet.plugin;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.model.Model;
@@ -30,12 +31,18 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
   
   @Override
   public boolean install() {
-    getOrMakeProfile(PRODUCTION_PROFILE, dependencies, new VersionOracle(getProject().getFacet(DependencyFacet.class)));
+    makeProfile(PRODUCTION_PROFILE, dependencies, new VersionOracle(getProject().getFacet(DependencyFacet.class)));
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    final Model pom = coreFacet.getPOM();
-    final Profile profile = getProfile(PRODUCTION_PROFILE, pom.getProfiles());
-
+    Model pom = coreFacet.getPOM();
+    Profile profile = getProfile(PRODUCTION_PROFILE, pom.getProfiles());
     final VersionOracle oracle = new VersionOracle(getProject().getFacet(DependencyFacet.class));
+    
+    if (profile == null) {
+      makeProfile(PRODUCTION_PROFILE, Collections.EMPTY_LIST, oracle);
+      pom = coreFacet.getPOM();
+      profile = getProfile(PRODUCTION_PROFILE, pom.getProfiles());
+    }
+
     Plugin plugin = getPlugin(pluginArtifact, profile.getBuild().getPlugins());
  
     if (plugin == null) {

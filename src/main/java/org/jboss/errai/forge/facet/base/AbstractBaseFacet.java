@@ -56,7 +56,7 @@ public abstract class AbstractBaseFacet extends BaseFacet {
     return retVal;
   }
 
-  protected boolean getOrMakeProfile(final String name, final Collection<DependencyBuilder> deps,
+  protected boolean makeProfile(final String name, final Collection<DependencyBuilder> deps,
           final VersionOracle versionOracle) {
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     final Model pom = coreFacet.getPOM();
