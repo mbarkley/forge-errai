@@ -40,7 +40,6 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     else {
       plugin = MavenPluginBuilder.create();
       plugin.setDependency(pluginDep);
-      pluginFacet.addPlugin(plugin);
     }
 
     Configuration config = plugin.getConfig();
@@ -57,6 +56,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     for (final Execution exec : executions) {
       plugin.addExecution(exec);
     }
+    pluginFacet.addPlugin(plugin);
     
     return true;
   }
