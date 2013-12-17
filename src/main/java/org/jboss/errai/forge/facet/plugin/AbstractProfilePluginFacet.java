@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -38,9 +39,13 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
     final VersionOracle oracle = new VersionOracle(getProject().getFacet(DependencyFacet.class));
     
     if (profile == null) {
-      makeProfile(PRODUCTION_PROFILE, Collections.EMPTY_LIST, oracle);
+      makeProfile(PRODUCTION_PROFILE, Collections.<DependencyBuilder> emptyList(), oracle);
       pom = coreFacet.getPOM();
       profile = getProfile(PRODUCTION_PROFILE, pom.getProfiles());
+    }
+    
+    if (profile.getBuild() == null) {
+      profile.setBuild(new BuildBase());
     }
 
     Plugin plugin = getPlugin(pluginArtifact, profile.getBuild().getPlugins());
