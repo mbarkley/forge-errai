@@ -61,7 +61,7 @@
     <dependency>
       <groupId>org.jboss.forge</groupId>
       <artifactId>forge-shell</artifactId>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <repositories>
