@@ -39,6 +39,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     }
     else {
       plugin = MavenPluginBuilder.create();
+      plugin.setDependency(pluginDep);
       pluginFacet.addPlugin(plugin);
     }
 
