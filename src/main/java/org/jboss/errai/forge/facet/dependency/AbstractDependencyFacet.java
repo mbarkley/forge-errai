@@ -12,6 +12,7 @@ import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
+import org.jboss.errai.forge.facet.base.CoreBuildFacet;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
@@ -19,7 +20,7 @@ import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.shell.Shell;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
-@RequiresFacet({ DependencyFacet.class })
+@RequiresFacet({ DependencyFacet.class, CoreBuildFacet.class })
 abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
   /**

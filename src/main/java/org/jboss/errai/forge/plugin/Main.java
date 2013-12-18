@@ -3,7 +3,7 @@ package org.jboss.errai.forge.plugin;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import org.jboss.errai.forge.facet.dependency.ErraiBuildDependencyFacet;
+import org.jboss.errai.forge.facet.aggregate.CoreFacet;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.facets.events.InstallFacets;
 import org.jboss.forge.shell.ShellMessages;
@@ -15,7 +15,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 import org.jboss.forge.shell.plugins.SetupCommand;
 
 @Alias("errai-setup")
-@RequiresFacet({ ErraiBuildDependencyFacet.class })
+@RequiresFacet({ CoreFacet.class })
 public class Main implements Plugin {
   
   @Inject
@@ -26,8 +26,8 @@ public class Main implements Plugin {
   
   @SetupCommand
   public void setup(PipeOut out) {
-    if (!project.hasFacet(ErraiBuildDependencyFacet.class)) {
-      installEvent.fire(new InstallFacets(ErraiBuildDependencyFacet.class));
+    if (!project.hasFacet(CoreFacet.class)) {
+      installEvent.fire(new InstallFacets(CoreFacet.class));
     }
     else {
       ShellMessages.info(out, "The plugin is already setup.");
