@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
+import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.plugin.CleanPluginFacet;
 import org.jboss.errai.forge.facet.plugin.CompilerPluginFacet;
 import org.jboss.errai.forge.facet.plugin.DependencyPluginFacet;
@@ -51,6 +52,8 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
       final Build build = pom.getBuild();
       
       build.setOutputDirectory(buildOutput);
+      // TODO don't hardcode path
+      pom.addProperty(Property.JbossHome.getName(), "${project.build.directory}/jboss-as-7.1.1.Final");
       
       Resource res = getResource(javaSrcPath, build.getResources());
       if (res == null) {
