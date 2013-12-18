@@ -2,7 +2,9 @@ package org.jboss.errai.forge.facet.plugin;
 
 import java.util.Collection;
 
+import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
+import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenPluginFacet;
@@ -48,8 +50,12 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     }
     
     for (final DependencyBuilder dep : dependencies) {
-      if (dep.getVersion() == null || dep.getVersion().equals(""))
-        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+      if (dep.getVersion() == null || dep.getVersion().equals("")) {
+        if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
+          dep.setVersion(Property.ErraiVersion.invoke());
+        else
+          dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+      }
       plugin.addPluginDependency(dep);
     }
     

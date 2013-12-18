@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 
 import org.apache.maven.model.Profile;
+import org.jboss.errai.forge.constant.ArtifactVault;
+import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
@@ -38,7 +40,11 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
     // Add dev mode build dependencies
     for (DependencyBuilder dep : coreDependencies) {
-      depFacet.addDirectDependency(dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId())));
+      if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
+        dep.setVersion(Property.ErraiVersion.invoke());
+      else
+        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+      depFacet.addDirectDependency(dep);
     }
     // Create profiles
     for (Entry<String, Collection<DependencyBuilder>> entry : profileDependencies.entrySet()) {

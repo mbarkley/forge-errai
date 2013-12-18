@@ -19,9 +19,11 @@ import org.jboss.errai.forge.facet.plugin.DependencyPluginFacet;
 import org.jboss.errai.forge.facet.plugin.GwtPluginFacet;
 import org.jboss.errai.forge.facet.plugin.JbossPluginFacet;
 import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
+import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.ScopeType;
+import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
 @RequiresFacet({ CleanPluginFacet.class, CompilerPluginFacet.class, DependencyPluginFacet.class, GwtPluginFacet.class,
@@ -54,6 +56,8 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
       build.setOutputDirectory(buildOutput);
       // TODO don't hardcode path
       pom.addProperty(Property.JbossHome.getName(), "${project.build.directory}/jboss-as-7.1.1.Final");
+      pom.addProperty(Property.DevContext.getName(), "${project.artifactId}");
+      pom.addProperty(Property.ErraiVersion.getName(), new VersionOracle(getProject().getFacet(DependencyFacet.class)).resolveErraiVersion());
       
       Resource res = getResource(javaSrcPath, build.getResources());
       if (res == null) {

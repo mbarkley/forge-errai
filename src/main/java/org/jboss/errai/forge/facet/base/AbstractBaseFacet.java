@@ -7,6 +7,8 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
+import org.jboss.errai.forge.constant.ArtifactVault;
+import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.profiles.ProfileBuilder;
@@ -69,8 +71,12 @@ public abstract class AbstractBaseFacet extends BaseFacet {
     }
 
     for (DependencyBuilder dep : deps) {
-      if (dep.getVersion() == null || dep.getVersion().equals(""))
-        dep.setVersion(versionOracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+      if (dep.getVersion() == null || dep.getVersion().equals("")) {
+        if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
+          dep.setVersion(Property.ErraiVersion.invoke());
+        else
+          dep.setVersion(versionOracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+      }
       profile.addDependency(convert(dep));
     }
 
