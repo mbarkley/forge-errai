@@ -7,9 +7,11 @@ import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Gw
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Hsq;
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.JUnit;
 
+import org.jboss.errai.forge.facet.base.RequiresCore;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.ScopeType;
 
+@RequiresCore
 public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
 
   public ErraiBuildDependencyFacet() {

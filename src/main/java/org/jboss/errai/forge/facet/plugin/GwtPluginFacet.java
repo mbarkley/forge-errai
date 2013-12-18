@@ -5,12 +5,14 @@ import java.util.Arrays;
 
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
+import org.jboss.errai.forge.facet.base.RequiresCore;
 import org.jboss.forge.maven.plugins.ConfigurationElement;
 import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
 import org.jboss.forge.maven.plugins.Execution;
 import org.jboss.forge.maven.plugins.ExecutionBuilder;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 
+@RequiresCore
 public class GwtPluginFacet extends AbstractPluginFacet {
 
   public GwtPluginFacet() {

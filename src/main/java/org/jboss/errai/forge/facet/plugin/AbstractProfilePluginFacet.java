@@ -11,18 +11,14 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
-import org.jboss.errai.forge.facet.base.CoreBuildFacet;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
-import org.jboss.forge.maven.MavenPluginFacet;
 import org.jboss.forge.maven.plugins.Configuration;
 import org.jboss.forge.maven.plugins.ConfigurationElement;
 import org.jboss.forge.maven.plugins.MavenPluginAdapter;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.DependencyFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
 
-@RequiresFacet({ MavenPluginFacet.class, DependencyFacet.class, CoreBuildFacet.class })
 abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
 
   protected DependencyArtifact pluginArtifact;

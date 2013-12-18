@@ -6,7 +6,6 @@ import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
-import org.jboss.errai.forge.facet.base.CoreBuildFacet;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenPluginFacet;
 import org.jboss.forge.maven.plugins.Configuration;
@@ -16,9 +15,7 @@ import org.jboss.forge.maven.plugins.MavenPluginBuilder;
 import org.jboss.forge.project.dependencies.Dependency;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.DependencyFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
 
-@RequiresFacet({ MavenPluginFacet.class, DependencyFacet.class, CoreBuildFacet.class })
 abstract class AbstractPluginFacet extends AbstractBaseFacet {
 
   protected DependencyArtifact pluginArtifact;
