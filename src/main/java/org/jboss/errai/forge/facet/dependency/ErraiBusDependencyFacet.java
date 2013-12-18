@@ -13,7 +13,7 @@ public class ErraiBusDependencyFacet extends AbstractDependencyFacet {
     setCoreDependencies(
             DependencyBuilder.create(ErraiBus.toString())
     );
-    setProfileDependencies(PRODUCTION_PROFILE,
+    setProfileDependencies(MAIN_PROFILE,
             DependencyBuilder.create(Guava.toString()).setScopeType(ScopeType.PROVIDED)
     );
   }

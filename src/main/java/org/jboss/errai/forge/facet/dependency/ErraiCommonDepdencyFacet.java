@@ -13,7 +13,7 @@ public class ErraiCommonDepdencyFacet extends AbstractDependencyFacet {
     setCoreDependencies(
             DependencyBuilder.create(ErraiCommon.toString())
     );
-    setProfileDependencies(PRODUCTION_PROFILE,
+    setProfileDependencies(MAIN_PROFILE,
             DependencyBuilder.create(GwtSlf4j.toString()).setScopeType(ScopeType.PROVIDED)
     );
   }

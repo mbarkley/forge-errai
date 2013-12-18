@@ -18,7 +18,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 @RequiresFacet({MavenCoreFacet.class})
 public abstract class AbstractBaseFacet extends BaseFacet {
 
-  protected static final String PRODUCTION_PROFILE = "production";
+  protected static final String MAIN_PROFILE = "jboss7";
   
   @Override
   public boolean isInstalled() {

@@ -34,7 +34,7 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
     setCoreDependencies(DependencyBuilder.create(ErraiTools.toString()), DependencyBuilder.create(GwtUser.toString())
             .setScopeType(ScopeType.PROVIDED), DependencyBuilder.create(ErraiJboss.toString()), DependencyBuilder
             .create(JUnit.toString()).setScopeType(ScopeType.TEST));
-    setProfileDependencies(PRODUCTION_PROFILE,
+    setProfileDependencies(MAIN_PROFILE,
             DependencyBuilder.create(ErraiTools.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(ErraiJboss.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(Hsq.toString()).setScopeType(ScopeType.PROVIDED),

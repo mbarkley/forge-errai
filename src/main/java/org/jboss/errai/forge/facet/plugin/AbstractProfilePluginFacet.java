@@ -32,16 +32,16 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
   
   @Override
   public boolean install() {
-    makeProfile(PRODUCTION_PROFILE, dependencies, new VersionOracle(getProject().getFacet(DependencyFacet.class)));
+    makeProfile(MAIN_PROFILE, dependencies, new VersionOracle(getProject().getFacet(DependencyFacet.class)));
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     Model pom = coreFacet.getPOM();
-    Profile profile = getProfile(PRODUCTION_PROFILE, pom.getProfiles());
+    Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
     final VersionOracle oracle = new VersionOracle(getProject().getFacet(DependencyFacet.class));
     
     if (profile == null) {
-      makeProfile(PRODUCTION_PROFILE, Collections.<DependencyBuilder> emptyList(), oracle);
+      makeProfile(MAIN_PROFILE, Collections.<DependencyBuilder> emptyList(), oracle);
       pom = coreFacet.getPOM();
-      profile = getProfile(PRODUCTION_PROFILE, pom.getProfiles());
+      profile = getProfile(MAIN_PROFILE, pom.getProfiles());
     }
     
     if (profile.getBuild() == null) {
@@ -55,7 +55,6 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
       plugin.setArtifactId(pluginArtifact.getArtifactId());
       plugin.setGroupId(pluginArtifact.getGroupId());
       plugin.setVersion(oracle.resolveVersion(plugin.getGroupId(), plugin.getArtifactId()));
-      profile.getBuild().addPlugin(plugin);
     }
     
     final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
@@ -69,6 +68,8 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
     }
     adapter.setExtensions(extensions);
     
+    profile.getBuild().addPlugin(plugin);
+    pom.addProfile(profile);
     coreFacet.setPOM(pom);
 
     return true;
