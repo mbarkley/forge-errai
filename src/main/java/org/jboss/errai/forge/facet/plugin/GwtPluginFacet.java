@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
+import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.forge.maven.plugins.ConfigurationElement;
 import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
 import org.jboss.forge.maven.plugins.Execution;
@@ -31,9 +32,11 @@ public class GwtPluginFacet extends AbstractPluginFacet {
                       "-Xmx712m "
                     + "-XX:CompileThreshold=7000 "
                     + "-XX:MaxPermSize=128M "
-                    + "-Derrai.jboss.home=${errai.jboss.home} "
-                    + "-Derrai.dev.context=${errai.dev.context} "
-                    + "-Derrai.jboss.javaagent.path=${settings.localRepository}/org/jboss/errai/errai-client-local-class-hider/${errai.version}/errai-client-local-class-hider-${errai.version}.jar"
+                    + "-D" + Property.JbossHome.getName() + "=" + Property.JbossHome.invoke() + " "
+                    + "-D" + Property.DevContext.getName() + "=" + Property.DevContext.invoke() + " "
+                    + "-Derrai.jboss.javaagent.path=${settings.localRepository}/org/jboss/errai/errai-client-local-class-hider/"
+                      + Property.ErraiVersion.invoke() + "/errai-client-local-class-hider-"
+                      + Property.ErraiVersion.invoke() + ".jar"
             )
     });
   }

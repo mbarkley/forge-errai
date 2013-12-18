@@ -3,7 +3,7 @@ package org.jboss.errai.forge.constant;
 public class PomPropertyVault {
   
   public static enum Property {
-    JbossHome("errai.jboss.home");
+    JbossHome("errai.jboss.home"), ErraiVersion("errai.version"), DevContext("errai.dev.context");
     
     private String name;
 
@@ -13,6 +13,10 @@ public class PomPropertyVault {
     
     public String getName() {
       return name;
+    }
+    
+    public String invoke() {
+      return "${" + name + "}";
     }
   }
 
