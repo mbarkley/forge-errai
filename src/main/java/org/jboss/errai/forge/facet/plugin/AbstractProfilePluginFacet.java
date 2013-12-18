@@ -69,6 +69,10 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
     }
     adapter.setExtensions(extensions);
     
+    // Changes are not committed from adater to original plugin
+    plugin.setConfiguration(adapter.getConfiguration());
+    plugin.setExecutions(adapter.getExecutions());
+    
     coreFacet.setPOM(pom);
 
     return true;
