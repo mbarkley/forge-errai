@@ -16,7 +16,7 @@ import org.jboss.forge.project.dependencies.DependencyBuilder;
 public class GwtPluginFacet extends AbstractPluginFacet {
 
   public GwtPluginFacet() {
-    pluginArtifact = DependencyArtifact.Gwt;
+    pluginArtifact = DependencyArtifact.GwtPlugin;
     dependencies = new ArrayList<DependencyBuilder>(0);
     executions = Arrays.asList(new Execution[] {
             ExecutionBuilder.create().addGoal("resources").addGoal("compile")

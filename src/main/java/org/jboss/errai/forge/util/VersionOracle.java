@@ -21,9 +21,10 @@ public class VersionOracle {
     versionMap.put(DependencyArtifact.Clean.toString(), "2.4.1");
     versionMap.put(DependencyArtifact.Compiler.toString(), "2.3.2");
     versionMap.put(DependencyArtifact.Dependency.toString(), "2.8");
-    versionMap.put(DependencyArtifact.Gwt.toString(), "2.5.1");
     versionMap.put(DependencyArtifact.War.toString(), "2.2");
     versionMap.put(DependencyArtifact.JbossPlugin.toString(), "7.1.1.Final");
+    versionMap.put(DependencyArtifact.GwtUser.toString(), "2.5.1");
+    versionMap.put(DependencyArtifact.GwtPlugin.toString(), "2.5.1");
   }
   
   public VersionOracle(DependencyFacet facet) {
