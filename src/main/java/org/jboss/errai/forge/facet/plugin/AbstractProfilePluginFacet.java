@@ -32,7 +32,6 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
   
   @Override
   public boolean install() {
-    makeProfile(MAIN_PROFILE, dependencies, new VersionOracle(getProject().getFacet(DependencyFacet.class)));
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     Model pom = coreFacet.getPOM();
     Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
