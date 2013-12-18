@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
+import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.dependency.AbstractDependencyFacet;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.profiles.ProfileBuilder;
@@ -42,6 +43,11 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
   public void testNoProfileEmptyInstall() throws Exception {
     final Project project = initializeJavaProject();
     NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    
+    final Model pom = coreFacet.getPOM();
+    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
+    coreFacet.setPOM(pom);
 
     project.installFacet(facet);
 
