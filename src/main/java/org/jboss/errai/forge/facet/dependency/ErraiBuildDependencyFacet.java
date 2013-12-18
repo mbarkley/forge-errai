@@ -29,6 +29,7 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
 
   public final String javaSrcPath = "src/main/java";
   public final String resSrcPath = "src/main/resources";
+  public final String buildOutput = "src/main/webapp/WEB-INF/classes";
 
   public ErraiBuildDependencyFacet() {
     setCoreDependencies(DependencyBuilder.create(ErraiTools.toString()), DependencyBuilder.create(GwtUser.toString())
@@ -48,6 +49,8 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
       final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
       final Model pom = coreFacet.getPOM();
       final Build build = pom.getBuild();
+      
+      build.setOutputDirectory(buildOutput);
       
       Resource res = getResource(javaSrcPath, build.getResources());
       if (res == null) {
