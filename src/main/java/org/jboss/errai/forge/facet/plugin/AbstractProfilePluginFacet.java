@@ -10,7 +10,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
-import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.plugins.Configuration;
@@ -19,7 +18,7 @@ import org.jboss.forge.maven.plugins.MavenPluginAdapter;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.DependencyFacet;
 
-abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
+abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
   protected DependencyArtifact pluginArtifact;
   protected Collection<DependencyBuilder> dependencies;
@@ -57,7 +56,7 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
     final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
     final Configuration config = adapter.getConfig();
     for (final ConfigurationElement elem : configurations) {
-      config.addConfigurationElement(elem);
+      mergeConfigurationElement(config, elem);
     }
     adapter.setConfig(config);
     
@@ -66,7 +65,7 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
     }
     adapter.setExtensions(extensions);
     
-    // Changes are not committed from adater to original plugin
+    // Changes are not committed from adapter to original plugin
     plugin.setConfiguration(adapter.getConfiguration());
     plugin.setExecutions(adapter.getExecutions());
     
