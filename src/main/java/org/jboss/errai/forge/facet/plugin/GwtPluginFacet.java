@@ -28,11 +28,11 @@ public class GwtPluginFacet extends AbstractPluginFacet {
             ConfigurationElementBuilder.create().setName("soyc").setText("false"),
             ConfigurationElementBuilder.create().setName("hostedWebApp").setText("src/main/webapp"),
             ConfigurationElementBuilder.create().setName("extraJvmArgs").setText(
-                      "-Xmx712m"
-                    + "-XX:CompileThreshold=7000"
-                    + "-XX:MaxPermSize=128M"
-                    + "-Derrai.jboss.home=${errai.jboss.home}"
-                    + "-Derrai.dev.context=${errai.dev.context}"
+                      "-Xmx712m "
+                    + "-XX:CompileThreshold=7000 "
+                    + "-XX:MaxPermSize=128M "
+                    + "-Derrai.jboss.home=${errai.jboss.home} "
+                    + "-Derrai.dev.context=${errai.dev.context} "
                     + "-Derrai.jboss.javaagent.path=${settings.localRepository}/org/jboss/errai/errai-client-local-class-hider/${errai.version}/errai-client-local-class-hider-${errai.version}.jar"
             )
     });
