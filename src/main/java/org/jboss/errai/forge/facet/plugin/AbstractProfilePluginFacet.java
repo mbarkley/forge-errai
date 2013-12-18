@@ -55,6 +55,7 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
       plugin.setArtifactId(pluginArtifact.getArtifactId());
       plugin.setGroupId(pluginArtifact.getGroupId());
       plugin.setVersion(oracle.resolveVersion(plugin.getGroupId(), plugin.getArtifactId()));
+      profile.getBuild().addPlugin(plugin);
     }
     
     final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
@@ -62,14 +63,13 @@ abstract class AbstractProfilePluginFacet extends AbstractBaseFacet {
     for (final ConfigurationElement elem : configurations) {
       config.addConfigurationElement(elem);
     }
+    adapter.setConfig(config);
     
     for (final PluginExecution exec : executions) {
       adapter.addExecution(exec);
     }
     adapter.setExtensions(extensions);
     
-    profile.getBuild().addPlugin(plugin);
-    pom.addProfile(profile);
     coreFacet.setPOM(pom);
 
     return true;
