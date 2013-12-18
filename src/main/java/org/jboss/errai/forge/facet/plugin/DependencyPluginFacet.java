@@ -27,6 +27,8 @@ public class DependencyPluginFacet extends AbstractPluginFacet {
                                     .addChild(ConfigurationElementBuilder.create()
                                             .setName("artifactId").setText("jboss-as-dist"))
                                     .addChild(ConfigurationElementBuilder.create()
+                                            .setName("version").setText("7.1.1.Final"))
+                                    .addChild(ConfigurationElementBuilder.create()
                                             .setName("type").setText("zip"))
                                     .addChild(ConfigurationElementBuilder.create()
                                             .setName("overWrite").setText("false"))
