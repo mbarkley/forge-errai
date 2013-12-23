@@ -16,6 +16,8 @@ import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.MavenPluginFacet;
 import org.jboss.forge.maven.plugins.Configuration;
 import org.jboss.forge.maven.plugins.ConfigurationElement;
+import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
+import org.jboss.forge.maven.plugins.ConfigurationElementNotFoundException;
 import org.jboss.forge.maven.plugins.Execution;
 import org.jboss.forge.maven.plugins.MavenPlugin;
 import org.jboss.forge.maven.plugins.PluginElement;
@@ -52,6 +54,20 @@ public class AbstractPluginFacetTest extends AbstractShellTest {
     }
   }
 
+  public static class ConfigHavingPlugin extends BaseTestImpl {
+    public ConfigHavingPlugin() {
+      pluginArtifact = DependencyArtifact.Clean;
+      configurations = Arrays.asList(new ConfigurationElement[] {
+              ConfigurationElementBuilder.create().setName("configName").setText("configText"),
+              ConfigurationElementBuilder.create().setName("parent").addChild(
+                      ConfigurationElementBuilder.create().setName("child").setText("childText")
+              )
+      });
+      executions = Collections.emptyList();
+      dependencies = Collections.emptyList();
+    }
+  }
+
   @Test
   public void testEmptyPluginDefinition() throws Exception {
     final Project project = initializeJavaProject();
@@ -65,6 +81,15 @@ public class AbstractPluginFacetTest extends AbstractShellTest {
   public void testWithDependencies() throws Exception {
     final Project project = initializeJavaProject();
     final DependencyHavingPlugin facet = new DependencyHavingPlugin();
+
+    project.installFacet(facet);
+    checkPlugin(project, facet);
+  }
+
+  @Test
+  public void testWithConfigurations() throws Exception {
+    final Project project = initializeJavaProject();
+    final ConfigHavingPlugin facet = new ConfigHavingPlugin();
 
     project.installFacet(facet);
     checkPlugin(project, facet);
@@ -154,11 +179,12 @@ public class AbstractPluginFacetTest extends AbstractShellTest {
     if (expected.hasChilderen()) {
       for (final PluginElement raw : expected.getChildren()) {
         final ConfigurationElement expectedChild = ConfigurationElement.class.cast(raw);
-        if (!outcome.hasChildByName(expectedChild.getName(), true)) {
-          fail("Could not find expected configuration element: " + expected.toString());
+        try {
+          final ConfigurationElement outcomeChild = outcome.getChildByName(expectedChild.getName(), true);
+          assertMatchingConfigElem(expectedChild, outcomeChild);
         }
-        else {
-          assertMatchingConfigElem(expectedChild, outcome.getChildByName(expectedChild.getName(), true));
+        catch (ConfigurationElementNotFoundException e) {
+          fail("Could not find expected configuration element: " + expected.toString());
         }
       }
     }
