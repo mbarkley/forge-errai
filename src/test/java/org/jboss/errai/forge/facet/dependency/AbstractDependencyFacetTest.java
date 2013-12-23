@@ -1,6 +1,8 @@
 package org.jboss.errai.forge.facet.dependency;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,7 +13,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
-import org.jboss.errai.forge.facet.dependency.AbstractDependencyFacet;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.profiles.ProfileBuilder;
 import org.jboss.forge.project.Project;
@@ -90,6 +91,25 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertEquals(2, profiles.get(0).getDependencies().size());
     assertEquals("errai-ui", profiles.get(0).getDependencies().get(0).getArtifactId());
     assertEquals(DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(1).getArtifactId());
+  }
+  
+  @Test
+  public void testConflictingDependency() throws Exception {
+    final Project project = initializeJavaProject();
+    final NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    Model pom = coreFacet.getPOM();
+    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
+    coreFacet.setPOM(pom);
+    
+    final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+    depFacet.addDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":2.4.2.Final"));
+    
+    project.installFacet(facet);
+    
+    assertTrue(project.hasFacet(facet.getClass()));
+    assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString()).setVersion(Property.ErraiVersion.invoke())));
+    assertFalse(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + "2.4.2.Final")));
   }
 
 }
