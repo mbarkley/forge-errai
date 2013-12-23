@@ -15,10 +15,12 @@ import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.MavenPluginFacet;
 import org.jboss.forge.maven.plugins.Configuration;
+import org.jboss.forge.maven.plugins.ConfigurationBuilder;
 import org.jboss.forge.maven.plugins.ConfigurationElement;
 import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
 import org.jboss.forge.maven.plugins.ConfigurationElementNotFoundException;
 import org.jboss.forge.maven.plugins.Execution;
+import org.jboss.forge.maven.plugins.ExecutionBuilder;
 import org.jboss.forge.maven.plugins.MavenPlugin;
 import org.jboss.forge.maven.plugins.PluginElement;
 import org.jboss.forge.project.Project;
@@ -68,6 +70,23 @@ public class AbstractPluginFacetTest extends AbstractShellTest {
     }
   }
 
+  public static class ExecutionHavingPlugin extends BaseTestImpl {
+    public ExecutionHavingPlugin() {
+      pluginArtifact = DependencyArtifact.Clean;
+      configurations = Collections.emptyList();
+      executions = Arrays.asList(new Execution[] {
+              ExecutionBuilder.create().setId("testExec").setPhase("compile").setConfig(
+                      ConfigurationBuilder.create().addConfigurationElement(
+                              ConfigurationElementBuilder.create().setName("parent")
+                              .addChild(ConfigurationElementBuilder.create().setName("child").setText("childText"))
+                      )
+                      .addConfigurationElement(ConfigurationElementBuilder.create().setName("leaf").setText("leafText"))
+              )
+      });
+      dependencies = Collections.emptyList();
+    }
+  }
+
   @Test
   public void testEmptyPluginDefinition() throws Exception {
     final Project project = initializeJavaProject();
@@ -90,6 +109,15 @@ public class AbstractPluginFacetTest extends AbstractShellTest {
   public void testWithConfigurations() throws Exception {
     final Project project = initializeJavaProject();
     final ConfigHavingPlugin facet = new ConfigHavingPlugin();
+
+    project.installFacet(facet);
+    checkPlugin(project, facet);
+  }
+
+  @Test
+  public void testWithExecutions() throws Exception {
+    final Project project = initializeJavaProject();
+    final ExecutionHavingPlugin facet = new ExecutionHavingPlugin();
 
     project.installFacet(facet);
     checkPlugin(project, facet);
