@@ -17,7 +17,7 @@ import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.junit.Test;
 
 public class AbstractPluginFacetTest extends BasePluginFacetTest {
-  
+
   public static class DefinitionOnly extends AbstractPluginFacet {
     public DefinitionOnly() {
       pluginArtifact = DependencyArtifact.Clean;
@@ -43,11 +43,9 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     public ConfigHavingPlugin() {
       pluginArtifact = DependencyArtifact.Clean;
       configurations = Arrays.asList(new ConfigurationElement[] {
-              ConfigurationElementBuilder.create().setName("configName").setText("configText"),
-              ConfigurationElementBuilder.create().setName("parent").addChild(
-                      ConfigurationElementBuilder.create().setName("child").setText("childText")
-              )
-      });
+          ConfigurationElementBuilder.create().setName("configName").setText("configText"),
+          ConfigurationElementBuilder.create().setName("parent")
+                  .addChild(ConfigurationElementBuilder.create().setName("child").setText("childText")) });
       executions = Collections.emptyList();
       dependencies = Collections.emptyList();
     }
@@ -57,15 +55,22 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     public ExecutionHavingPlugin() {
       pluginArtifact = DependencyArtifact.Clean;
       configurations = Collections.emptyList();
-      executions = Arrays.asList(new Execution[] {
-              ExecutionBuilder.create().setId("testExec").setPhase("compile").setConfig(
-                      ConfigurationBuilder.create().addConfigurationElement(
-                              ConfigurationElementBuilder.create().setName("parent")
-                              .addChild(ConfigurationElementBuilder.create().setName("child").setText("childText"))
-                      )
-                      .addConfigurationElement(ConfigurationElementBuilder.create().setName("leaf").setText("leafText"))
-              )
-      });
+      executions = Arrays.asList(new Execution[] { ExecutionBuilder
+              .create()
+              .setId("testExec")
+              .setPhase("compile")
+              .setConfig(
+                      ConfigurationBuilder
+                              .create()
+                              .addConfigurationElement(
+                                      ConfigurationElementBuilder
+                                              .create()
+                                              .setName("parent")
+                                              .addChild(
+                                                      ConfigurationElementBuilder.create().setName("child")
+                                                              .setText("childText")))
+                              .addConfigurationElement(
+                                      ConfigurationElementBuilder.create().setName("leaf").setText("leafText"))) });
       dependencies = Collections.emptyList();
     }
   }
@@ -115,7 +120,8 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     Build build = coreFacet.getPOM().getBuild();
     if (build == null)
       build = new Build();
-    checkDependencies(build, facet.dependencies, facet.pluginArtifact.toString());
+    checkDependencies(build, facet.dependencies, build.getPluginsAsMap().get(facet.pluginArtifact.toString())
+            .getDependencies(), facet.pluginArtifact.toString());
     checkConfigurations(pluginFacet.getPlugin(DependencyBuilder.create(artifactDef)).getConfig(), facet.configurations);
   }
 

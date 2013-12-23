@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.apache.maven.model.BuildBase;
-import org.apache.maven.model.Plugin;
 import org.jboss.forge.maven.MavenPluginFacet;
 import org.jboss.forge.maven.plugins.Configuration;
 import org.jboss.forge.maven.plugins.ConfigurationElement;
@@ -22,7 +21,7 @@ import org.jboss.forge.project.dependencies.ScopeType;
 import org.jboss.forge.test.AbstractShellTest;
 
 public abstract class BasePluginFacetTest extends AbstractShellTest {
-  
+
   protected void checkExecutions(MavenPlugin plugin, Collection<Execution> executions) {
     assertEquals(executions.size(), plugin.listExecutions().size());
 
@@ -45,13 +44,12 @@ public abstract class BasePluginFacetTest extends AbstractShellTest {
   }
 
   // TODO check dependency exclusions
-  protected void checkDependencies(BuildBase build, Collection<DependencyBuilder> dependencies, String artifactKey) {
-    final Plugin corePlugin = build.getPluginsAsMap().get(artifactKey);
-    
-    assertEquals(dependencies.size(), corePlugin.getDependencies().size());
+  protected void checkDependencies(BuildBase build, Collection<DependencyBuilder> expectedDependencies,
+          Collection<org.apache.maven.model.Dependency> actualDependencies, String artifactKey) {
+    assertEquals(expectedDependencies.size(), actualDependencies.size());
 
-    Outer: for (final DependencyBuilder expected : dependencies) {
-      for (final org.apache.maven.model.Dependency outcome : corePlugin.getDependencies()) {
+    Outer: for (final DependencyBuilder expected : expectedDependencies) {
+      for (final org.apache.maven.model.Dependency outcome : actualDependencies) {
         if (expected.getGroupId().equals(outcome.getGroupId())
                 && expected.getArtifactId().equals(outcome.getArtifactId())) {
           assertEquals(expected.getGroupId(), outcome.getGroupId());
@@ -60,7 +58,7 @@ public abstract class BasePluginFacetTest extends AbstractShellTest {
           assertEquals(expected.getScopeType(), outcome.getScope());
           if (ScopeType.SYSTEM.equals(expected.getScopeTypeEnum()))
             assertEquals(expected.getSystemPath(), outcome.getSystemPath());
-          
+
           continue Outer;
         }
       }
@@ -102,6 +100,5 @@ public abstract class BasePluginFacetTest extends AbstractShellTest {
       assertEquals(expected.getText(), outcome.getText());
     }
   }
-
 
 }

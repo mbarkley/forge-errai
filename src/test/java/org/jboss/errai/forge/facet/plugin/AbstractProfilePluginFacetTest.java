@@ -91,6 +91,33 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
   }
   
+  @Test
+  public void testDependencyHavingPlugin() throws Exception {
+    final Project project = initializeJavaProject();
+    final DependencyHavingPlugin facet = new DependencyHavingPlugin();
+    
+    project.installFacet(facet);
+    checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
+  }
+  
+  @Test
+  public void testConfigHavingPlugin() throws Exception {
+    final Project project = initializeJavaProject();
+    final ConfigHavingPlugin facet = new ConfigHavingPlugin();
+    
+    project.installFacet(facet);
+    checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
+  }
+  
+  @Test
+  public void testExecutionHavingPlugin() throws Exception {
+    final Project project = initializeJavaProject();
+    final ExecutionHavingPlugin facet = new ExecutionHavingPlugin();
+    
+    project.installFacet(facet);
+    checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
+  }
+  
   protected void checkPlugin(Project project, AbstractProfilePluginFacet facet, String profileId) {
     final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
     Profile profile = null;
@@ -112,10 +139,13 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
     final Collection<Execution> executions = new ArrayList<Execution>();
     for (final PluginExecution plugExec : facet.executions) {
       configAdapter.setConfiguration(plugExec.getConfiguration());
-      executions.add(ExecutionBuilder.create().setId(plugExec.getId()).setPhase(plugExec.getPhase()).setConfig(configAdapter.getConfig()));
+      ExecutionBuilder newExec = ExecutionBuilder.create().setId(plugExec.getId()).setPhase(plugExec.getPhase()).setConfig(configAdapter.getConfig());
+      for (final String goal : plugExec.getGoals())
+        newExec.addGoal(goal);
+      executions.add(newExec);
     }
     checkExecutions(adapter, executions);
-    checkDependencies(build, facet.dependencies, facet.pluginArtifact.toString());
+    checkDependencies(build, facet.dependencies, plugin.getDependencies(), facet.pluginArtifact.toString());
     checkConfigurations(adapter.getConfig(), facet.configurations);
   }
 
