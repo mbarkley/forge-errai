@@ -28,7 +28,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
   @Inject
   protected Shell shell;
-
+  
   @Override
   public boolean install() {
     // TODO error handling and reversion
@@ -38,12 +38,10 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
     // Add dev mode build dependencies
     for (DependencyBuilder dep : coreDependencies) {
-      if (!ArtifactVault.isManaged(dep.getGroupId(), dep.getArtifactId())) {
-        if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
-          dep.setVersion(Property.ErraiVersion.invoke());
-        else
-          dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
-      }
+      if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
+        dep.setVersion(Property.ErraiVersion.invoke());
+      else
+        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
       depFacet.addDirectDependency(dep);
     }
     // Create profiles

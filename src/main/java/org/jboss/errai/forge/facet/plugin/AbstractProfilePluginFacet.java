@@ -64,8 +64,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
     adapter.setConfig(config);
 
     for (final DependencyBuilder depBuilder : dependencies) {
-      if (!ArtifactVault.isManaged(depBuilder.getGroupId(), depBuilder.getArtifactId())
-              && (depBuilder.getVersion() == null || depBuilder.getVersion().equals(""))) {
+      if (depBuilder.getVersion() == null || depBuilder.getVersion().equals("")) {
         if (ArtifactVault.ERRAI_GROUP_ID.equals(depBuilder.getGroupId())) {
           depBuilder.setVersion(Property.ErraiVersion.invoke());
         }

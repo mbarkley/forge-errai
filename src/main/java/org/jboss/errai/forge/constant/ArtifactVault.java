@@ -17,9 +17,6 @@ public final class ArtifactVault {
     GwtSlf4j("gwt-slf4j", "de.benediktmeurer.gwt-slf4j"),
     JavaxInject("javax.inject", "javax.inject"),
     CdiApi("cdi-api", "javax.enterprise"),
-    JavaEE("jboss-javaee-6.0", "org.jboss.spec", false),
-    WeldCore("weld-core", "org.jboss.weld", false),
-    WeldServletCore("weld-servlet-core", "org.jboss.weld.servlet", false),
     
     // plugins
     Clean("maven-clean-plugin", "org.apache.maven.plugins"),
@@ -30,10 +27,8 @@ public final class ArtifactVault {
     JbossPlugin("jboss-as-maven-plugin", "org.jboss.as.plugins"),
     
     // errai
-    ErraiBom("errai-bom", "org.jboss.errai", false),
-    ErraiParent("errai-parent", "org.jboss.errai", false),
     ErraiNetty("netty", "org.jboss.errai.io.netty"),
-    ErraiJboss("errai-cdi-jboss", "org.jboss.errai", false),
+    ErraiJboss("errai-cdi-jboss"),
     ErraiCommon("errai-common"),
     ErraiTools("errai-tools"),
     ErraiBus("errai-bus"),
@@ -45,16 +40,10 @@ public final class ArtifactVault {
     
     private final String artifactId;
     private final String groupId;
-    private final boolean managed;
-    
-    private DependencyArtifact(final String artifactId, final String groupId, boolean managed) {
-      this.artifactId = artifactId;
-      this.groupId = groupId;
-      this.managed = managed;
-    }
     
     private DependencyArtifact(final String artifactId, final String groupId) {
-      this(artifactId, groupId, true);
+      this.artifactId = artifactId;
+      this.groupId = groupId;
     }
 
     private DependencyArtifact(final String id) {
@@ -73,10 +62,6 @@ public final class ArtifactVault {
     public String toString() {
       return String.format("%s:%s", groupId, artifactId);
     }
-
-    public boolean isManaged() {
-      return managed;
-    }
     
     private static Map<String, DependencyArtifact> artifacts = new HashMap<String, ArtifactVault.DependencyArtifact>();
     
@@ -89,11 +74,6 @@ public final class ArtifactVault {
     public static DependencyArtifact valueOf(String groupId, String artifactId) {
       return artifacts.get(groupId + ":" + artifactId);
     }
-  }
-  
-  public static boolean isManaged(final String groupId, final String artifactId) {
-    final DependencyArtifact artifact = DependencyArtifact.valueOf(groupId, artifactId);
-    return artifact != null && artifact.isManaged();
   }
   
 }
