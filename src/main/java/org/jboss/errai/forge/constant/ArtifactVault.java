@@ -15,6 +15,8 @@ public final class ArtifactVault {
     Hsq("hsqldb", "hsqldb"),
     JUnit("junit", "junit"),
     GwtSlf4j("gwt-slf4j", "de.benediktmeurer.gwt-slf4j"),
+    JavaxInject("javax.inject", "javax.inject"),
+    CdiApi("cdi-api", "javax.enterprise"),
     
     // plugins
     Clean("maven-clean-plugin", "org.apache.maven.plugins"),
@@ -33,7 +35,8 @@ public final class ArtifactVault {
     ErraiCdiClient("errai-cdi-client"),
     ErraiWeldIntegration("errai-weld-integration"),
     ErraiCdiJetty("errai-cdi-jetty"),
-    ErraiCodegenGwt("errai-codegen-gwt");
+    ErraiCodegenGwt("errai-codegen-gwt"),
+    ErraiIoc("errai-ioc");
     
     private final String artifactId;
     private final String groupId;

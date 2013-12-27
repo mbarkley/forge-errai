@@ -4,7 +4,7 @@ import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
-@RequiresFacet({ ErraiBusDependencyFacet.class })
+@RequiresFacet({ ErraiBusDependencyFacet.class, ErraiIocDependencyFacet.class })
 public class ErraiCdiClientDependencyFacet extends AbstractDependencyFacet {
 
   public ErraiCdiClientDependencyFacet() {
