@@ -8,6 +8,7 @@ import org.jboss.forge.project.facets.BaseFacet;
  * @author Max Barkley <mbarkley@redhat.com>
  */
 abstract class BaseAggregatorFacet extends BaseFacet {
+  // TODO Implement uninstall
 
   @Override
   public boolean install() {
