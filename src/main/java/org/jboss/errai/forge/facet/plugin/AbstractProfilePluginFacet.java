@@ -9,7 +9,10 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
+import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
+import org.jboss.errai.forge.constant.PomPropertyVault.Property;
+import org.jboss.errai.forge.util.MavenConverter;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.plugins.Configuration;
@@ -25,26 +28,26 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
   protected Collection<ConfigurationElement> configurations;
   protected Collection<PluginExecution> executions;
   protected boolean extensions = true;
-  
+
   @Override
   public boolean install() {
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     Model pom = coreFacet.getPOM();
     Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
     final VersionOracle oracle = new VersionOracle(getProject().getFacet(DependencyFacet.class));
-    
+
     if (profile == null) {
       makeProfile(MAIN_PROFILE, Collections.<DependencyBuilder> emptyList(), oracle);
       pom = coreFacet.getPOM();
       profile = getProfile(MAIN_PROFILE, pom.getProfiles());
     }
-    
+
     if (profile.getBuild() == null) {
       profile.setBuild(new BuildBase());
     }
 
     Plugin plugin = getPlugin(pluginArtifact, profile.getBuild().getPlugins());
- 
+
     if (plugin == null) {
       plugin = new Plugin();
       plugin.setArtifactId(pluginArtifact.getArtifactId());
@@ -52,23 +55,37 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
       plugin.setVersion(oracle.resolveVersion(plugin.getGroupId(), plugin.getArtifactId()));
       profile.getBuild().addPlugin(plugin);
     }
-    
+
     final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
     final Configuration config = adapter.getConfig();
     for (final ConfigurationElement elem : configurations) {
       mergeConfigurationElement(config, elem);
     }
     adapter.setConfig(config);
-    
+
+    for (final DependencyBuilder depBuilder : dependencies) {
+      if (depBuilder.getVersion() == null || depBuilder.getVersion().equals("")) {
+        if (ArtifactVault.ERRAI_GROUP_ID.equals(depBuilder.getGroupId())) {
+          depBuilder.setVersion(Property.ErraiVersion.invoke());
+        }
+        else {
+          depBuilder.setVersion(new VersionOracle(getProject().getFacet(DependencyFacet.class)).resolveVersion(
+                  depBuilder.getGroupId(), depBuilder.getArtifactId()));
+        }
+      }
+      adapter.addDependency(MavenConverter.convert(depBuilder));
+    }
+
     for (final PluginExecution exec : executions) {
       adapter.addExecution(exec);
     }
     adapter.setExtensions(extensions);
-    
+
     // Changes are not committed from adapter to original plugin
     plugin.setConfiguration(adapter.getConfiguration());
     plugin.setExecutions(adapter.getExecutions());
-    
+    plugin.setDependencies(adapter.getDependencies());
+
     coreFacet.setPOM(pom);
 
     return true;
