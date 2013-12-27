@@ -29,7 +29,11 @@ public final class ArtifactVault {
     ErraiJboss("errai-cdi-jboss"),
     ErraiCommon("errai-common"),
     ErraiTools("errai-tools"),
-    ErraiBus("errai-bus");
+    ErraiBus("errai-bus"),
+    ErraiCdiClient("errai-cdi-client"),
+    ErraiWeldIntegration("errai-weld-integration"),
+    ErraiCdiJetty("errai-cdi-jetty"),
+    ErraiCodegenGwt("errai-codegen-gwt");
     
     private final String artifactId;
     private final String groupId;

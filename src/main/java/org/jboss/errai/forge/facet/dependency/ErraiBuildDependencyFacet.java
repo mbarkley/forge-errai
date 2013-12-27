@@ -1,5 +1,6 @@
 package org.jboss.errai.forge.facet.dependency;
 
+import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.ErraiCodegenGwt;
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.ErraiJboss;
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.ErraiNetty;
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.ErraiTools;
@@ -23,6 +24,7 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
             DependencyBuilder.create(ErraiJboss.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(Hsq.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(JUnit.toString()).setScopeType(ScopeType.PROVIDED),
-            DependencyBuilder.create(ErraiNetty.toString()).setScopeType(ScopeType.PROVIDED));
+            DependencyBuilder.create(ErraiNetty.toString()).setScopeType(ScopeType.PROVIDED),
+            DependencyBuilder.create(ErraiCodegenGwt.toString()).setScopeType(ScopeType.PROVIDED));
   }
 }
