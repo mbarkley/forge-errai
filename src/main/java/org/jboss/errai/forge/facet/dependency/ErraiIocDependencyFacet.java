@@ -10,7 +10,6 @@ public class ErraiIocDependencyFacet extends AbstractDependencyFacet {
   public ErraiIocDependencyFacet() {
     setCoreDependencies(DependencyBuilder.create(ErraiIoc.toString()));
     setProfileDependencies(MAIN_PROFILE,
-            DependencyBuilder.create(ErraiTools.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(ErraiCodegenGwt.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(JavaxInject.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(CdiApi.toString()).setScopeType(ScopeType.PROVIDED)
