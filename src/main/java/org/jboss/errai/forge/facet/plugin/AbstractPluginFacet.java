@@ -50,7 +50,8 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     }
 
     for (final DependencyBuilder dep : dependencies) {
-      if (dep.getVersion() == null || dep.getVersion().equals("")) {
+      if (!ArtifactVault.isManaged(dep.getGroupId(), dep.getArtifactId())
+              && (dep.getVersion() == null || dep.getVersion().equals(""))) {
         if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
           dep.setVersion(Property.ErraiVersion.invoke());
         else
