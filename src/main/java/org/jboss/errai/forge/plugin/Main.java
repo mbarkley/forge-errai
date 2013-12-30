@@ -4,6 +4,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
+import org.jboss.errai.forge.facet.aggregate.ErraiMessagingFacet;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.facets.events.InstallFacets;
 import org.jboss.forge.shell.ShellMessages;
@@ -37,6 +38,16 @@ public class Main implements Plugin {
   @Command("version")
   public void pipeVersion(PipeOut out) {
     ShellMessages.info(out, "1.0.0-SNAPSHOT");
+  }
+  
+  @Command("messaging")
+  public void addMessaging(PipeOut out) {
+    if (!project.hasFacet(ErraiMessagingFacet.class)) {
+      installEvent.fire(new InstallFacets(ErraiMessagingFacet.class));
+    }
+    else {
+      ShellMessages.info(out, "Errai Messaging has already been added to this project.");
+    }
   }
 
 }
