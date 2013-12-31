@@ -15,7 +15,11 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
   private final Shell shell;
 
   public ModuleCoreFacet(final Shell shell) {
+    this();
     this.shell = shell;
+  }
+  
+  public ModuleCoreFacet() {
     modules = Arrays.asList(new Module[] {
             Module.GwtUser
     });

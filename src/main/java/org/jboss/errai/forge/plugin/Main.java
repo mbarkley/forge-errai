@@ -9,7 +9,6 @@ import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiMessagingFacet;
-import org.jboss.errai.forge.facet.module.ModuleCoreFacet;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.facets.events.InstallFacets;
 import org.jboss.forge.shell.Shell;
@@ -18,9 +17,11 @@ import org.jboss.forge.shell.plugins.Alias;
 import org.jboss.forge.shell.plugins.Command;
 import org.jboss.forge.shell.plugins.PipeOut;
 import org.jboss.forge.shell.plugins.Plugin;
+import org.jboss.forge.shell.plugins.RequiresFacet;
 import org.jboss.forge.shell.plugins.SetupCommand;
 
 @Alias("errai-setup")
+@RequiresFacet({ CoreFacet.class })
 public class Main implements Plugin {
 
   @Inject
@@ -41,8 +42,8 @@ public class Main implements Plugin {
       final File module = promptForModule();
       config.setProjectProperty(ProjectProperty.MODULE, module);
     }
-    if (!project.hasFacet(ModuleCoreFacet.class)) {
-      project.installFacet(new ModuleCoreFacet(shell));
+    if (!project.hasFacet(CoreFacet.class)) {
+      project.installFacet(new CoreFacet());
     }
   }
 
