@@ -30,7 +30,7 @@ public final class ProjectConfig {
   }
 
   public <T> void setProjectProperty(ProjectProperty property, T value) {
-    if (property.valueType.isAssignableFrom(value.getClass())) {
+    if (!property.valueType.isInstance(value)) {
       throw new IllegalArgumentException("Value for property " + property.toString() + " must be type "
               + property.valueType + ", not " + value.getClass());
     }
