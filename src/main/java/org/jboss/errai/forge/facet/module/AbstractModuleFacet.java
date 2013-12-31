@@ -1,24 +1,23 @@
 package org.jboss.errai.forge.facet.module;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
+import org.jboss.forge.shell.Shell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class AbstractModuleFacet extends AbstractBaseFacet {
   
@@ -26,6 +25,8 @@ public class AbstractModuleFacet extends AbstractBaseFacet {
    * A collection of module logical names to be inherited (fully-qualified, not "gwt.xml" suffix).
    */
   protected Collection<Module> modules;
+  @Inject
+  protected Shell shell;
 
   @Override
   public boolean install() {
@@ -62,20 +63,21 @@ public class AbstractModuleFacet extends AbstractBaseFacet {
         }
       }
     }
-    catch (ParserConfigurationException e) {
-      // TODO error handling
-      return false;
-    }
-    catch (SAXException e) {
-      // TODO error handling
-      return false;
-    }
-    catch (IOException e) {
-      // TODO error handling
+    catch (Exception e) {
+      error("Error: failed to add required inheritance to module.", e);
       return false;
     }
     
     return true;
+  }
+
+  protected void error(final String msg, final Exception ex) {
+    shell.println(msg);
+    if (shell.isVerbose() && ex != null) {
+      for (final StackTraceElement trace : ex.getStackTrace()) {
+        shell.println(trace.toString());
+      }
+    }
   }
   
   public File getModuleFile() {

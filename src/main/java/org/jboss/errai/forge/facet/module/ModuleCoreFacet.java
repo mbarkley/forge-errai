@@ -12,8 +12,6 @@ import org.jboss.forge.shell.Shell;
 
 public class ModuleCoreFacet extends AbstractModuleFacet {
 
-  private final Shell shell;
-  
   private final String emptyModuleContents =
           "<?xml version='1.0' encoding='UTF-8'?>\n"
           + "<!DOCTYPE module PUBLIC '-//Google Inc.//DTD Google Web Toolkit 1.6//EN'\n\t"
@@ -65,15 +63,6 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
     }
 
     return super.install();
-  }
-
-  private void error(final String msg, final Exception ex) {
-    shell.println(msg);
-    if (shell.isVerbose() && ex != null) {
-      for (final StackTraceElement trace : ex.getStackTrace()) {
-        shell.println(trace.toString());
-      }
-    }
   }
 
 }
