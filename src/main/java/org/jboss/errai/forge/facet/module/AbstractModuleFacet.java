@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
+import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -24,7 +25,7 @@ public class AbstractModuleFacet extends AbstractBaseFacet {
   /**
    * A collection of module logical names to be inherited (fully-qualified, not "gwt.xml" suffix).
    */
-  protected Collection<String> modules;
+  protected Collection<Module> modules;
 
   @Override
   public boolean install() {
@@ -41,8 +42,8 @@ public class AbstractModuleFacet extends AbstractBaseFacet {
       }
       
       Node before = null;
-      for (final String newModule : modules) {
-        if (!curModuleNames.contains(newModule)) {
+      for (final Module newModule : modules) {
+        if (!curModuleNames.contains(newModule.getLogicalName())) {
           // Append after last insertion (or after last inherit tag)
           if (before == null) {
             final NodeList childNodes = root.getChildNodes();
@@ -55,7 +56,7 @@ public class AbstractModuleFacet extends AbstractBaseFacet {
           }
          
           final Element newNode = doc.createElement("inherits");
-          newNode.setAttribute("name", newModule);
+          newNode.setAttribute("name", newModule.getLogicalName());
           
           root.insertBefore(newNode, before);
         }
