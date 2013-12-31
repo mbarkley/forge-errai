@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class AbstractModuleFacet extends AbstractBaseFacet {
+abstract class AbstractModuleFacet extends AbstractBaseFacet {
   
   /**
    * A collection of module logical names to be inherited (fully-qualified, not "gwt.xml" suffix).
