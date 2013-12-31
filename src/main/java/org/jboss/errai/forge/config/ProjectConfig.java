@@ -33,9 +33,14 @@ public final class ProjectConfig {
   public ProjectConfig(final ConfigurationFactory factory) {
     final Configuration config = factory.getUserConfig();
     for (final ProjectProperty prop : ProjectProperty.values()) {
-      Object val = config.getProperty(getProjectAttribute(prop));
-      if (val != null) {
-        properties.put(prop, val);
+      String val = config.getString(getProjectAttribute(prop));
+      if (val != null && val.equals("")) {
+        if (prop.valueType.equals(File.class)) {
+          properties.put(prop, new File(val));
+        }
+        else {
+          properties.put(prop, val);
+        }
       }
     }
     configFactory = factory;
@@ -53,9 +58,14 @@ public final class ProjectConfig {
 
     final Configuration config = configFactory.getUserConfig();
     properties.put(property, value);
-    config.setProperty(getProjectAttribute(property), value);
+    if (property.valueType.equals(File.class)) {
+      config.setProperty(getProjectAttribute(property), File.class.cast(value).getAbsolutePath());
+    }
+    else {
+      config.setProperty(getProjectAttribute(property), value);
+    }
   }
-  
+
   public static String getProjectAttribute(final ProjectProperty prop) {
     return PREFIX + prop.name();
   }
