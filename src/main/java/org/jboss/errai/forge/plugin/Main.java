@@ -43,7 +43,7 @@ public class Main implements Plugin {
       config.setProjectProperty(ProjectProperty.MODULE, module);
     }
     if (!project.hasFacet(CoreFacet.class)) {
-      project.installFacet(new CoreFacet());
+      installEvent.fire(new InstallFacets(CoreFacet.class));
     }
   }
 
