@@ -8,6 +8,10 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
@@ -62,6 +66,12 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
           root.insertBefore(newNode, before);
         }
       }
+      
+      final TransformerFactory transFactory = TransformerFactory.newInstance();
+      final Transformer transformer = transFactory.newTransformer();
+      final DOMSource source = new DOMSource(doc);
+      final StreamResult res = new StreamResult(getModuleFile());
+      transformer.transform(source, res);
     }
     catch (Exception e) {
       error("Error: failed to add required inheritance to module.", e);
