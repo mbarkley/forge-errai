@@ -7,7 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.jboss.forge.project.Project;
+import org.jboss.forge.env.Configuration;
+import org.jboss.forge.env.ConfigurationFactory;
 
 @Singleton
 public final class ProjectConfig {
@@ -26,17 +27,18 @@ public final class ProjectConfig {
 
   private final Map<ProjectProperty, Object> properties = new ConcurrentHashMap<ProjectProperty, Object>();
 
-  final private Project project;
+  private final ConfigurationFactory configFactory;
 
   @Inject
-  public ProjectConfig(Project project) {
+  public ProjectConfig(final ConfigurationFactory factory) {
+    final Configuration config = factory.getUserConfig();
     for (final ProjectProperty prop : ProjectProperty.values()) {
-      Object val = project.getAttribute(getProjectAttribute(prop));
+      Object val = config.getProperty(getProjectAttribute(prop));
       if (val != null) {
         properties.put(prop, val);
       }
     }
-    this.project = project;
+    configFactory = factory;
   }
 
   public <T> T getProjectProperty(ProjectProperty property, Class<T> type) {
@@ -49,8 +51,9 @@ public final class ProjectConfig {
               + property.valueType + ", not " + value.getClass());
     }
 
+    final Configuration config = configFactory.getUserConfig();
     properties.put(property, value);
-    project.setAttribute(getProjectAttribute(property), value);
+    config.setProperty(getProjectAttribute(property), value);
   }
   
   public static String getProjectAttribute(final ProjectProperty prop) {
