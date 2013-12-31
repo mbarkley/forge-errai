@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.jboss.forge.shell.Shell;
@@ -31,7 +30,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
 
   @Override
   public boolean install() {
-    final File module = ProjectConfig.getMainConfig().getProjectProperty(ProjectProperty.MODULE, File.class);
+    final File module = config.getProjectProperty(ProjectProperty.MODULE, File.class);
     if (!module.exists()) {
       module.getParentFile().mkdirs();
       try {

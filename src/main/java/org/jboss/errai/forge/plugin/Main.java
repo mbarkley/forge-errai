@@ -32,11 +32,12 @@ public class Main implements Plugin {
 
   @Inject
   private Shell shell;
+  
+  @Inject
+  private ProjectConfig config;
 
   @SetupCommand
   public void setup(PipeOut out) {
-    final ProjectConfig config = ProjectConfig.getMainConfig();
-
     // Configure gwt module
     if (config.getProjectProperty(ProjectProperty.MODULE, File.class) == null) {
       final File module = promptForModule();

@@ -34,6 +34,8 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
   protected Collection<Module> modules;
   @Inject
   protected Shell shell;
+  @Inject
+  protected ProjectConfig config;
 
   final private static Properties xmlProperties = new Properties();
   {
@@ -103,7 +105,7 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
   }
 
   public File getModuleFile() {
-    return ProjectConfig.getMainConfig().getProjectProperty(ProjectProperty.MODULE, File.class);
+    return config.getProjectProperty(ProjectProperty.MODULE, File.class);
   }
 
 }
