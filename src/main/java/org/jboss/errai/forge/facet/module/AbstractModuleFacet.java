@@ -3,11 +3,13 @@ package org.jboss.errai.forge.facet.module;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -24,13 +26,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 abstract class AbstractModuleFacet extends AbstractBaseFacet {
-  
+
   /**
-   * A collection of module logical names to be inherited (fully-qualified, not "gwt.xml" suffix).
+   * A collection of module logical names to be inherited (fully-qualified, not
+   * "gwt.xml" suffix).
    */
   protected Collection<Module> modules;
   @Inject
   protected Shell shell;
+
+  final private static Properties xmlProperties = new Properties();
+  {
+    xmlProperties.setProperty(OutputKeys.INDENT, "yes");
+    xmlProperties.setProperty(OutputKeys.DOCTYPE_PUBLIC, "-//Google Inc.//DTD Google Web Toolkit 1.6//EN");
+    xmlProperties.setProperty(OutputKeys.DOCTYPE_SYSTEM,
+            "http://google-web-toolkit.googlecode.com/svn/releases/1.6/distro-source/core/src/gwt-module.dtd");
+  }
 
   @Override
   public boolean install() {
@@ -40,12 +51,12 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
       final Document doc = builder.parse(getModuleFile());
       final Node root = doc.getElementsByTagName("module").item(0);
       final NodeList curModules = doc.getElementsByTagName("inherits");
-      
+
       final Set<String> curModuleNames = new HashSet<String>();
       for (int i = 0; i < curModules.getLength(); i++) {
         curModuleNames.add(curModules.item(i).getAttributes().getNamedItem("name").getNodeValue());
       }
-      
+
       Node before = null;
       for (final Module newModule : modules) {
         if (!curModuleNames.contains(newModule.getLogicalName())) {
@@ -59,25 +70,26 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
               }
             }
           }
-         
+
           final Element newNode = doc.createElement("inherits");
           newNode.setAttribute("name", newModule.getLogicalName());
-          
+
           root.insertBefore(newNode, before);
         }
       }
-      
+
       final TransformerFactory transFactory = TransformerFactory.newInstance();
       final Transformer transformer = transFactory.newTransformer();
       final DOMSource source = new DOMSource(doc);
       final StreamResult res = new StreamResult(getModuleFile());
+      transformer.setOutputProperties(xmlProperties);
       transformer.transform(source, res);
     }
     catch (Exception e) {
       error("Error: failed to add required inheritance to module.", e);
       return false;
     }
-    
+
     return true;
   }
 
@@ -89,7 +101,7 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
       }
     }
   }
-  
+
   public File getModuleFile() {
     return ProjectConfig.getMainConfig().getProjectProperty(ProjectProperty.MODULE, File.class);
   }
