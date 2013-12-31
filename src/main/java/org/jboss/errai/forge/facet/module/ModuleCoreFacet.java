@@ -13,6 +13,12 @@ import org.jboss.forge.shell.Shell;
 public class ModuleCoreFacet extends AbstractModuleFacet {
 
   private final Shell shell;
+  
+  private final String emptyModuleContents =
+          "<?xml version='1.0' encoding='UTF-8'?>\n"
+          + "<!DOCTYPE module PUBLIC '-//Google Inc.//DTD Google Web Toolkit 1.6//EN'\n\t"
+          + "'http://google-web-toolkit.googlecode.com/svn/releases/1.6/distro-source/core/src/gwt-module.dtd'>\n"
+          + "<module></module>\n";
 
   public ModuleCoreFacet(final Shell shell) {
     this();
@@ -41,7 +47,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
       final FileWriter writer;
       try {
         writer = new FileWriter(module);
-        writer.append("<module></module>");
+        writer.append(emptyModuleContents);
       }
       catch (IOException e) {
         error("Cannot write to module at " + module.getAbsolutePath(), e);
