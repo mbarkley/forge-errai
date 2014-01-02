@@ -3,11 +3,14 @@ package org.jboss.errai.forge.facet.dependency;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
@@ -38,11 +41,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
     // Add dev mode build dependencies
     for (DependencyBuilder dep : coreDependencies) {
-      if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
-        dep.setVersion(Property.ErraiVersion.invoke());
-      else
-        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
-      depFacet.addDirectDependency(dep);
+      depFacet.addDirectDependency(getDependencyWithVersion(dep, oracle));
     }
     // Create profiles
     for (Entry<String, Collection<DependencyBuilder>> entry : profileDependencies.entrySet()) {
@@ -61,13 +60,69 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
       }
     }
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    for (Profile profile : coreFacet.getPOM().getProfiles()) {
+    Model pom = coreFacet.getPOM();
+    for (Profile profile : pom.getProfiles()) {
       if (profileDependencies.containsKey(profile.getId())) {
-        coreFacet.getPOM().removeProfile(profile);
+        for (DependencyBuilder dep : profileDependencies.get(profile.getId())) {
+          List<Dependency> profDeps = profile.getDependencies();
+          for (int i = 0; i < profDeps.size(); i++) {
+            if (profDeps.get(i).getArtifactId().equals(dep.getArtifactId())
+                    && profDeps.get(i).getGroupId().equals(dep.getGroupId())) {
+              profDeps.remove(i);
+              break;
+            }
+          }
+        }
       }
     }
+    coreFacet.setPOM(pom);
 
     return true;
+  }
+  
+  @Override
+  public boolean isInstalled() {
+    if (super.isInstalled()) {
+      return true;
+    }
+    else {
+      final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
+      final VersionOracle oracle = new VersionOracle(depFacet);
+      for (final DependencyBuilder dep : coreDependencies) {
+        if (!depFacet.hasDirectDependency(getDependencyWithVersion(dep, oracle))) {
+          return false;
+        }
+      }
+      
+      final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+      final Model pom = coreFacet.getPOM();
+      for (final String profName : profileDependencies.keySet()) {
+        final Profile profile = getProfile(profName, pom.getProfiles());
+        if (profile == null) {
+          return false;
+        }
+        outer:
+        for (final Dependency profDep : profile.getDependencies()) {
+          for (final DependencyBuilder dep : profileDependencies.get(profName)) {
+            if (profDep.getArtifactId().equals(dep.getArtifactId()) && profDep.getGroupId().equals(dep.getGroupId())) {
+              continue outer;
+            }
+          }
+          return false;
+        }
+      }
+      
+      return true;
+    }
+  }
+  
+  private DependencyBuilder getDependencyWithVersion(final DependencyBuilder dep, final VersionOracle oracle) {
+      if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
+        dep.setVersion(Property.ErraiVersion.invoke());
+      else
+        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+      
+      return dep;
   }
 
   protected void setCoreDependencies(final DependencyBuilder... deps) {

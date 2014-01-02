@@ -1,8 +1,6 @@
 package org.jboss.errai.forge.facet.dependency;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -111,5 +109,51 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString()).setVersion(Property.ErraiVersion.invoke())));
     assertFalse(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + "2.4.2.Final")));
   }
+  
+  @Test
+  public void testNoProfileUninstall() throws Exception {
+    // Setup
+    final Project project = initializeJavaProject();
+    NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    
+    final Model pom = coreFacet.getPOM();
+    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
+    coreFacet.setPOM(pom);
 
+    project.installFacet(facet);
+
+    assertTrue("Precondition failed.", project.hasFacet(NoProfileDependencyFacet.class));
+    assertTrue("Precondition failed.", project.getFacet(DependencyFacet.class).hasDirectDependency(
+            DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":3.0-SNAPSHOT")));
+    
+    // Actual test
+    facet = new NoProfileDependencyFacet();
+    facet.setProject(project);
+    project.removeFacet(facet);
+    assertFalse("Precondition failed.", project.hasFacet(NoProfileDependencyFacet.class));
+  }
+
+  @Test
+  public void testProfileUninstall() throws Exception {
+    // Setup
+    final Project project = initializeJavaProject();
+    ProfileDependencyFacet facet = new ProfileDependencyFacet();
+
+    project.installFacet(facet);
+
+    assertTrue(project.hasFacet(ProfileDependencyFacet.class));
+    List<Profile> profiles = project.getFacet(MavenCoreFacet.class).getPOM().getProfiles();
+    assertEquals("Precondition failed.", 1, profiles.size());
+    assertEquals("Precondition failed.", "myProfile", profiles.get(0).getId());
+    assertEquals("Precondition failed.", 1, profiles.get(0).getDependencies().size());
+    assertEquals("Precondition failed.", DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(0).getArtifactId());
+    
+    // Actual test
+    facet = new ProfileDependencyFacet();
+    facet.setProject(project);
+    project.removeFacet(facet);
+    profiles = project.getFacet(MavenCoreFacet.class).getPOM().getProfiles();
+    assertEquals("Precondition failed.", 0, profiles.get(0).getDependencies().size());
+  }
 }
