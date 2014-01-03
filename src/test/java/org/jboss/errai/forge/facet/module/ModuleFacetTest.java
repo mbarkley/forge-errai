@@ -107,6 +107,17 @@ public class ModuleFacetTest extends AbstractShellTest {
   }
   
   @Test
+  public void testAbstractModuleFacetIsInstalledNegative(ProjectConfig config, SimpleModuleFacet facet) throws Exception {
+    final Project project = initializeJavaProject();
+    String body = ModuleCoreFacet.emptyModuleContents;
+    final File moduleFile = makeBlankModuleFile(project, body);
+    config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
+    facet.setProject(project);
+    
+    assertFalse(facet.isInstalled());
+  }
+  
+  @Test
   public void testAbstractModuleFacetUninstall(ProjectConfig config, SimpleModuleFacet facet) throws Exception {
     final Project project = initializeJavaProject();
     String body = ModuleCoreFacet.emptyModuleContents.replace("</module>",
