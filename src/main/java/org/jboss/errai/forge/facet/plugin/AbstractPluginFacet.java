@@ -2,16 +2,21 @@ package org.jboss.errai.forge.facet.plugin;
 
 import java.util.Collection;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.util.VersionOracle;
+import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.MavenPluginFacet;
 import org.jboss.forge.maven.plugins.Configuration;
 import org.jboss.forge.maven.plugins.ConfigurationElement;
 import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
+import org.jboss.forge.maven.plugins.ConfigurationElementNotFoundException;
 import org.jboss.forge.maven.plugins.Execution;
+import org.jboss.forge.maven.plugins.MavenPlugin;
 import org.jboss.forge.maven.plugins.MavenPluginBuilder;
 import org.jboss.forge.maven.plugins.PluginElement;
 import org.jboss.forge.project.dependencies.Dependency;
@@ -65,6 +70,90 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     pluginFacet.addPlugin(plugin);
 
     return true;
+  }
+
+  @Override
+  public boolean isInstalled() {
+    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+    final Model pom = coreFacet.getPOM();
+    if (pom.getBuild() == null)
+      return false;
+
+    final Plugin plugin = pom.getBuild().getPluginsAsMap().get(pluginArtifact.toString());
+
+    if (plugin == null)
+      return false;
+
+    outer: for (final DependencyBuilder dep : dependencies) {
+      for (final org.apache.maven.model.Dependency pluginDep : plugin.getDependencies()) {
+        if (dep.getArtifactId().equals(pluginDep.getArtifactId()) && dep.getGroupId().equals(pluginDep.getGroupId()))
+          continue outer;
+      }
+      return false;
+    }
+
+    final MavenPluginFacet pluginFacet = getProject().getFacet(MavenPluginFacet.class);
+    final MavenPlugin mPlugin = pluginFacet.getPlugin(DependencyBuilder.create(pluginArtifact.toString()));
+
+    outer: for (final Execution exec : executions) {
+      for (final Execution pluginExec : mPlugin.listExecutions()) {
+        // TODO check more than just id
+        if (exec.getId().equals(pluginExec.getId()))
+          continue outer;
+      }
+      return false;
+    }
+    
+    if (!isMatchingConfiguration(mPlugin.getConfig(), configurations))
+      return false;
+
+    return true;
+  }
+
+  protected boolean isMatchingConfiguration(final Configuration config, final Collection<ConfigurationElement> elements) {
+    for (final ConfigurationElement elem : elements) {
+      if (!isMatchingElement(config.getConfigurationElement(elem.getName()), elem))
+        return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Checks that the given {@link ConfigurationElement} is consistent with the
+   * expected one. This means that the expected configuration tree is a subtree
+   * of the given.
+   * 
+   * @param given
+   *          The given configuration element.
+   * @param expected
+   *          The expected configuration element.
+   * @return True if expected is a subtree of given.
+   */
+  private boolean isMatchingElement(final ConfigurationElement given, final ConfigurationElement expected) {
+    if (given == null)
+      return false;
+
+    if (expected.hasChilderen()) {
+      for (final PluginElement pluginElem : expected.getChildren()) {
+        if (pluginElem instanceof ConfigurationElement) {
+          final ConfigurationElement elem = ConfigurationElement.class.cast(pluginElem);
+          try {
+            final ConfigurationElement child = given.getChildByName(elem.getName(), true);
+            if (!isMatchingElement(child, elem))
+              return false;
+          }
+          catch (ConfigurationElementNotFoundException e) {
+            return false;
+          }
+        }
+      }
+      
+      return true;
+    }
+    else {
+      return expected.getText().equals(given.getText());
+    }
   }
 
   @Override

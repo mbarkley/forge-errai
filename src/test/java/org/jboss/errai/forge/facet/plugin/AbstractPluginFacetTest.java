@@ -1,5 +1,8 @@
 package org.jboss.errai.forge.facet.plugin;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -94,6 +97,27 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
   }
 
   @Test
+  public void testIsInstalledWithDependencies() throws Exception {
+    final Project project = initializeJavaProject();
+    final DependencyHavingPlugin facet = new DependencyHavingPlugin() {
+      public boolean isInstalled() { return false; };
+      public boolean uninstall() { return true; };
+    };
+    final DependencyHavingPlugin testFacet = new DependencyHavingPlugin();
+    testFacet.setProject(project);
+    
+    assertFalse(testFacet.isInstalled());
+
+    project.installFacet(facet);
+    // Precondition
+    checkPlugin(project, facet);
+    project.unregisterFacet(facet);
+    
+    // Actual test
+    assertTrue(testFacet.isInstalled());
+  }
+  
+  @Test
   public void testWithConfigurations() throws Exception {
     final Project project = initializeJavaProject();
     final ConfigHavingPlugin facet = new ConfigHavingPlugin();
@@ -103,12 +127,52 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
   }
 
   @Test
+  public void testIsInstalledWithConfigurations() throws Exception {
+    final Project project = initializeJavaProject();
+    final ConfigHavingPlugin facet = new ConfigHavingPlugin() {
+      public boolean isInstalled() { return false; };
+      public boolean uninstall() { return true; };
+    };
+    final ConfigHavingPlugin testFacet = new ConfigHavingPlugin();
+    testFacet.setProject(project);
+    
+    assertFalse(testFacet.isInstalled());
+
+    project.installFacet(facet);
+    // Precondition
+    checkPlugin(project, facet);
+    project.unregisterFacet(facet);
+    
+    assertTrue(testFacet.isInstalled());
+  }
+
+  @Test
   public void testWithExecutions() throws Exception {
     final Project project = initializeJavaProject();
     final ExecutionHavingPlugin facet = new ExecutionHavingPlugin();
 
     project.installFacet(facet);
     checkPlugin(project, facet);
+  }
+
+  @Test
+  public void testIsInstalledWithExecutions() throws Exception {
+    final Project project = initializeJavaProject();
+    final ExecutionHavingPlugin facet = new ExecutionHavingPlugin() {
+      public boolean isInstalled() { return false; };
+      public boolean uninstall() { return true; };
+    };
+    final ExecutionHavingPlugin testFacet = new ExecutionHavingPlugin();
+    testFacet.setProject(project);
+    
+    assertFalse(testFacet.isInstalled());
+
+    project.installFacet(facet);
+    // Precondition
+    checkPlugin(project, facet);
+    project.unregisterFacet(facet);
+    
+    assertTrue(testFacet.isInstalled());
   }
 
   private void checkPlugin(Project project, AbstractPluginFacet facet) {
