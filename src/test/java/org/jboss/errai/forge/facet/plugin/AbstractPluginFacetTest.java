@@ -1,7 +1,6 @@
 package org.jboss.errai.forge.facet.plugin;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -173,6 +172,21 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     project.unregisterFacet(facet);
     
     assertTrue(testFacet.isInstalled());
+  }
+  
+  @Test
+  public void testUninstall() throws Exception {
+    final Project project = initializeJavaProject();
+    final ExecutionHavingPlugin facet = new ExecutionHavingPlugin();
+    project.installFacet(facet);
+    
+    // Precondition
+    assertTrue(facet.isInstalled());
+    
+    project.removeFacet(facet);
+    
+    final MavenPluginFacet pluginFacet = project.getFacet(MavenPluginFacet.class);
+    assertFalse(pluginFacet.hasPlugin(DependencyBuilder.create(facet.pluginArtifact.toString())));
   }
 
   private void checkPlugin(Project project, AbstractPluginFacet facet) {

@@ -158,8 +158,10 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
 
   @Override
   public boolean uninstall() {
-    // TODO implement
-    return false;
+    final MavenPluginFacet pluginFacet = getProject().getFacet(MavenPluginFacet.class);
+    pluginFacet.removePlugin(DependencyBuilder.create(pluginArtifact.toString()));
+    
+    return true;
   }
 
   protected void mergeConfigurationElement(final Configuration config, final ConfigurationElement configElem) {
