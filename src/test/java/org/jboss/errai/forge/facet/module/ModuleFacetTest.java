@@ -92,6 +92,37 @@ public class ModuleFacetTest extends AbstractShellTest {
     assertEquals(1, countMatches("<inherits name=\"[^\"]*\"/>", moduleContent));
   }
   
+  @Test
+  public void testAbstractModuleFacetIsInstalled(ProjectConfig config, SimpleModuleFacet facet) throws Exception {
+    final Project project = initializeJavaProject();
+    String body = ModuleCoreFacet.emptyModuleContents.replace("</module>",
+            "<inherits name='org.jboss.errai.common.ErraiCommon'/>\n"
+            + "<inherits name='com.google.gwt.user.User'/>\n"
+            + "</module>");
+    final File moduleFile = makeBlankModuleFile(project, body);
+    config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
+    facet.setProject(project);
+    
+    assertTrue(facet.isInstalled());
+  }
+  
+  @Test
+  public void testAbstractModuleFacetUninstall(ProjectConfig config, SimpleModuleFacet facet) throws Exception {
+    final Project project = initializeJavaProject();
+    String body = ModuleCoreFacet.emptyModuleContents.replace("</module>",
+            "<inherits name='org.jboss.errai.common.ErraiCommon'/>\n"
+            + "<inherits name='com.google.gwt.user.User'/>\n"
+            + "</module>");
+    final File moduleFile = makeBlankModuleFile(project, body);
+    config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
+    facet.setProject(project);
+    
+    boolean res = facet.uninstall();
+    
+    assertTrue(res);
+    assertEquals(0, countMatches("<inherits name=\"[^\"]*\"/>", getFileContentAsString(moduleFile)));
+  }
+  
   private int countMatches(final String regex, final String content) {
     final Pattern pattern = Pattern.compile(regex);
     final Matcher matcher = pattern.matcher(content);

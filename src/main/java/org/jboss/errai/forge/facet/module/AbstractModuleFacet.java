@@ -94,6 +94,73 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
 
     return true;
   }
+  
+  @Override
+  public boolean isInstalled() {
+    final File moduleFile = getModuleFile();
+    if (moduleFile == null || !moduleFile.exists())
+      return false;
+    
+    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    try {
+      final DocumentBuilder builder = factory.newDocumentBuilder();
+      final Document doc = builder.parse(getModuleFile());
+      final NodeList curModules = doc.getElementsByTagName("inherits");
+
+      final Set<String> curModuleNames = new HashSet<String>();
+      for (int i = 0; i < curModules.getLength(); i++) {
+        curModuleNames.add(curModules.item(i).getAttributes().getNamedItem("name").getNodeValue());
+      }
+      
+      for (final Module module : modules) {
+        if (!curModuleNames.contains(module.getLogicalName()))
+          return false;
+      }
+      
+      return true;
+    }
+    catch (Exception e) {
+      error("Error: could not read gwt module.", e);
+      return false;
+    }
+  }
+  
+  @Override
+  public boolean uninstall() {
+    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    try {
+      final DocumentBuilder builder = factory.newDocumentBuilder();
+      final Document doc = builder.parse(getModuleFile());
+      final NodeList curModules = doc.getElementsByTagName("inherits");
+
+      final Set<String> moduleNames = new HashSet<String>(modules.size());
+      for (final Module module : modules) {
+        moduleNames.add(module.getLogicalName());
+      }
+      
+      for (int i = 0; i < curModules.getLength(); i++) {
+        final Node item = curModules.item(i);
+        if (moduleNames.contains(item.getAttributes().getNamedItem("name").getTextContent())) {
+          item.getParentNode().removeChild(item);
+          i--;
+        }
+      }
+
+      final TransformerFactory transFactory = TransformerFactory.newInstance();
+      final Transformer transformer = transFactory.newTransformer();
+      final DOMSource source = new DOMSource(doc);
+      final StreamResult res = new StreamResult(getModuleFile());
+      transformer.setOutputProperties(xmlProperties);
+      transformer.transform(source, res);
+      
+      return true;
+    }
+    catch (Exception e) {
+      error("Error: failed to remove inherited modules.", e);
+      return false;
+    }
+
+  }
 
   protected void error(final String msg, final Exception ex) {
     shell.println(msg);
