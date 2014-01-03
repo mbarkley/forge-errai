@@ -23,8 +23,8 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
 
   public static class NoProfileDependencyFacet extends AbstractDependencyFacet {
     public NoProfileDependencyFacet() {
-      coreDependencies = Arrays.asList(new DependencyBuilder[] { DependencyBuilder.create(DependencyArtifact.ErraiCommon
-              .toString()) });
+      coreDependencies = Arrays.asList(new DependencyBuilder[] { DependencyBuilder
+              .create(DependencyArtifact.ErraiCommon.toString()) });
       profileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
     }
   }
@@ -33,8 +33,8 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     public ProfileDependencyFacet() {
       coreDependencies = Arrays.asList(new DependencyBuilder[0]);
       profileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
-      profileDependencies.put("myProfile",
-              Arrays.asList(new DependencyBuilder[] { DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString()) }));
+      profileDependencies.put("myProfile", Arrays.asList(new DependencyBuilder[] { DependencyBuilder
+              .create(DependencyArtifact.ErraiCommon.toString()) }));
     }
   }
 
@@ -43,7 +43,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     final Project project = initializeJavaProject();
     NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
     final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
-    
+
     final Model pom = coreFacet.getPOM();
     pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
     coreFacet.setPOM(pom);
@@ -67,7 +67,8 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertEquals(1, profiles.size());
     assertEquals("myProfile", profiles.get(0).getId());
     assertEquals(1, profiles.get(0).getDependencies().size());
-    assertEquals(DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(0).getArtifactId());
+    assertEquals(DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(0)
+            .getArtifactId());
   }
 
   @Test
@@ -88,9 +89,10 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertEquals("myProfile", profiles.get(0).getId());
     assertEquals(2, profiles.get(0).getDependencies().size());
     assertEquals("errai-ui", profiles.get(0).getDependencies().get(0).getArtifactId());
-    assertEquals(DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(1).getArtifactId());
+    assertEquals(DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(1)
+            .getArtifactId());
   }
-  
+
   @Test
   public void testConflictingDependency() throws Exception {
     final Project project = initializeJavaProject();
@@ -99,24 +101,26 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     Model pom = coreFacet.getPOM();
     pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
     coreFacet.setPOM(pom);
-    
+
     final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
     depFacet.addDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":2.4.2.Final"));
-    
+
     project.installFacet(facet);
-    
+
     assertTrue(project.hasFacet(facet.getClass()));
-    assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString()).setVersion(Property.ErraiVersion.invoke())));
-    assertFalse(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + "2.4.2.Final")));
+    assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString())
+            .setVersion(Property.ErraiVersion.invoke())));
+    assertFalse(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString()
+            + "2.4.2.Final")));
   }
-  
+
   @Test
   public void testNoProfileUninstall() throws Exception {
     // Setup
     final Project project = initializeJavaProject();
     NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
     final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
-    
+
     final Model pom = coreFacet.getPOM();
     pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
     coreFacet.setPOM(pom);
@@ -124,14 +128,17 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     project.installFacet(facet);
 
     assertTrue("Precondition failed.", project.hasFacet(NoProfileDependencyFacet.class));
-    assertTrue("Precondition failed.", project.getFacet(DependencyFacet.class).hasDirectDependency(
-            DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":3.0-SNAPSHOT")));
-    
+    assertTrue(
+            "Precondition failed.",
+            project.getFacet(DependencyFacet.class).hasDirectDependency(
+                    DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":3.0-SNAPSHOT")));
+
     // Actual test
     facet = new NoProfileDependencyFacet();
     facet.setProject(project);
     project.removeFacet(facet);
-    assertFalse("Precondition failed.", project.hasFacet(NoProfileDependencyFacet.class));
+    assertFalse(project.hasFacet(NoProfileDependencyFacet.class));
+    assertEquals(0, coreFacet.getPOM().getDependencies().size());
   }
 
   @Test
@@ -147,13 +154,61 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertEquals("Precondition failed.", 1, profiles.size());
     assertEquals("Precondition failed.", "myProfile", profiles.get(0).getId());
     assertEquals("Precondition failed.", 1, profiles.get(0).getDependencies().size());
-    assertEquals("Precondition failed.", DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(0).getArtifactId());
-    
+    assertEquals("Precondition failed.", DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0)
+            .getDependencies().get(0).getArtifactId());
+
     // Actual test
     facet = new ProfileDependencyFacet();
     facet.setProject(project);
     project.removeFacet(facet);
     profiles = project.getFacet(MavenCoreFacet.class).getPOM().getProfiles();
-    assertEquals("Precondition failed.", 0, profiles.get(0).getDependencies().size());
+    assertEquals(0, profiles.get(0).getDependencies().size());
+  }
+
+  @Test
+  public void testNoProfileIsInstalled() throws Exception {
+    // Setup
+    final Project project = initializeJavaProject();
+    NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+
+    final Model pom = coreFacet.getPOM();
+    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
+    coreFacet.setPOM(pom);
+
+    project.installFacet(facet);
+
+    assertTrue("Precondition failed.", project.hasFacet(NoProfileDependencyFacet.class));
+    assertTrue(
+            "Precondition failed.",
+            project.getFacet(DependencyFacet.class).hasDirectDependency(
+                    DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":3.0-SNAPSHOT")));
+
+    // Actual test
+    facet = new NoProfileDependencyFacet();
+    facet.setProject(project);
+    assertTrue(facet.isInstalled());
+  }
+
+  @Test
+  public void testProfileIsInstalled() throws Exception {
+    // Setup
+    final Project project = initializeJavaProject();
+    ProfileDependencyFacet facet = new ProfileDependencyFacet();
+
+    project.installFacet(facet);
+
+    assertTrue(project.hasFacet(ProfileDependencyFacet.class));
+    List<Profile> profiles = project.getFacet(MavenCoreFacet.class).getPOM().getProfiles();
+    assertEquals("Precondition failed.", 1, profiles.size());
+    assertEquals("Precondition failed.", "myProfile", profiles.get(0).getId());
+    assertEquals("Precondition failed.", 1, profiles.get(0).getDependencies().size());
+    assertEquals("Precondition failed.", DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0)
+            .getDependencies().get(0).getArtifactId());
+
+    // Actual test
+    facet = new ProfileDependencyFacet();
+    facet.setProject(project);
+    assertTrue(facet.isInstalled());
   }
 }

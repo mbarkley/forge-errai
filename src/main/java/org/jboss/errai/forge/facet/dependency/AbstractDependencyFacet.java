@@ -31,7 +31,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
   @Inject
   protected Shell shell;
-  
+
   @Override
   public boolean install() {
     // TODO error handling and reversion
@@ -79,50 +79,44 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
     return true;
   }
-  
+
   @Override
   public boolean isInstalled() {
-    if (super.isInstalled()) {
-      return true;
-    }
-    else {
-      final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
-      final VersionOracle oracle = new VersionOracle(depFacet);
-      for (final DependencyBuilder dep : coreDependencies) {
-        if (!depFacet.hasDirectDependency(getDependencyWithVersion(dep, oracle))) {
-          return false;
-        }
+    final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
+    final VersionOracle oracle = new VersionOracle(depFacet);
+    for (final DependencyBuilder dep : coreDependencies) {
+      if (!depFacet.hasDirectDependency(getDependencyWithVersion(dep, oracle))) {
+        return false;
       }
-      
-      final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-      final Model pom = coreFacet.getPOM();
-      for (final String profName : profileDependencies.keySet()) {
-        final Profile profile = getProfile(profName, pom.getProfiles());
-        if (profile == null) {
-          return false;
-        }
-        outer:
-        for (final Dependency profDep : profile.getDependencies()) {
-          for (final DependencyBuilder dep : profileDependencies.get(profName)) {
-            if (profDep.getArtifactId().equals(dep.getArtifactId()) && profDep.getGroupId().equals(dep.getGroupId())) {
-              continue outer;
-            }
+    }
+
+    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+    final Model pom = coreFacet.getPOM();
+    for (final String profName : profileDependencies.keySet()) {
+      final Profile profile = getProfile(profName, pom.getProfiles());
+      if (profile == null) {
+        return false;
+      }
+      outer: for (final Dependency profDep : profile.getDependencies()) {
+        for (final DependencyBuilder dep : profileDependencies.get(profName)) {
+          if (profDep.getArtifactId().equals(dep.getArtifactId()) && profDep.getGroupId().equals(dep.getGroupId())) {
+            continue outer;
           }
-          return false;
         }
+        return false;
       }
-      
-      return true;
     }
+
+    return true;
   }
-  
+
   private DependencyBuilder getDependencyWithVersion(final DependencyBuilder dep, final VersionOracle oracle) {
-      if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
-        dep.setVersion(Property.ErraiVersion.invoke());
-      else
-        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
-      
-      return dep;
+    if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
+      dep.setVersion(Property.ErraiVersion.invoke());
+    else
+      dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+
+    return dep;
   }
 
   protected void setCoreDependencies(final DependencyBuilder... deps) {
