@@ -11,7 +11,7 @@ import org.jboss.forge.shell.Shell;
 
 public class ModuleCoreFacet extends AbstractModuleFacet {
 
-  private final String emptyModuleContents =
+  final static String emptyModuleContents =
           "<?xml version='1.0' encoding='UTF-8'?>\n"
           + "<!DOCTYPE module PUBLIC '-//Google Inc.//DTD Google Web Toolkit 1.6//EN'\n\t"
           + "'http://google-web-toolkit.googlecode.com/svn/releases/1.6/distro-source/core/src/gwt-module.dtd'>\n"
