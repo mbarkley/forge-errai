@@ -175,6 +175,9 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     final Model pom = coreFacet.getPOM();
     pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
     coreFacet.setPOM(pom);
+    facet.setProject(project);
+    
+    assertFalse(facet.isInstalled());
 
     project.installFacet(facet);
 
@@ -195,6 +198,9 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     // Setup
     final Project project = initializeJavaProject();
     ProfileDependencyFacet facet = new ProfileDependencyFacet();
+    facet.setProject(project);
+    
+    assertFalse(facet.isInstalled());
 
     project.installFacet(facet);
 
