@@ -1,5 +1,7 @@
 package org.jboss.errai.forge.facet.plugin;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -101,6 +103,21 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   }
   
   @Test
+  public void testDependencyHavingPluginIsInstalled() throws Exception {
+    final Project project = initializeJavaProject();
+    final DependencyHavingPlugin facet = new DependencyHavingPlugin();
+    final DependencyHavingPlugin testFacet = new DependencyHavingPlugin();
+    testFacet.setProject(project);
+    
+    assertFalse(testFacet.isInstalled());
+    
+    project.installFacet(facet);
+    checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
+    
+    assertTrue(testFacet.isInstalled());
+  }
+  
+  @Test
   public void testConfigHavingPlugin() throws Exception {
     final Project project = initializeJavaProject();
     final ConfigHavingPlugin facet = new ConfigHavingPlugin();
@@ -110,12 +127,42 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   }
   
   @Test
+  public void testConfigHavingPluginIsInstalled() throws Exception {
+    final Project project = initializeJavaProject();
+    final ConfigHavingPlugin facet = new ConfigHavingPlugin();
+    final ConfigHavingPlugin testFacet = new ConfigHavingPlugin();
+    testFacet.setProject(project);
+    
+    assertFalse(testFacet.isInstalled());
+    
+    project.installFacet(facet);
+    checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
+    
+    assertTrue(testFacet.isInstalled());
+  }
+  
+  @Test
   public void testExecutionHavingPlugin() throws Exception {
     final Project project = initializeJavaProject();
     final ExecutionHavingPlugin facet = new ExecutionHavingPlugin();
     
     project.installFacet(facet);
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
+  }
+  
+  @Test
+  public void testExecutionHavingPluginIsInstalled() throws Exception {
+    final Project project = initializeJavaProject();
+    final ExecutionHavingPlugin facet = new ExecutionHavingPlugin();
+    final ExecutionHavingPlugin testFacet = new ExecutionHavingPlugin();
+    testFacet.setProject(project);
+    
+    assertFalse(testFacet.isInstalled());
+    
+    project.installFacet(facet);
+    checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
+    
+    assertTrue(testFacet.isInstalled());
   }
   
   protected void checkPlugin(Project project, AbstractProfilePluginFacet facet, String profileId) {

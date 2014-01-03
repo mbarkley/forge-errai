@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.model.BuildBase;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -88,6 +89,41 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
     coreFacet.setPOM(pom);
 
+    return true;
+  }
+  
+  @Override
+  public boolean isInstalled() {
+    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+    final Model pom = coreFacet.getPOM();
+    
+    final Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
+    if (profile == null || profile.getBuild() == null)
+      return false;
+    
+    final Plugin plugin = profile.getBuild().getPluginsAsMap().get(pluginArtifact.toString());
+    
+    outer: for (final DependencyBuilder dep : dependencies) {
+      for (final Dependency pluginDep : plugin.getDependencies()) {
+        if (pluginDep.getArtifactId().equals(dep.getArtifactId()) && pluginDep.getGroupId().equals(dep.getGroupId()))
+          continue outer;
+      }
+      return false;
+    }
+    
+    outer: for (final PluginExecution exec : executions) {
+      for (final PluginExecution pluginExec : plugin.getExecutions()) {
+        if (pluginExec.getId().equals(exec.getId()))
+          continue outer;
+      }
+      return false;
+    }
+    
+    final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
+    
+    if (!isMatchingConfiguration(adapter.getConfig(), configurations))
+      return false;
+    
     return true;
   }
 
