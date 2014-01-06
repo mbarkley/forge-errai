@@ -19,11 +19,6 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 public abstract class AbstractBaseFacet extends BaseFacet {
 
   public static final String MAIN_PROFILE = "jboss7";
-  
-  @Override
-  public boolean isInstalled() {
-    return getProject().hasFacet(getClass());
-  }
 
   protected Profile getProfile(final String name, final List<Profile> profiles) {
     for (final Profile profile : profiles) {
