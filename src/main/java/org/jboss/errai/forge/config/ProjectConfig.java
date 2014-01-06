@@ -34,7 +34,7 @@ public final class ProjectConfig {
     final Configuration config = factory.getUserConfig();
     for (final ProjectProperty prop : ProjectProperty.values()) {
       String val = config.getString(getProjectAttribute(prop));
-      if (val != null && val.equals("")) {
+      if (val != null && !val.equals("")) {
         if (prop.valueType.equals(File.class)) {
           properties.put(prop, new File(val));
         }
