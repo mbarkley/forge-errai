@@ -2,6 +2,7 @@ package org.jboss.errai.forge.facet.aggregate;
 
 import org.jboss.errai.forge.facet.dependency.ErraiBuildDependencyFacet;
 import org.jboss.errai.forge.facet.dependency.ErraiBusDependencyFacet;
+import org.jboss.errai.forge.facet.module.ErraiBusModuleFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
 /**
@@ -9,6 +10,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ CoreFacet.class, ErraiBusDependencyFacet.class, ErraiBuildDependencyFacet.class })
+@RequiresFacet({ CoreFacet.class, ErraiBusDependencyFacet.class, ErraiBuildDependencyFacet.class,
+    ErraiBusModuleFacet.class })
 public class ErraiMessagingFacet extends BaseAggregatorFacet {
 }
