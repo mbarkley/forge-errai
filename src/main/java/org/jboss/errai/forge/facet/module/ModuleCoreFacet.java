@@ -30,7 +30,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
 
   @Override
   public boolean install() {
-    final File module = config.getProjectProperty(ProjectProperty.MODULE, File.class);
+    final File module = configFactory.getProjectConfig(project).getProjectProperty(ProjectProperty.MODULE, File.class);
     if (!module.exists()) {
       module.getParentFile().mkdirs();
       try {

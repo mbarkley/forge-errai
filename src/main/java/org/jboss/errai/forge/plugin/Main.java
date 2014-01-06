@@ -6,6 +6,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import org.jboss.errai.forge.config.ProjectConfig;
+import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiMessagingFacet;
@@ -34,10 +35,11 @@ public class Main implements Plugin {
   private Shell shell;
   
   @Inject
-  private ProjectConfig config;
+  private ProjectConfigFactory configFactory;
 
   @SetupCommand
   public void setup(PipeOut out) {
+    final ProjectConfig config = configFactory.getProjectConfig(project);
     // Configure gwt module
     if (config.getProjectProperty(ProjectProperty.MODULE, File.class) == null) {
       final File module = promptForModule();

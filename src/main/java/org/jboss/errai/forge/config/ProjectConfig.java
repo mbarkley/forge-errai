@@ -4,11 +4,11 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jboss.forge.env.Configuration;
 import org.jboss.forge.env.ConfigurationFactory;
+import org.jboss.forge.project.Project;
 
 @Singleton
 public final class ProjectConfig {
@@ -29,9 +29,11 @@ public final class ProjectConfig {
 
   private final ConfigurationFactory configFactory;
 
-  @Inject
-  public ProjectConfig(final ConfigurationFactory factory) {
-    final Configuration config = factory.getUserConfig();
+  private final Project project;
+
+  ProjectConfig(final ConfigurationFactory factory, final Project project) {
+    this.project = project;
+    final Configuration config = factory.getProjectConfig(project);
     for (final ProjectProperty prop : ProjectProperty.values()) {
       String val = config.getString(getProjectAttribute(prop));
       if (val != null && !val.equals("")) {
@@ -56,7 +58,7 @@ public final class ProjectConfig {
               + property.valueType + ", not " + value.getClass());
     }
 
-    final Configuration config = configFactory.getUserConfig();
+    final Configuration config = configFactory.getProjectConfig(project);
     properties.put(property, value);
     if (property.valueType.equals(File.class)) {
       config.setProperty(getProjectAttribute(property), File.class.cast(value).getAbsolutePath());

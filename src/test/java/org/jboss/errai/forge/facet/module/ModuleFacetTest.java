@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
+import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ModuleVault;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.jboss.forge.maven.MavenCoreFacet;
@@ -31,7 +32,8 @@ public class ModuleFacetTest extends AbstractShellTest {
 
   @Deployment
   public static JavaArchive getDeployment() {
-    return AbstractShellTest.getDeployment().addClass(ProjectConfig.class).addClass(ModuleCoreFacet.class);
+    return AbstractShellTest.getDeployment().addClasses(ProjectConfig.class, ModuleCoreFacet.class,
+            ProjectConfigFactory.class);
   }
 
   @Test
@@ -77,7 +79,7 @@ public class ModuleFacetTest extends AbstractShellTest {
     assertTrue(moduleContent, moduleContent.contains("<inherits name=\"com.google.gwt.user.User\"/>"));
     assertEquals(1, countMatches("<inherits name=\"[^\"]*\"/>", moduleContent));
   }
-  
+
   @Test
   public void testModuleCoreFacetWithoutModule(ProjectConfig config, ModuleCoreFacet facet) throws Exception {
     final Project project = initializeJavaProject();
@@ -91,57 +93,56 @@ public class ModuleFacetTest extends AbstractShellTest {
     assertTrue(moduleContent, moduleContent.contains("<inherits name=\"com.google.gwt.user.User\"/>"));
     assertEquals(1, countMatches("<inherits name=\"[^\"]*\"/>", moduleContent));
   }
-  
+
   @Test
   public void testAbstractModuleFacetIsInstalled(ProjectConfig config, SimpleModuleFacet facet) throws Exception {
     final Project project = initializeJavaProject();
     String body = ModuleCoreFacet.emptyModuleContents.replace("</module>",
-            "<inherits name='org.jboss.errai.common.ErraiCommon'/>\n"
-            + "<inherits name='com.google.gwt.user.User'/>\n"
-            + "</module>");
+            "<inherits name='org.jboss.errai.common.ErraiCommon'/>\n" + "<inherits name='com.google.gwt.user.User'/>\n"
+                    + "</module>");
     final File moduleFile = makeBlankModuleFile(project, body);
     config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
     facet.setProject(project);
-    
+
     assertTrue(facet.isInstalled());
   }
-  
+
   @Test
-  public void testAbstractModuleFacetIsInstalledNegative(ProjectConfig config, SimpleModuleFacet facet) throws Exception {
+  public void testAbstractModuleFacetIsInstalledNegative(ProjectConfig config, SimpleModuleFacet facet)
+          throws Exception {
     final Project project = initializeJavaProject();
     String body = ModuleCoreFacet.emptyModuleContents;
     final File moduleFile = makeBlankModuleFile(project, body);
     config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
     facet.setProject(project);
-    
+
     assertFalse(facet.isInstalled());
   }
-  
+
   @Test
   public void testAbstractModuleFacetUninstall(ProjectConfig config, SimpleModuleFacet facet) throws Exception {
     final Project project = initializeJavaProject();
     String body = ModuleCoreFacet.emptyModuleContents.replace("</module>",
-            "<inherits name='org.jboss.errai.common.ErraiCommon'/>\n"
-            + "<inherits name='com.google.gwt.user.User'/>\n"
-            + "</module>");
+            "<inherits name='org.jboss.errai.common.ErraiCommon'/>\n" + "<inherits name='com.google.gwt.user.User'/>\n"
+                    + "</module>");
     final File moduleFile = makeBlankModuleFile(project, body);
     config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
     facet.setProject(project);
-    
+
     boolean res = facet.uninstall();
-    
+
     assertTrue(res);
     assertEquals(0, countMatches("<inherits name=\"[^\"]*\"/>", getFileContentAsString(moduleFile)));
   }
-  
+
   private int countMatches(final String regex, final String content) {
     final Pattern pattern = Pattern.compile(regex);
     final Matcher matcher = pattern.matcher(content);
-    
+
     int count = 0;
     while (matcher.find())
       count++;
-    
+
     return count;
   }
 

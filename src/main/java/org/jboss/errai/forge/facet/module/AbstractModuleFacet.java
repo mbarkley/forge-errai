@@ -15,8 +15,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
+import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.forge.shell.Shell;
@@ -35,7 +35,7 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
   @Inject
   protected Shell shell;
   @Inject
-  protected ProjectConfig config;
+  protected ProjectConfigFactory configFactory;
 
   final private static Properties xmlProperties = new Properties();
   {
@@ -172,7 +172,7 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
   }
 
   public File getModuleFile() {
-    return config.getProjectProperty(ProjectProperty.MODULE, File.class);
+    return configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE, File.class);
   }
 
 }
