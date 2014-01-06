@@ -19,7 +19,7 @@ public class GwtPluginFacet extends AbstractPluginFacet {
     pluginArtifact = DependencyArtifact.GwtPlugin;
     dependencies = new ArrayList<DependencyBuilder>(0);
     executions = Arrays.asList(new Execution[] {
-            ExecutionBuilder.create().addGoal("resources").addGoal("compile")
+            ExecutionBuilder.create().addGoal("resources").addGoal("compile").setId("").setPhase("")
     });
     configurations = Arrays.asList(new ConfigurationElement[] {
             ConfigurationElementBuilder.create().setName("logLevel").setText("INFO"),
