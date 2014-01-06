@@ -14,7 +14,6 @@ import org.jboss.forge.maven.MavenPluginFacet;
 import org.jboss.forge.maven.plugins.Configuration;
 import org.jboss.forge.maven.plugins.ConfigurationElement;
 import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
-import org.jboss.forge.maven.plugins.ConfigurationElementNotFoundException;
 import org.jboss.forge.maven.plugins.Execution;
 import org.jboss.forge.maven.plugins.MavenPlugin;
 import org.jboss.forge.maven.plugins.MavenPluginBuilder;
@@ -103,7 +102,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
       }
       return false;
     }
-    
+
     if (!isMatchingConfiguration(mPlugin.getConfig(), configurations))
       return false;
 
@@ -138,17 +137,19 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
       for (final PluginElement pluginElem : expected.getChildren()) {
         if (pluginElem instanceof ConfigurationElement) {
           final ConfigurationElement elem = ConfigurationElement.class.cast(pluginElem);
-          try {
-            final ConfigurationElement child = given.getChildByName(elem.getName(), true);
-            if (!isMatchingElement(child, elem))
-              return false;
+          ConfigurationElement child;
+          int i;
+          for (i = 0; i < given.getChildren().size(); i++) {
+            child = ConfigurationElement.class.cast(given.getChildren().get(i));
+            if (child.getName().equals(elem.getName()) && isMatchingElement(child, elem)) {
+              return true;
+            }
           }
-          catch (ConfigurationElementNotFoundException e) {
+          if (i == given.getChildren().size())
             return false;
-          }
         }
       }
-      
+
       return true;
     }
     else {
@@ -160,7 +161,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
   public boolean uninstall() {
     final MavenPluginFacet pluginFacet = getProject().getFacet(MavenPluginFacet.class);
     pluginFacet.removePlugin(DependencyBuilder.create(pluginArtifact.toString()));
-    
+
     return true;
   }
 

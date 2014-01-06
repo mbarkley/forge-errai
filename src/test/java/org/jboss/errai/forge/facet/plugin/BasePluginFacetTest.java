@@ -11,7 +11,6 @@ import org.apache.maven.model.BuildBase;
 import org.jboss.forge.maven.MavenPluginFacet;
 import org.jboss.forge.maven.plugins.Configuration;
 import org.jboss.forge.maven.plugins.ConfigurationElement;
-import org.jboss.forge.maven.plugins.ConfigurationElementNotFoundException;
 import org.jboss.forge.maven.plugins.Execution;
 import org.jboss.forge.maven.plugins.MavenPlugin;
 import org.jboss.forge.maven.plugins.PluginElement;
@@ -87,12 +86,20 @@ public abstract class BasePluginFacetTest extends AbstractShellTest {
     if (expected.hasChilderen()) {
       for (final PluginElement raw : expected.getChildren()) {
         final ConfigurationElement expectedChild = ConfigurationElement.class.cast(raw);
-        try {
-          final ConfigurationElement outcomeChild = outcome.getChildByName(expectedChild.getName(), true);
-          assertMatchingConfigElem(expectedChild, outcomeChild);
+        ConfigurationElement outcomeChild;
+        int i;
+        for (i = 0; i < outcome.getChildren().size(); i++) {
+          outcomeChild = (ConfigurationElement) outcome.getChildren().get(i);
+          try {
+            assertMatchingConfigElem(expectedChild, outcomeChild);
+            break;
+          }
+          catch (AssertionError e) {
+            continue;
+          }
         }
-        catch (ConfigurationElementNotFoundException e) {
-          fail("Could not find expected configuration element: " + expected.toString());
+        if (i == outcome.getChildren().size()) {
+          fail("Could not find match for " + expectedChild);
         }
       }
     }

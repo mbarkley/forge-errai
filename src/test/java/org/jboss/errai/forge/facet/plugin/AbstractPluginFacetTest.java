@@ -47,7 +47,8 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
       configurations = Arrays.asList(new ConfigurationElement[] {
           ConfigurationElementBuilder.create().setName("configName").setText("configText"),
           ConfigurationElementBuilder.create().setName("parent")
-                  .addChild(ConfigurationElementBuilder.create().setName("child").setText("childText")) });
+                  .addChild(ConfigurationElementBuilder.create().setName("child").setText("childText"))
+                  .addChild(ConfigurationElementBuilder.create().setName("child").setText("otherChildText"))});
       executions = Collections.emptyList();
       dependencies = Collections.emptyList();
     }
