@@ -42,6 +42,8 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
 
     if (pluginFacet.hasPlugin(pluginDep)) {
       plugin = MavenPluginBuilder.create(pluginFacet.getPlugin(pluginDep));
+      // So that it is not duplicated when added later on
+      pluginFacet.removePlugin(pluginDep);
     }
     else {
       plugin = MavenPluginBuilder.create();
