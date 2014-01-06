@@ -126,6 +126,30 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
     
     return true;
   }
+  
+  @Override
+  public boolean uninstall() {
+    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+    final Model pom = coreFacet.getPOM();
+    
+    final Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
+    if (profile == null)
+      return false;
+    
+    final BuildBase build = profile.getBuild();
+    if (build == null)
+      return false;
+    
+    final Plugin plugin = build.getPluginsAsMap().get(pluginArtifact.toString());
+    if (plugin == null)
+      return false;
+    
+    build.removePlugin(plugin);
+    profile.setBuild(build);
+    coreFacet.setPOM(pom);
+    
+    return true;
+  }
 
   private Plugin getPlugin(DependencyArtifact pluginArtifact, List<Plugin> plugins) {
     for (final Plugin plugin : plugins) {

@@ -118,6 +118,18 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   }
   
   @Test
+  public void testUninstall() throws Exception {
+    final Project project = initializeJavaProject();
+    final DependencyHavingPlugin facet = new DependencyHavingPlugin();
+    
+    project.installFacet(facet);
+    checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
+    project.removeFacet(facet);
+    
+    checkUninstalled(project, facet, AbstractBaseFacet.MAIN_PROFILE);
+  }
+  
+  @Test
   public void testConfigHavingPlugin() throws Exception {
     final Project project = initializeJavaProject();
     final ConfigHavingPlugin facet = new ConfigHavingPlugin();
@@ -194,6 +206,23 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
     checkExecutions(adapter, executions);
     checkDependencies(build, facet.dependencies, plugin.getDependencies(), facet.pluginArtifact.toString());
     checkConfigurations(adapter.getConfig(), facet.configurations);
+  }
+  
+  private void checkUninstalled(Project project, AbstractProfilePluginFacet facet, String profileId) {
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    Profile profile = null;
+    for (final Profile prof : coreFacet.getPOM().getProfiles()) {
+      if (profileId.equals(prof.getId())) {
+        profile = prof;
+        break;
+      }
+    }
+    Assert.notNull(profile, "Could not find profile with matching id, " + profileId);
+    final BuildBase build = profile.getBuild();
+    Assert.notNull(build, "No build for profile " + profileId);
+    
+    final Plugin plugin = build.getPluginsAsMap().get(facet.pluginArtifact.toString());
+    assertNull("Plugin was not uninstalled.", plugin);
   }
 
 }
