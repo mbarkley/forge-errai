@@ -24,8 +24,6 @@ public class CleanPluginFacet extends AbstractPluginFacet {
                     .addChild(ConfigurationElementBuilder.create().setName("directory").setText("${basedir}"))
                     .addChild(ConfigurationElementBuilder.create().setName("includes")
                             .addChild(ConfigurationElementBuilder.create().setName("include")
-                            .setText("src/main/webapp/app/"))
-                            .addChild(ConfigurationElementBuilder.create().setName("include")
                             .setText("src/main/webapp/WEB-INF/deploy/"))
                             .addChild(ConfigurationElementBuilder.create().setName("include")
                             .setText("src/main/webapp/WEB-INF/lib/"))

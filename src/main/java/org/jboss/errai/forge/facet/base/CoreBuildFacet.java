@@ -15,9 +15,19 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 @RequiresFacet({ MavenCoreFacet.class, DependencyFacet.class })
 public class CoreBuildFacet extends AbstractBaseFacet {
 
-  public final String javaSrcPath = "src/main/java";
-  public final String resSrcPath = "src/main/resources";
-  public final String buildOutput = "src/main/webapp/WEB-INF/classes";
+  public static final String DEV_CONTEXT = "${project.artifactId}";
+  public static final String JBOSS_HOME = "${project.build.directory}/jboss-as-7.1.1.Final";
+  public static final String JAVA_SRC_PATH = "src/main/java";
+  public static final String RES_SRC_PATH = "src/main/resources";
+  public static final String BUILD_OUTPUT = "src/main/webapp/WEB-INF/classes";
+  private String erraiVersion;
+
+  private String getErraiVersion() {
+    if (erraiVersion == null)
+      erraiVersion = new VersionOracle(getProject().getFacet(DependencyFacet.class)).resolveErraiVersion();
+    
+    return erraiVersion;
+  }
 
   @Override
   public boolean install() {
@@ -25,23 +35,22 @@ public class CoreBuildFacet extends AbstractBaseFacet {
     final Model pom = coreFacet.getPOM();
     final Build build = pom.getBuild();
 
-    build.setOutputDirectory(buildOutput);
+    build.setOutputDirectory(BUILD_OUTPUT);
     // TODO don't hardcode path
-    pom.addProperty(Property.JbossHome.getName(), "${project.build.directory}/jboss-as-7.1.1.Final");
-    pom.addProperty(Property.DevContext.getName(), "${project.artifactId}");
-    pom.addProperty(Property.ErraiVersion.getName(),
-            new VersionOracle(getProject().getFacet(DependencyFacet.class)).resolveErraiVersion());
+    pom.addProperty(Property.JbossHome.getName(), JBOSS_HOME);
+    pom.addProperty(Property.DevContext.getName(), DEV_CONTEXT);
+    pom.addProperty(Property.ErraiVersion.getName(), getErraiVersion());
 
-    Resource res = getResource(javaSrcPath, build.getResources());
+    Resource res = getResource(JAVA_SRC_PATH, build.getResources());
     if (res == null) {
       res = new Resource();
-      res.setDirectory(javaSrcPath);
+      res.setDirectory(JAVA_SRC_PATH);
       build.addResource(res);
     }
-    res = getResource(resSrcPath, build.getResources());
+    res = getResource(RES_SRC_PATH, build.getResources());
     if (res == null) {
       res = new Resource();
-      res.setDirectory(resSrcPath);
+      res.setDirectory(RES_SRC_PATH);
       build.addResource(res);
     }
     coreFacet.setPOM(pom);
@@ -56,12 +65,15 @@ public class CoreBuildFacet extends AbstractBaseFacet {
     final Build build = pom.getBuild();
 
     Properties properties = pom.getProperties();
-    return !(build == null || build.getOutputDirectory() == null || !build.getOutputDirectory().equals(buildOutput)
+    return !(build == null || build.getOutputDirectory() == null || !build.getOutputDirectory().equals(BUILD_OUTPUT)
             || !properties.containsKey(Property.JbossHome.getName())
+            || !properties.get(Property.JbossHome.getName()).equals(JBOSS_HOME)
             || !properties.containsKey(Property.DevContext.getName())
+            || !properties.get(Property.DevContext.getName()).equals(DEV_CONTEXT)
             || !properties.containsKey(Property.ErraiVersion.getName())
-            || getResource(javaSrcPath, build.getResources()) == null
-            || getResource(resSrcPath, build.getResources()) == null);
+            || !properties.get(Property.ErraiVersion.getName()).equals(getErraiVersion())
+            || getResource(JAVA_SRC_PATH, build.getResources()) == null
+            || getResource(RES_SRC_PATH, build.getResources()) == null);
   }
 
   private Resource getResource(String relPath, List<Resource> resources) {
