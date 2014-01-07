@@ -172,7 +172,7 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
   }
 
   public File getModuleFile() {
-    return configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE, File.class);
+    return configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE_FILE, File.class);
   }
 
 }

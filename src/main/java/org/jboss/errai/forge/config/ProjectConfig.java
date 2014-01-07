@@ -14,7 +14,8 @@ import org.jboss.forge.project.Project;
 public final class ProjectConfig {
 
   public static enum ProjectProperty {
-    MODULE(File.class);
+    MODULE_FILE(File.class),
+    MODULE_LOGICAL(String.class);
 
     public final Class<?> valueType;
 

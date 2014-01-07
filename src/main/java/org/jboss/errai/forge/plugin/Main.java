@@ -33,25 +33,37 @@ public class Main implements Plugin {
 
   @Inject
   private Shell shell;
-  
+
   @Inject
   private ProjectConfigFactory configFactory;
 
   @SetupCommand
   public void setup(PipeOut out) {
     final ProjectConfig config = configFactory.getProjectConfig(project);
+    
     // Configure gwt module
-    if (config.getProjectProperty(ProjectProperty.MODULE, File.class) == null) {
-      final File module = promptForModule();
-      config.setProjectProperty(ProjectProperty.MODULE, module);
+    if (config.getProjectProperty(ProjectProperty.MODULE_LOGICAL, String.class) == null) {
+      final String module = promptForModule();
+      config.setProjectProperty(ProjectProperty.MODULE_LOGICAL, module);
     }
+    if (config.getProjectProperty(ProjectProperty.MODULE_FILE, File.class) == null) {
+      final File modulePath = moduleLogicalNameToFile(config.getProjectProperty(ProjectProperty.MODULE_LOGICAL,
+              String.class));
+      config.setProjectProperty(ProjectProperty.MODULE_FILE, modulePath);
+    }
+    
     if (!project.hasFacet(CoreFacet.class)) {
       installEvent.fire(new InstallFacets(CoreFacet.class));
     }
   }
 
-  private File promptForModule() {
+  private String promptForModule() {
     final String moduleName = shell.prompt("Please type the logical name for your module.");
+    // TODO check if name is valid and re-prompt
+    return moduleName;
+  }
+
+  private File moduleLogicalNameToFile(final String moduleName) {
     final String relModuleFile = moduleName.replace('.', File.separatorChar) + ".gwt.xml";
 
     // TODO make this dynamic to project settings

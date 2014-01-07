@@ -1,9 +1,8 @@
 package org.jboss.errai.forge.facet.resource;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 
@@ -19,10 +18,6 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
    * Relative to project root.
    */
   protected String relFilePath;
-  /**
-   * Path to a resource in classpath.
-   */
-  protected String resourceName;
 
   @Override
   public boolean install() {
@@ -37,22 +32,17 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
         return false;
       }
     }
-    FileOutputStream writer = null;
-    final InputStream stream = getClass().getResourceAsStream(resourceName);
+    FileWriter writer = null;
     try {
-      writer = new FileOutputStream(file);
-      final byte[] buf = new byte[256];
-      int amtRead;
-      while (true) {
-        amtRead = stream.read(buf);
-        if (amtRead == -1)
-          break;
-        else
-          writer.write(buf, 0, amtRead);
-      }
+      writer = new FileWriter(file);
+      writer.write(getResourceContent());
     }
     catch (IOException e) {
       printError("Could not write to " + file.getAbsolutePath(), e);
+      return false;
+    }
+    catch (Exception e) {
+      printError("Unexpected error while trying to add resource " + relFilePath, e);
       return false;
     }
     finally {
@@ -63,17 +53,12 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
       catch (IOException e) {
         printError("Could not close FileWriter for " + file.getAbsolutePath(), e);
       }
-      try {
-        if (stream != null)
-          stream.close();
-      }
-      catch (IOException e) {
-        printError("Could not close resource stream " + resourceName, e);
-      }
     }
 
     return true;
   }
+
+  protected abstract String getResourceContent() throws Exception;
 
   @Override
   public boolean isInstalled() {

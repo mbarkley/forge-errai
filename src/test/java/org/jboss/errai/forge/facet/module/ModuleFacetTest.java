@@ -40,7 +40,7 @@ public class ModuleFacetTest extends AbstractShellTest {
   public void testEmptyModuleInstall(ProjectConfig config, SimpleModuleFacet facet) throws Exception {
     final Project project = initializeJavaProject();
     final File moduleFile = makeBlankModuleFile(project, ModuleCoreFacet.emptyModuleContents);
-    config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
+    config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
     project.installFacet(facet);
 
@@ -56,7 +56,7 @@ public class ModuleFacetTest extends AbstractShellTest {
     final String body = ModuleCoreFacet.emptyModuleContents.replace("</module>",
             "<inherits name=\"org.jboss.errai.common.Logging\"/></module>");
     final File moduleFile = makeBlankModuleFile(project, body);
-    config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
+    config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
     project.installFacet(facet);
 
@@ -71,7 +71,7 @@ public class ModuleFacetTest extends AbstractShellTest {
   public void testModuleCoreFacetWithModule(ProjectConfig config, ModuleCoreFacet facet) throws Exception {
     final Project project = initializeJavaProject();
     final File moduleFile = makeBlankModuleFile(project, ModuleCoreFacet.emptyModuleContents);
-    config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
+    config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
     project.installFacet(facet);
 
@@ -85,7 +85,7 @@ public class ModuleFacetTest extends AbstractShellTest {
     final Project project = initializeJavaProject();
     final File moduleFile = makeBlankModuleFile(project, ModuleCoreFacet.emptyModuleContents);
     moduleFile.delete();
-    config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
+    config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
     project.installFacet(facet);
 
@@ -101,7 +101,7 @@ public class ModuleFacetTest extends AbstractShellTest {
             "<inherits name='org.jboss.errai.common.ErraiCommon'/>\n" + "<inherits name='com.google.gwt.user.User'/>\n"
                     + "</module>");
     final File moduleFile = makeBlankModuleFile(project, body);
-    config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
+    config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
     facet.setProject(project);
 
     assertTrue(facet.isInstalled());
@@ -113,7 +113,7 @@ public class ModuleFacetTest extends AbstractShellTest {
     final Project project = initializeJavaProject();
     String body = ModuleCoreFacet.emptyModuleContents;
     final File moduleFile = makeBlankModuleFile(project, body);
-    config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
+    config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
     facet.setProject(project);
 
     assertFalse(facet.isInstalled());
@@ -126,7 +126,7 @@ public class ModuleFacetTest extends AbstractShellTest {
             "<inherits name='org.jboss.errai.common.ErraiCommon'/>\n" + "<inherits name='com.google.gwt.user.User'/>\n"
                     + "</module>");
     final File moduleFile = makeBlankModuleFile(project, body);
-    config.setProjectProperty(ProjectProperty.MODULE, moduleFile);
+    config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
     facet.setProject(project);
 
     boolean res = facet.uninstall();
