@@ -29,7 +29,7 @@ public class GwtPluginFacet extends AbstractPluginFacet {
             ConfigurationElementBuilder.create().setName("disableCastChecking").setText("true"),
             ConfigurationElementBuilder.create().setName("runTarget").setText("${errai.dev.context}/index.html"),
             ConfigurationElementBuilder.create().setName("soyc").setText("false"),
-            ConfigurationElementBuilder.create().setName("hostedWebApp").setText("src/main/webapp"),
+            ConfigurationElementBuilder.create().setName("hostedWebapp").setText("src/main/webapp"),
             ConfigurationElementBuilder.create().setName("extraJvmArgs").setText(
                       "-Xmx712m "
                     + "-XX:CompileThreshold=7000 "
