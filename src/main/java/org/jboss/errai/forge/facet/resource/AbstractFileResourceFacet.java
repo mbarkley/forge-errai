@@ -22,7 +22,7 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
   /**
    * Path to a resource in classpath.
    */
-  protected String resourcePath;
+  protected String resourceName;
 
   @Override
   public boolean install() {
@@ -38,7 +38,7 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
       }
     }
     FileOutputStream writer = null;
-    final InputStream stream = getClass().getResourceAsStream(resourcePath);
+    final InputStream stream = getClass().getResourceAsStream(resourceName);
     try {
       writer = new FileOutputStream(file);
       final byte[] buf = new byte[256];
@@ -68,7 +68,7 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
           stream.close();
       }
       catch (IOException e) {
-        printError("Could not close resource stream " + resourcePath, e);
+        printError("Could not close resource stream " + resourceName, e);
       }
     }
 
