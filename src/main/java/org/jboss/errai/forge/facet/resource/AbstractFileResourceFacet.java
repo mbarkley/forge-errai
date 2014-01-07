@@ -64,7 +64,8 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
         printError("Could not close FileWriter for " + file.getAbsolutePath(), e);
       }
       try {
-        stream.close();
+        if (stream != null)
+          stream.close();
       }
       catch (IOException e) {
         printError("Could not close resource stream " + resourcePath, e);
