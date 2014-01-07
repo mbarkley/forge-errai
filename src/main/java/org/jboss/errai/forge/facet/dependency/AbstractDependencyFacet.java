@@ -97,8 +97,8 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
       if (profile == null) {
         return false;
       }
-      outer: for (final Dependency profDep : profile.getDependencies()) {
-        for (final DependencyBuilder dep : profileDependencies.get(profName)) {
+      outer: for (final DependencyBuilder dep : profileDependencies.get(profName)) {
+        for (final Dependency profDep : profile.getDependencies()) {
           if (profDep.getArtifactId().equals(dep.getArtifactId()) && profDep.getGroupId().equals(dep.getGroupId())) {
             continue outer;
           }
