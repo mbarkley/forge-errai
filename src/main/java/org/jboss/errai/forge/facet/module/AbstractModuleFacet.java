@@ -1,15 +1,15 @@
 package org.jboss.errai.forge.facet.module;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -18,14 +18,14 @@ import javax.xml.transform.stream.StreamResult;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
-import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
+import org.jboss.errai.forge.facet.resource.AbstractXmlResourceFacet;
 import org.jboss.forge.shell.Shell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-abstract class AbstractModuleFacet extends AbstractBaseFacet {
+abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
 
   /**
    * A collection of module logical names to be inherited (fully-qualified, not
@@ -37,92 +37,16 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
   @Inject
   protected ProjectConfigFactory configFactory;
 
-  final private static Properties xmlProperties = new Properties();
-  {
-    xmlProperties.setProperty(OutputKeys.INDENT, "yes");
-    xmlProperties.setProperty(OutputKeys.DOCTYPE_PUBLIC, "-//Google Inc.//DTD Google Web Toolkit 1.6//EN");
-    xmlProperties.setProperty(OutputKeys.DOCTYPE_SYSTEM,
-            "http://google-web-toolkit.googlecode.com/svn/releases/1.6/distro-source/core/src/gwt-module.dtd");
-  }
-
-  @Override
-  public boolean install() {
-    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    try {
-      final DocumentBuilder builder = factory.newDocumentBuilder();
-      final Document doc = builder.parse(getModuleFile());
-      final Node root = doc.getElementsByTagName("module").item(0);
-      final NodeList curModules = doc.getElementsByTagName("inherits");
-
-      final Set<String> curModuleNames = new HashSet<String>();
-      for (int i = 0; i < curModules.getLength(); i++) {
-        curModuleNames.add(curModules.item(i).getAttributes().getNamedItem("name").getNodeValue());
-      }
-
-      Node before = null;
-      for (final Module newModule : modules) {
-        if (!curModuleNames.contains(newModule.getLogicalName())) {
-          // Append after last insertion (or after last inherit tag)
-          if (before == null) {
-            final NodeList childNodes = root.getChildNodes();
-            for (int j = childNodes.getLength() - 1; j >= 0; j--) {
-              if (childNodes.item(j).getNodeName().equals("inherits")) {
-                before = childNodes.item(j).getNextSibling();
-                break;
-              }
-            }
-          }
-
-          final Element newNode = doc.createElement("inherits");
-          newNode.setAttribute("name", newModule.getLogicalName());
-
-          root.insertBefore(newNode, before);
-        }
-      }
-
-      final TransformerFactory transFactory = TransformerFactory.newInstance();
-      final Transformer transformer = transFactory.newTransformer();
-      final DOMSource source = new DOMSource(doc);
-      final StreamResult res = new StreamResult(getModuleFile());
-      transformer.setOutputProperties(xmlProperties);
-      transformer.transform(source, res);
-    }
-    catch (Exception e) {
-      error("Error: failed to add required inheritance to module.", e);
-      return false;
+  protected Collection<Node> generateInsertElements(final Collection<Module> modules, final Document doc)
+          throws ParserConfigurationException {
+    final Collection<Node> retVal = new ArrayList<Node>(modules.size());
+    for (final Module mod : modules) {
+      final Element elem = doc.createElement("inherits");
+      elem.setAttribute("name", mod.getLogicalName());
+      retVal.add(elem);
     }
 
-    return true;
-  }
-  
-  @Override
-  public boolean isInstalled() {
-    final File moduleFile = getModuleFile();
-    if (moduleFile == null || !moduleFile.exists())
-      return false;
-    
-    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    try {
-      final DocumentBuilder builder = factory.newDocumentBuilder();
-      final Document doc = builder.parse(getModuleFile());
-      final NodeList curModules = doc.getElementsByTagName("inherits");
-
-      final Set<String> curModuleNames = new HashSet<String>();
-      for (int i = 0; i < curModules.getLength(); i++) {
-        curModuleNames.add(curModules.item(i).getAttributes().getNamedItem("name").getNodeValue());
-      }
-      
-      for (final Module module : modules) {
-        if (!curModuleNames.contains(module.getLogicalName()))
-          return false;
-      }
-      
-      return true;
-    }
-    catch (Exception e) {
-      error("Error: could not read gwt module.", e);
-      return false;
-    }
+    return retVal;
   }
   
   @Override
@@ -137,7 +61,7 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
       for (final Module module : modules) {
         moduleNames.add(module.getLogicalName());
       }
-      
+
       for (int i = 0; i < curModules.getLength(); i++) {
         final Node item = curModules.item(i);
         if (moduleNames.contains(item.getAttributes().getNamedItem("name").getTextContent())) {
@@ -152,27 +76,28 @@ abstract class AbstractModuleFacet extends AbstractBaseFacet {
       final StreamResult res = new StreamResult(getModuleFile());
       transformer.setOutputProperties(xmlProperties);
       transformer.transform(source, res);
-      
+
       return true;
     }
     catch (Exception e) {
-      error("Error: failed to remove inherited modules.", e);
+      printError("Error: failed to remove inherited modules.", e);
       return false;
     }
-
   }
 
-  protected void error(final String msg, final Exception ex) {
-    shell.println(msg);
-    if (shell.isVerbose() && ex != null) {
-      for (final StackTraceElement trace : ex.getStackTrace()) {
-        shell.println(trace.toString());
-      }
-    }
+  @Override
+  protected Collection<Node> getElementsToInsert(Document doc) throws ParserConfigurationException {
+    return generateInsertElements(modules, doc);
   }
 
   public File getModuleFile() {
     return configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE_FILE, File.class);
+  }
+
+  @Override
+  protected String getRelPath() {
+    return configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE_FILE, File.class)
+            .getPath();
   }
 
 }

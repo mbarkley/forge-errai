@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 
+import javax.xml.transform.OutputKeys;
+
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.jboss.forge.shell.Shell;
@@ -26,6 +28,9 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
     modules = Arrays.asList(new Module[] {
             Module.GwtUser
     });
+    xmlProperties.setProperty(OutputKeys.DOCTYPE_PUBLIC, "-//Google Inc.//DTD Google Web Toolkit 1.6//EN");
+    xmlProperties.setProperty(OutputKeys.DOCTYPE_SYSTEM,
+            "http://google-web-toolkit.googlecode.com/svn/releases/1.6/distro-source/core/src/gwt-module.dtd");
   }
 
   @Override
@@ -37,7 +42,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
         module.createNewFile();
       }
       catch (IOException e) {
-        error("Could not create module at " + module.getAbsolutePath(), e);
+        printError("Could not create module at " + module.getAbsolutePath(), e);
         return false;
       }
 
@@ -47,7 +52,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
         writer.append(emptyModuleContents);
       }
       catch (IOException e) {
-        error("Cannot write to module at " + module.getAbsolutePath(), e);
+        printError("Cannot write to module at " + module.getAbsolutePath(), e);
         return false;
       }
       
