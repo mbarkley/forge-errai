@@ -6,6 +6,7 @@ import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Er
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.GwtUser;
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Hsq;
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.JUnit;
+import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.JbossSupport;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -24,6 +25,7 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
     setProfileDependencies(MAIN_PROFILE,
             DependencyBuilder.create(ErraiTools.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(ErraiJboss.toString()).setScopeType(ScopeType.PROVIDED),
+            DependencyBuilder.create(JbossSupport.toString()),
             DependencyBuilder.create(Hsq.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(JUnit.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(ErraiNetty.toString()).setScopeType(ScopeType.PROVIDED)

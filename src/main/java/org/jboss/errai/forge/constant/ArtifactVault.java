@@ -29,6 +29,7 @@ public final class ArtifactVault {
     // errai
     ErraiNetty("netty", "org.jboss.errai.io.netty"),
     ErraiJboss("errai-cdi-jboss"),
+    JbossSupport("errai-jboss-as-support"),
     ErraiCommon("errai-common"),
     ErraiTools("errai-tools"),
     ErraiBus("errai-bus"),
