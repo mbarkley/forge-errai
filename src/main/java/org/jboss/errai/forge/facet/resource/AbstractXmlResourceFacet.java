@@ -32,6 +32,7 @@ import org.w3c.dom.NodeList;
 public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
 
   final protected Properties xmlProperties = new Properties();
+  protected final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
   public AbstractXmlResourceFacet() {
     xmlProperties.setProperty(OutputKeys.INDENT, "yes");
@@ -39,7 +40,6 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
 
   @Override
   public boolean install() {
-    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     try {
       final File file = getResFile(getRelPath());
       if (!file.exists()) {
@@ -75,13 +75,12 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     if (!file.exists())
       return false;
 
-    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     try {
       final DocumentBuilder builder = factory.newDocumentBuilder();
       final Document doc = builder.parse(file);
-      final Collection<Node> toInsert = getElementsToInsert(doc);
+      final Collection<Node> toCheck = getElementsToInsert(doc);
       final Element root = doc.getDocumentElement();
-      final Map<String, Collection<Node>> elementsByTagName = mapElementsByTagName(toInsert);
+      final Map<String, Collection<Node>> elementsByTagName = mapElementsByTagName(toCheck);
       final Map<String, Collection<Node>> existingByTagName = mapElementsByTagName(root.getChildNodes());
       
       for (final String name : elementsByTagName.keySet()) {
@@ -107,8 +106,38 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
 
   @Override
   public boolean uninstall() {
-    // TODO Auto-generated method stub
-    return super.uninstall();
+    final File file = getResFile(getRelPath());
+    if (!file.exists())
+      // XXX not sure if this case should return true or false...
+      return true;
+
+    try {
+      final DocumentBuilder builder = factory.newDocumentBuilder();
+      final Document doc = builder.parse(file);
+      final Collection<Node> toRemove = getElementsToInsert(doc);
+      final Element root = doc.getDocumentElement();
+      final Map<String, Collection<Node>> elementsByTagName = mapElementsByTagName(toRemove);
+      final Map<String, Collection<Node>> existingByTagName = mapElementsByTagName(root.getChildNodes());
+      
+      for (final String name : elementsByTagName.keySet()) {
+        if (!existingByTagName.containsKey(name))
+          continue;
+        
+        for (final Node node : elementsByTagName.get(name)) {
+          for (final Node existing : existingByTagName.get(name)) {
+            if (matches(node, existing)) {
+              existing.getParentNode().removeChild(existing);
+            }
+          }
+        }
+      }
+    }
+    catch (Exception e) {
+      printError("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
+      return false;
+    }
+
+    return true;
   }
 
   protected File getResFile(final String relPath) {

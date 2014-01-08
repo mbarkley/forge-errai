@@ -3,17 +3,9 @@ package org.jboss.errai.forge.facet.module;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.inject.Inject;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
@@ -23,7 +15,6 @@ import org.jboss.forge.shell.Shell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
 
@@ -49,42 +40,6 @@ abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
     return retVal;
   }
   
-  @Override
-  public boolean uninstall() {
-    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    try {
-      final DocumentBuilder builder = factory.newDocumentBuilder();
-      final Document doc = builder.parse(getModuleFile());
-      final NodeList curModules = doc.getElementsByTagName("inherits");
-
-      final Set<String> moduleNames = new HashSet<String>(modules.size());
-      for (final Module module : modules) {
-        moduleNames.add(module.getLogicalName());
-      }
-
-      for (int i = 0; i < curModules.getLength(); i++) {
-        final Node item = curModules.item(i);
-        if (moduleNames.contains(item.getAttributes().getNamedItem("name").getTextContent())) {
-          item.getParentNode().removeChild(item);
-          i--;
-        }
-      }
-
-      final TransformerFactory transFactory = TransformerFactory.newInstance();
-      final Transformer transformer = transFactory.newTransformer();
-      final DOMSource source = new DOMSource(doc);
-      final StreamResult res = new StreamResult(getModuleFile());
-      transformer.setOutputProperties(xmlProperties);
-      transformer.transform(source, res);
-
-      return true;
-    }
-    catch (Exception e) {
-      printError("Error: failed to remove inherited modules.", e);
-      return false;
-    }
-  }
-
   @Override
   protected Collection<Node> getElementsToInsert(Document doc) throws ParserConfigurationException {
     return generateInsertElements(modules, doc);
