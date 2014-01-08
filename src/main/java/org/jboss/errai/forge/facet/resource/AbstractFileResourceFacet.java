@@ -3,6 +3,8 @@ package org.jboss.errai.forge.facet.resource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 
@@ -59,6 +61,38 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
   }
 
   protected abstract String getResourceContent() throws Exception;
+  
+  protected StringBuilder readResource(final String resource) throws IOException {
+    final StringBuilder builder = new StringBuilder();
+    final InputStream stream = getClass().getResourceAsStream(resource);
+    final InputStreamReader reader = new InputStreamReader(stream);
+    final char[] buf = new char[256];
+    int read;
+    while (true) {
+      read = reader.read(buf);
+      if (read == -1)
+        break;
+      builder.append(buf, 0, read);
+    }
+    reader.close();
+    stream.close();
+    
+    return builder;
+  }
+
+  /**
+   * Replace all occurrences of a {@link String} in a give {@link StringBuilder}.
+   * 
+   * @param subject The {@link StringBuilder} to be modified.
+   * @param toReplace The {@link String} to be replaced.
+   * @param replacement The replacement {@link String}.
+   */
+  protected void replace(final StringBuilder subject, final String toReplace, final String replacement) {
+    for (int fillerIndex = subject.indexOf(toReplace); fillerIndex > -1; fillerIndex = subject.indexOf(toReplace,
+            fillerIndex)) {
+      subject.replace(fillerIndex, fillerIndex + toReplace.length(), replacement);
+    }
+  }
 
   @Override
   public boolean isInstalled() {
