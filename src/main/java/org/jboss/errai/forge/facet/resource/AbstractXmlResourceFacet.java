@@ -71,7 +71,12 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
 
   @Override
   public boolean isInstalled() {
-    final File file = getResFile(getRelPath());
+    final String relPath = getRelPath();
+    if (relPath == null)
+      // Project config has not been setup yet.
+      return false;
+    
+    final File file = getResFile(relPath);
     if (!file.exists())
       return false;
 

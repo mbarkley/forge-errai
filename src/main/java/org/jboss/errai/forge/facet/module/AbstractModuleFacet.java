@@ -51,8 +51,11 @@ abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
 
   @Override
   protected String getRelPath() {
-    return configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE_FILE, File.class)
-            .getPath();
+    final File module = configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE_FILE, File.class);
+    if (module != null)
+      return module.getPath();
+    else
+      return null;
   }
 
 }
