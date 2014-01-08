@@ -7,7 +7,10 @@ import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Gw
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Hsq;
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.JUnit;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.facet.base.RequiresCore;
+import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.ScopeType;
 
@@ -25,5 +28,22 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
             DependencyBuilder.create(JUnit.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(ErraiNetty.toString()).setScopeType(ScopeType.PROVIDED)
     );
+  }
+  
+  @Override
+  public boolean install() {
+    if (super.install()) {
+      // Set main profile to be active by default
+      final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+      final Model pom = coreFacet.getPOM();
+      final Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
+      profile.getActivation().setActiveByDefault(true);
+      coreFacet.setPOM(pom);
+      
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 }
