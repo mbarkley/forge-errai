@@ -17,7 +17,7 @@ public class ErraiBusServletConfigFacet extends AbstractXmlResourceFacet {
   protected Collection<Node> getElementsToInsert(Document doc) throws ParserConfigurationException {
     final Element servlet = doc.createElement("servlet");
     servlet.appendChild(doc.createElement("servlet-name")).setTextContent("ErraiServlet");
-    servlet.appendChild(doc.createElement("sevlet-class")).setTextContent(
+    servlet.appendChild(doc.createElement("servlet-class")).setTextContent(
             "org.jboss.errai.bus.server.servlet.DefaultBlockingServlet");
     
     final Node initParam = servlet.appendChild(doc.createElement("init-param"));
