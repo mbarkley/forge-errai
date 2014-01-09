@@ -1,5 +1,6 @@
 package org.jboss.errai.forge.facet.dependency;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -58,18 +59,23 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
     for (DependencyBuilder dep : coreDependencies) {
       depFacet.addDirectDependency(getDependencyWithVersion(dep, oracle));
-      if (ArtifactVault.isBlacklisted(dep) && !dep.getScopeTypeEnum().equals(ScopeType.PROVIDED)) {
-        final String profile = ArtifactVault.getBlacklistedProfile(dep);
-        final DependencyBuilder providedDep = DependencyBuilder.create(dep);
-        providedDep.setScopeType(ScopeType.PROVIDED);
-        addDependenciesToProfile(profile, Arrays.asList(new DependencyBuilder[] {providedDep}), oracle);
+    }
+    
+    for (String profileId : ArtifactVault.getBlacklistProfiles()) {
+      for (String artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {
+        final DependencyBuilder dep = DependencyBuilder.create(artifact);
+        if (depFacet.hasEffectiveDependency(dep)) {
+          if (!profileDependencies.containsKey(profileId))
+            profileDependencies.put(profileId, new ArrayList<DependencyBuilder>());
+          profileDependencies.get(profileId).add(dep.setScopeType(ScopeType.PROVIDED));
+        }
       }
     }
 
     for (Entry<String, Collection<DependencyBuilder>> entry : profileDependencies.entrySet()) {
       addDependenciesToProfile(entry.getKey(), entry.getValue(), oracle);
     }
-    
+
     return true;
   }
 
@@ -130,6 +136,13 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     }
 
     return true;
+  }
+
+  private void blacklist(final String profile, final org.jboss.forge.project.dependencies.Dependency dep,
+          final VersionOracle oracle) {
+    final DependencyBuilder providedDep = DependencyBuilder.create(dep);
+    providedDep.setScopeType(ScopeType.PROVIDED);
+    addDependenciesToProfile(profile, Arrays.asList(new DependencyBuilder[] { providedDep }), oracle);
   }
 
   private DependencyBuilder getDependencyWithVersion(final DependencyBuilder dep, final VersionOracle oracle) {

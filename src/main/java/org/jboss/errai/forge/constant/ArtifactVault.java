@@ -1,5 +1,6 @@
 package org.jboss.errai.forge.constant;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -133,6 +134,14 @@ public final class ArtifactVault {
   
   public static String getBlacklistedProfile(final Dependency dep) {
     return getBlacklistedProfile(dep.getGroupId() + ":" + dep.getArtifactId());
+  }
+  
+  public static Collection<String> getBlacklistProfiles() {
+    return blacklist.keySet();
+  }
+  
+  public static Collection<String> getBlacklistedArtifacts(final String profileId) {
+    return blacklist.get(profileId);
   }
 
 }
