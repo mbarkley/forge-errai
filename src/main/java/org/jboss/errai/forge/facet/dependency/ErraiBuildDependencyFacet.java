@@ -10,12 +10,13 @@ import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Jb
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.jboss.errai.forge.facet.base.RequiresCore;
+import org.jboss.errai.forge.facet.base.CoreBuildFacet;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.ScopeType;
+import org.jboss.forge.shell.plugins.RequiresFacet;
 
-@RequiresCore
+@RequiresFacet({ CoreBuildFacet.class })
 public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
 
   public ErraiBuildDependencyFacet() {
