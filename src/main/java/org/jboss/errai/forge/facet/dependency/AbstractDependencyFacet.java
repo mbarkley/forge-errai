@@ -180,7 +180,11 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
    *          {@link AbstractDependencyFacet#profileDependencies}.
    */
   protected void setProfileDependencies(final String name, final DependencyBuilder... deps) {
-    profileDependencies.put(name, Arrays.asList(deps));
+    final List<DependencyBuilder> list = new ArrayList<DependencyBuilder>(deps.length);
+    for (int i = 0; i < deps.length; i++) {
+      list.add(deps[i]);
+    }
+    profileDependencies.put(name, list);
   }
 
 }
