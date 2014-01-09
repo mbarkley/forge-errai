@@ -94,7 +94,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
         
         findLoop: for (final Node node : elementsByTagName.get(name)) {
           for (final Node existing : existingByTagName.get(name)) {
-            if (matches(node, existing))
+            if (node.getNodeType() == Node.ELEMENT_NODE && matches(node, existing))
               continue findLoop;
           }
           return false;
@@ -130,7 +130,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
         
         for (final Node node : elementsByTagName.get(name)) {
           for (final Node existing : existingByTagName.get(name)) {
-            if (matches(node, existing)) {
+            if (node.getNodeType() == Node.ELEMENT_NODE && matches(node, existing)) {
               existing.getParentNode().removeChild(existing);
             }
           }
@@ -191,7 +191,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       List<Node> existing = existingMap.get(name);
       nodeLoop: for (final Node node : namedNodes.get(name)) {
         for (final Node existingNode : existing) {
-          if (matches(node, existingNode))
+          if (node.getNodeType() == Node.ELEMENT_NODE && matches(node, existingNode))
             break nodeLoop;
         }
         Node before = null;
@@ -203,7 +203,10 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
   }
 
   protected boolean matches(Node node, Node other) {
-    if (!(node instanceof Element) || !(other instanceof Element)) {
+    if (!(other instanceof Element)) {
+      return false;
+    }
+    if (!(node instanceof Element)) {
       throw new IllegalArgumentException("Arguments must be instances of Element.");
     }
 
@@ -211,11 +214,26 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     if (!e1.getNodeName().equals(e2.getNodeName()))
       return false;
 
+    // other must have attributes consistent with node
     final NamedNodeMap attributes = e1.getAttributes();
     for (int i = 0; i < attributes.getLength(); i++) {
       final Node item = attributes.item(i);
       if (!e2.hasAttribute(item.getNodeName()) || !e2.getAttribute(item.getNodeName()).equals(item.getNodeValue()))
         return false;
+    }
+    
+    // children of other must be consistent with children of node
+    if (e1.hasChildNodes()) {
+      outer: for (Node child = e1.getFirstChild(); child != null; child = child.getNextSibling()) {
+        if (!(child instanceof Element))
+          continue;
+        for (Node otherChild = e2.getFirstChild(); otherChild != null; otherChild = otherChild.getNextSibling()) {
+          if (otherChild instanceof Element && matches(child, otherChild))
+            continue outer;
+        }
+        
+        return false;
+      }
     }
 
     return true;
