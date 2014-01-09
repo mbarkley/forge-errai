@@ -4,6 +4,7 @@ import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Er
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.ErraiTools;
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.GwtUser;
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.JUnit;
+import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.JbossSupport;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -15,8 +16,8 @@ import org.jboss.forge.project.dependencies.ScopeType;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
 /**
- * This facet sets all the common Maven dependencies required to build or
- * run in development mode an application with Errai.
+ * This facet sets all the common Maven dependencies required to build or run in
+ * development mode an application with Errai.
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
@@ -27,6 +28,7 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
     setCoreDependencies(DependencyBuilder.create(ErraiTools.toString()), DependencyBuilder.create(GwtUser.toString())
             .setScopeType(ScopeType.PROVIDED), DependencyBuilder.create(ErraiJboss.toString()), DependencyBuilder
             .create(JUnit.toString()).setScopeType(ScopeType.TEST));
+    setProfileDependencies(MAIN_PROFILE, DependencyBuilder.create(JbossSupport.toString()));
   }
 
   @Override

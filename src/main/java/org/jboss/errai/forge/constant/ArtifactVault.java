@@ -99,7 +99,6 @@ public final class ArtifactVault {
     final Set<String> mainProfileBlacklist = blacklist.get(AbstractBaseFacet.MAIN_PROFILE);
     mainProfileBlacklist.add(DependencyArtifact.ErraiTools.toString());
     mainProfileBlacklist.add(DependencyArtifact.ErraiJboss.toString());
-    mainProfileBlacklist.add(DependencyArtifact.JbossSupport.toString());
     mainProfileBlacklist.add(DependencyArtifact.Hsq.toString());
     mainProfileBlacklist.add(DependencyArtifact.JUnit.toString());
     mainProfileBlacklist.add(DependencyArtifact.ErraiNetty.toString());
