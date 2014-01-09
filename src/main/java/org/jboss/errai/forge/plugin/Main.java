@@ -75,7 +75,7 @@ public class Main implements Plugin {
     return modulePath;
   }
 
-  @Command("install core")
+  @Command("add-core")
   public void addCore(PipeOut out) {
     if (!project.hasFacet(CoreFacet.class)) {
       installEvent.fire(new InstallFacets(CoreFacet.class));
@@ -90,7 +90,7 @@ public class Main implements Plugin {
     ShellMessages.info(out, "1.0.0-SNAPSHOT");
   }
 
-  @Command("install messaging")
+  @Command("add-messaging")
   public void addMessaging(PipeOut out) {
     if (!project.hasFacet(ErraiMessagingFacet.class)) {
       installEvent.fire(new InstallFacets(ErraiMessagingFacet.class));
