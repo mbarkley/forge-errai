@@ -14,7 +14,6 @@ public class ErraiCdiClientDependencyFacet extends AbstractDependencyFacet {
 
   public ErraiCdiClientDependencyFacet() {
     setCoreDependencies(DependencyBuilder.create(DependencyArtifact.ErraiCdiClient.toString()));
-    setProfileDependencies(MAIN_PROFILE);
   }
 
 }
