@@ -9,6 +9,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.facet.base.CoreBuildFacet;
 import org.jboss.forge.maven.MavenCoreFacet;
+import org.jboss.forge.maven.profiles.ProfileBuilder;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.ScopeType;
 import org.jboss.forge.shell.plugins.RequiresFacet;
@@ -34,7 +35,11 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
       // Set main profile to be active by default
       final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
       final Model pom = coreFacet.getPOM();
-      final Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
+      Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
+      if (profile == null) {
+        profile = ProfileBuilder.create().setId(MAIN_PROFILE).getAsMavenProfile();
+        pom.addProfile(profile);
+      }
       profile.getActivation().setActiveByDefault(true);
       coreFacet.setPOM(pom);
 
