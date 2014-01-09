@@ -55,16 +55,19 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     // TODO error handling and reversion
 
     final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
+    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     final VersionOracle oracle = new VersionOracle(depFacet);
 
     for (DependencyBuilder dep : coreDependencies) {
       depFacet.addDirectDependency(getDependencyWithVersion(dep, oracle));
     }
     
+    final Model pom = coreFacet.getPOM();
     for (String profileId : ArtifactVault.getBlacklistProfiles()) {
+      final Profile profile = getProfile(profileId, pom.getProfiles());
       for (String artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {
         DependencyBuilder dep = DependencyBuilder.create(artifact);
-        if (depFacet.hasEffectiveDependency(dep)) {
+        if (depFacet.hasEffectiveDependency(dep) && !hasProvidedDependency(profile, dep)) {
           org.jboss.forge.project.dependencies.Dependency existing = depFacet.getEffectiveDependency(dep);
           dep.setVersion(existing.getVersion()).setScopeType(ScopeType.PROVIDED);
           if (!profileDependencies.containsKey(profileId))
@@ -79,6 +82,18 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     }
 
     return true;
+  }
+
+  private boolean hasProvidedDependency(Profile profile, DependencyBuilder dep) {
+    if (profile == null || profile.getDependencies() == null)
+      return false;
+    
+    for (final Dependency profDep : profile.getDependencies()) {
+      if (dep.getGroupId().equals(profDep.getGroupId()) && dep.getArtifactId().equals(profDep.getArtifactId()) && profDep.getScope().equals("provided"))
+        return true;
+    }
+    
+    return false;
   }
 
   @Override
