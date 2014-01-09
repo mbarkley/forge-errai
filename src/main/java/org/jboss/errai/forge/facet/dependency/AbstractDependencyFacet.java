@@ -35,15 +35,15 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
   /**
    * Dependencies to be added to the build in the Maven pom file. Versions of
-   * these dependencies will be ignored and are re-assigned from a
-   * {@link VersionOracle}.
+   * these dependencies will be assigned from a {@link VersionOracle} if
+   * unspecified.
    */
   protected Collection<DependencyBuilder> coreDependencies;
   /**
    * Dependencies to be added to the build of Maven profiles with names matching
-   * the keys of this map. Versions of these dependencies will be ignored and
-   * are re-assigned from a {@link VersionOracle}. Profiles that do not already
-   * exist will be created.
+   * the keys of this map. Versions of these dependencies will be assigned from
+   * a {@link VersionOracle} if unspecified. Profiles that do not already exist will be
+   * created.
    */
   protected Map<String, Collection<DependencyBuilder>> profileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
 
@@ -63,11 +63,13 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     
     for (String profileId : ArtifactVault.getBlacklistProfiles()) {
       for (String artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {
-        final DependencyBuilder dep = DependencyBuilder.create(artifact);
+        DependencyBuilder dep = DependencyBuilder.create(artifact);
         if (depFacet.hasEffectiveDependency(dep)) {
+          org.jboss.forge.project.dependencies.Dependency existing = depFacet.getEffectiveDependency(dep);
+          dep.setVersion(existing.getVersion()).setScopeType(ScopeType.PROVIDED);
           if (!profileDependencies.containsKey(profileId))
             profileDependencies.put(profileId, new ArrayList<DependencyBuilder>());
-          profileDependencies.get(profileId).add(dep.setScopeType(ScopeType.PROVIDED));
+          profileDependencies.get(profileId).add(dep);
         }
       }
     }
