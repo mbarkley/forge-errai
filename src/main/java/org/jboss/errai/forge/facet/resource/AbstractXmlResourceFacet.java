@@ -25,12 +25,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * For adding and removing configurations from an xml file.
+ * A base class for modifying XML-based configuration files. Concrete subclasses
+ * may modify the field {@link AbstractXmlResourceFacet#xmlProperties
+ * xmlProperties}.
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
 public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
 
+  /**
+   * The properties used when writing to an XML file.
+   * 
+   * @see {@link OutputKeys}, {@link Transformer}
+   */
   final protected Properties xmlProperties = new Properties();
   protected final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -75,7 +82,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     if (relPath == null)
       // Project config has not been setup yet.
       return false;
-    
+
     final File file = getResFile(relPath);
     if (!file.exists())
       return false;
@@ -87,11 +94,11 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       final Element root = doc.getDocumentElement();
       final Map<String, Collection<Node>> elementsByTagName = mapElementsByTagName(toCheck);
       final Map<String, Collection<Node>> existingByTagName = mapElementsByTagName(root.getChildNodes());
-      
+
       for (final String name : elementsByTagName.keySet()) {
         if (!existingByTagName.containsKey(name))
           return false;
-        
+
         findLoop: for (final Node node : elementsByTagName.get(name)) {
           for (final Node existing : existingByTagName.get(name)) {
             if (node.getNodeType() == Node.ELEMENT_NODE && matches(node, existing))
@@ -123,11 +130,11 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       final Element root = doc.getDocumentElement();
       final Map<String, Collection<Node>> elementsByTagName = mapElementsByTagName(toRemove);
       final Map<String, Collection<Node>> existingByTagName = mapElementsByTagName(root.getChildNodes());
-      
+
       for (final String name : elementsByTagName.keySet()) {
         if (!existingByTagName.containsKey(name))
           continue;
-        
+
         for (final Node node : elementsByTagName.get(name)) {
           for (final Node existing : existingByTagName.get(name)) {
             if (node.getNodeType() == Node.ELEMENT_NODE && matches(node, existing)) {
@@ -153,10 +160,32 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     return file;
   }
 
+  /**
+   * Get DOM elements to write to an XML configuration file. Concrete subclasses
+   * should return a collection of nodes that will be merged as children of the
+   * root element of the specified XML file.
+   * 
+   * @param doc
+   *          The returned nodes should be created with or imported into this
+   *          document.
+   * @return A collection of nodes, which are part of the given document.
+   */
   protected abstract Collection<Node> getElementsToInsert(final Document doc) throws ParserConfigurationException;
 
+  /**
+   * Get the relative path of XML file to be configured by this facet. Concrete
+   * subclasses must return the path (relative to the project root directory) of
+   * the XML file they are configuring.
+   * 
+   * @return The path (relative to the project root directory) of an XML
+   *         configuration file.
+   */
   protected abstract String getRelPath();
 
+  /**
+   * @return A map with key values of node names, mapping to collections of
+   *         nodes with the corresponding node name.
+   */
   protected Map<String, Collection<Node>> mapElementsByTagName(Collection<Node> elements) {
     final Map<String, Collection<Node>> retVal = new HashMap<String, Collection<Node>>();
     for (final Node node : elements) {
@@ -167,16 +196,29 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
 
     return retVal;
   }
-  
+
+  /**
+   * @return A map with key values of node names, mapping to collections of
+   *         nodes with the corresponding node name.
+   */
   protected Map<String, Collection<Node>> mapElementsByTagName(final NodeList nodes) {
     final List<Node> list = new ArrayList<Node>(nodes.getLength());
     for (int i = 0; i < nodes.getLength(); i++) {
       list.add(nodes.item(i));
     }
-    
+
     return mapElementsByTagName(list);
   }
 
+  /**
+   * Add a collection of nodes as children of another node. If a node in the
+   * collection matches a child of the parent node, do not add it.
+   * 
+   * @param parent
+   *          The node to add children to.
+   * @param namedNodes
+   *          A collection of nodes to add as children.
+   */
   protected void safeBatchAdd(final Node parent, final Map<String, Collection<Node>> namedNodes) {
     Map<String, List<Node>> existingMap = new HashMap<String, List<Node>>();
     for (final String name : namedNodes.keySet()) {
@@ -202,6 +244,17 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     }
   }
 
+  /**
+   * Check if a node is consistent with another. A node, {@code other} is
+   * consistent with another node, {@code node}, if the tree rooted at
+   * {@code node} is a subtree of {@code other} (i.e. every child element,
+   * attribute, or text value in {@code node} exists in the same relative path
+   * in {@code other}).
+   * 
+   * @param node The primary node for matching against.
+   * @param other The secondary node being matched against the primary node.
+   * @return True iff {@code other} is consistent with {@code node}.
+   */
   protected boolean matches(Node node, Node other) {
     if (!(other instanceof Element)) {
       return false;
@@ -221,7 +274,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       if (!e2.hasAttribute(item.getNodeName()) || !e2.getAttribute(item.getNodeName()).equals(item.getNodeValue()))
         return false;
     }
-    
+
     // children of other must be consistent with children of node
     if (e1.hasChildNodes()) {
       outer: for (Node child = e1.getFirstChild(); child != null; child = child.getNextSibling()) {
@@ -231,7 +284,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
           if (otherChild instanceof Element && matches(child, otherChild))
             continue outer;
         }
-        
+
         return false;
       }
     }

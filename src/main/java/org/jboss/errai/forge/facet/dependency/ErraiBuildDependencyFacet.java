@@ -16,6 +16,12 @@ import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.ScopeType;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
+/**
+ * This facet sets all the common Maven dependencies required to build or
+ * run in development mode an application with Errai.
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 @RequiresFacet({ CoreBuildFacet.class })
 public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
 
@@ -29,10 +35,9 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
             DependencyBuilder.create(JbossSupport.toString()),
             DependencyBuilder.create(Hsq.toString()).setScopeType(ScopeType.PROVIDED),
             DependencyBuilder.create(JUnit.toString()).setScopeType(ScopeType.PROVIDED),
-            DependencyBuilder.create(ErraiNetty.toString()).setScopeType(ScopeType.PROVIDED)
-    );
+            DependencyBuilder.create(ErraiNetty.toString()).setScopeType(ScopeType.PROVIDED));
   }
-  
+
   @Override
   public boolean install() {
     if (super.install()) {
@@ -42,7 +47,7 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
       final Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
       profile.getActivation().setActiveByDefault(true);
       coreFacet.setPOM(pom);
-      
+
       return true;
     }
     else {

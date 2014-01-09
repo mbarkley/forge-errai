@@ -6,6 +6,11 @@ import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Gw
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.dependencies.ScopeType;
 
+/**
+ * This facet sets the Maven dependencies needed to use the errai-common project.
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 public class ErraiCommonDepdencyFacet extends AbstractDependencyFacet {
 
   public ErraiCommonDepdencyFacet() {

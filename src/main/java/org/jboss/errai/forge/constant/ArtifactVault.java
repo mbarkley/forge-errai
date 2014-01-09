@@ -3,11 +3,18 @@ package org.jboss.errai.forge.constant;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 public final class ArtifactVault {
   
   public static final String ERRAI_GROUP_ID = "org.jboss.errai";
   
+  /**
+   * An enumeration of Maven dependency artifacts used by various facets.
+   * 
+   * @author Max Barkley <mbarkley@redhat.com>
+   */
   public static enum DependencyArtifact {
     // Non-errai
     GwtUser("gwt-user", "com.google.gwt"),
@@ -51,15 +58,23 @@ public final class ArtifactVault {
       this(id, ERRAI_GROUP_ID);
     }
     
+    /**
+     * @return The artifact id of this dependency.
+     */
     public String getArtifactId() {
       return artifactId;
     }
     
+    /**
+     * @return The group id of this dependency.
+     */
     public String getGroupId() {
       return groupId;
     }
     
-    @Override
+    /**
+     * Returns the string {@code groupId} + ":" + {@code artifactId}.
+     */
     public String toString() {
       return String.format("%s:%s", groupId, artifactId);
     }
@@ -72,6 +87,9 @@ public final class ArtifactVault {
       }
     }
     
+    /**
+     * Lookup a {@link DependencyArtifact} by the unique combination of it's group id and artifact id.
+     */
     public static DependencyArtifact valueOf(String groupId, String artifactId) {
       return artifacts.get(groupId + ":" + artifactId);
     }

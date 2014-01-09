@@ -14,6 +14,11 @@ import org.jboss.forge.maven.plugins.ExecutionBuilder;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
+/**
+ * This facet configures the gwt-maven-plugin in the build section of the pom file.
+ *
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 @RequiresFacet({ CoreBuildFacet.class, GwtHostPageFacet.class })
 public class GwtPluginFacet extends AbstractPluginFacet {
 

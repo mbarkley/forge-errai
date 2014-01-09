@@ -11,6 +11,11 @@ import org.jboss.forge.project.dependencies.Dependency;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.DependencyFacet;
 
+/**
+ * Provides versions for Maven dependencies.
+ *
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 public class VersionOracle {
 
   private DependencyFacet depFacet;
@@ -31,14 +36,23 @@ public class VersionOracle {
     depFacet = facet;
   }
 
+  /**
+   * Get a version for the given dependency.
+   */
   public String resolveVersion(DependencyArtifact dependency) {
     return resolveVersion(dependency.getGroupId(), dependency.getArtifactId());
   }
 
+  /**
+   * Get a version for the given dependency.
+   */
   public String resolveVersion(PluginArtifact plugin) {
     return resolveVersion(plugin.getGroupId(), plugin.getArtifactId());
   }
 
+  /**
+   * Get a version for the given dependency.
+   */
   public String resolveVersion(String groupId, String artifactId) {
     String staticVersion = getStaticVersion(groupId, artifactId);
     if (staticVersion != null)
@@ -55,6 +69,7 @@ public class VersionOracle {
     
     String maxVersion = null;
     for (final Dependency versionDep : availVersions) {
+      // FIXME needs a more reliable way of comparing versions
       if (!versionDep.isSnapshot() && (maxVersion == null || versionDep.getVersion().compareTo(maxVersion) > 0)) {
         maxVersion = versionDep.getVersion();
       }
@@ -67,6 +82,9 @@ public class VersionOracle {
     return versionMap.get(groupId + ":" + artifactId);
   }
 
+  /**
+   * @return The most recent non-snapshot version of Errai.
+   */
   public String resolveErraiVersion() {
     DependencyArtifact common = DependencyArtifact.ErraiCommon;
     return getHighestStableVersion(common.getGroupId(), common.getArtifactId());

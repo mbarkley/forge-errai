@@ -21,12 +21,28 @@ import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.shell.Shell;
 
+/**
+ * A base class for all facets that install Maven dependencies. Concrete
+ * subclasses must provide values for
+ * {@link AbstractDependencyFacet#coreDependencies} and
+ * {@link AbstractDependencyFacet#profileDependencies}.
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
   /**
-   * Version-less.
+   * Dependencies to be added to the build in the Maven pom file. Versions of
+   * these dependencies will be ignored and are re-assigned from a
+   * {@link VersionOracle}.
    */
   protected Collection<DependencyBuilder> coreDependencies;
+  /**
+   * Dependencies to be added to the build of Maven profiles with names matching
+   * the keys of this map. Versions of these dependencies will be ignored and
+   * are re-assigned from a {@link VersionOracle}. Profiles that do not already
+   * exist will be created.
+   */
   protected Map<String, Collection<DependencyBuilder>> profileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
 
   @Inject
@@ -39,13 +55,12 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
     final VersionOracle oracle = new VersionOracle(depFacet);
 
-    // Add dev mode build dependencies
     for (DependencyBuilder dep : coreDependencies) {
       depFacet.addDirectDependency(getDependencyWithVersion(dep, oracle));
     }
-    // Create profiles
+
     for (Entry<String, Collection<DependencyBuilder>> entry : profileDependencies.entrySet()) {
-      makeProfile(entry.getKey(), entry.getValue(), oracle);
+      addDependenciesToProfile(entry.getKey(), entry.getValue(), oracle);
     }
 
     return true;
@@ -119,10 +134,29 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     return dep;
   }
 
+  /**
+   * A convenience method for setting
+   * {@link AbstractDependencyFacet#coreDependencies}.
+   * 
+   * @param deps
+   *          Dependencies to be put in a {@link Collection} and assigned to
+   *          {@link AbstractDependencyFacet#coreDependencies}.
+   */
   protected void setCoreDependencies(final DependencyBuilder... deps) {
     coreDependencies = Arrays.asList(deps);
   }
 
+  /**
+   * A convenience method for setting a key-value pair in
+   * {@link AbstractDependencyFacet#profileDependencies}.
+   * 
+   * @param name
+   *          The name of a Maven profile. If no profile with this name exists,
+   *          one will be added to the pom file.
+   * @param deps
+   *          Dependencies to be put in a {@link Collection} and added to
+   *          {@link AbstractDependencyFacet#profileDependencies}.
+   */
   protected void setProfileDependencies(final String name, final DependencyBuilder... deps) {
     profileDependencies.put(name, Arrays.asList(deps));
   }

@@ -10,13 +10,25 @@ import org.jboss.forge.env.Configuration;
 import org.jboss.forge.env.ConfigurationFactory;
 import org.jboss.forge.project.Project;
 
+/**
+ * A singleton class for accessing project-wide plugin settings.
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 @Singleton
 public final class ProjectConfig {
 
+  /**
+   * An enumeration of project properties stored in a {@link ProjectConfig}.
+   * 
+   * @author Max Barkley <mbarkley@redhat.com>
+   */
   public static enum ProjectProperty {
-    MODULE_FILE(File.class),
-    MODULE_LOGICAL(String.class);
+    MODULE_FILE(File.class), MODULE_LOGICAL(String.class);
 
+    /**
+     * The type of value stored by this property.
+     */
     public final Class<?> valueType;
 
     private ProjectProperty(Class<?> type) {
@@ -49,10 +61,32 @@ public final class ProjectConfig {
     configFactory = factory;
   }
 
+  /**
+   * Get the value of a {@link ProjectProperty}.
+   * 
+   * @param property
+   *          The {@link ProjectProperty} to which the returned value belongs.
+   * @param type
+   *          The type of the returned value.
+   * @return The value associated with the given {@link ProjectProperty}, or
+   *         null if none exists.
+   */
   public <T> T getProjectProperty(ProjectProperty property, Class<T> type) {
     return type.cast(properties.get(property));
   }
 
+  /**
+   * Set the value of a {@link ProjectProperty}. This value will persist in the
+   * forge configurations.
+   * 
+   * @param property
+   *          The {@link ProjectProperty} to which a value will be assigned.
+   * @param value
+   *          The value to assign to the property.
+   * @throws IllegalArgumentException
+   *           If the class of the {@code value} does not match
+   *           {@code property.valueType}.
+   */
   public <T> void setProjectProperty(ProjectProperty property, T value) {
     if (!property.valueType.isInstance(value)) {
       throw new IllegalArgumentException("Value for property " + property.toString() + " must be type "
@@ -69,6 +103,9 @@ public final class ProjectConfig {
     }
   }
 
+  /**
+   * @return The name used to store and retrieve persistent project configurations.
+   */
   public static String getProjectAttribute(final ProjectProperty prop) {
     return PREFIX + prop.name();
   }

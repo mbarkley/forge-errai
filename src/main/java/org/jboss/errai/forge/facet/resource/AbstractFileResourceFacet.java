@@ -9,15 +9,23 @@ import java.io.InputStreamReader;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 
 /**
- * Base class for facets that add required resource file (such as a .properties
- * file).
+ * Base class for facets that add required a resource file (such as a
+ * .properties file). It is not the responsibility of this class to check the
+ * content of the resource file. It simply checks for existence, and if
+ * necessary installs a simple version of the required resource.
+ * 
+ * Concrete subclasses must assign the field
+ * {@link AbstractFileResourceFacet#relFilePath relFilePath} and implement the
+ * method {@link AbstractFileResourceFacet#getResourceContent()
+ * getResourceContent}.
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
 abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
 
   /**
-   * Relative to project root.
+   * The path (relative to the project root directory) of the file resource to
+   * be installed.
    */
   protected String relFilePath;
 
@@ -60,8 +68,24 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
     return true;
   }
 
+  /**
+   * Get a String to be written to the resource file being installed by this
+   * class. This method is called if the resource file specified by this facet
+   * does not exist and one must be created.
+   * 
+   * @return The text to be written to the resource file at
+   *         {@link AbstractFileResourceFacet#relFilePath relFilePath}.
+   */
   protected abstract String getResourceContent() throws Exception;
-  
+
+  /**
+   * Reads a classpath resource into a {@link StringBuilder}.
+   * 
+   * @param resource
+   *          The name of the classpath resource to be copied.
+   * @return A {@link StringBuilder} containing the contents of the specified
+   *         resource.
+   */
   protected StringBuilder readResource(final String resource) throws IOException {
     final StringBuilder builder = new StringBuilder();
     final InputStream stream = getClass().getResourceAsStream(resource);
@@ -76,16 +100,20 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
     }
     reader.close();
     stream.close();
-    
+
     return builder;
   }
 
   /**
-   * Replace all occurrences of a {@link String} in a give {@link StringBuilder}.
+   * Replace all occurrences of a {@link String} in a give {@link StringBuilder}
+   * .
    * 
-   * @param subject The {@link StringBuilder} to be modified.
-   * @param toReplace The {@link String} to be replaced.
-   * @param replacement The replacement {@link String}.
+   * @param subject
+   *          The {@link StringBuilder} to be modified.
+   * @param toReplace
+   *          The {@link String} to be replaced.
+   * @param replacement
+   *          The replacement {@link String}.
    */
   protected void replace(final StringBuilder subject, final String toReplace, final String replacement) {
     for (int fillerIndex = subject.indexOf(toReplace); fillerIndex > -1; fillerIndex = subject.indexOf(toReplace,

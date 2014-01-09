@@ -21,6 +21,13 @@ import org.jboss.forge.shell.plugins.Plugin;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 import org.jboss.forge.shell.plugins.SetupCommand;
 
+/**
+ * The Errai Forge Plugin implementation. Configures the Maven pom file, GWT
+ * Module, and other configuration files for adding various Errai features to a
+ * maven project.
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 @Alias("errai-setup")
 @RequiresFacet({ CoreFacet.class })
 public class Main implements Plugin {
@@ -40,7 +47,7 @@ public class Main implements Plugin {
   @SetupCommand
   public void setup(PipeOut out) {
     final ProjectConfig config = configFactory.getProjectConfig(project);
-    
+
     // Configure gwt module
     if (config.getProjectProperty(ProjectProperty.MODULE_LOGICAL, String.class) == null) {
       final String module = promptForModule();
@@ -51,7 +58,7 @@ public class Main implements Plugin {
               String.class));
       config.setProjectProperty(ProjectProperty.MODULE_FILE, modulePath);
     }
-    
+
     if (!project.hasFacet(CoreFacet.class)) {
       installEvent.fire(new InstallFacets(CoreFacet.class));
     }

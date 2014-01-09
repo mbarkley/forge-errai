@@ -10,6 +10,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+/**
+ * This facet configures the ErraiServlet used by the errai-bus project.
+ *
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 @RequiresFacet({ WebXmlFacet.class })
 public class ErraiBusServletConfigFacet extends AbstractXmlResourceFacet {
 

@@ -11,7 +11,9 @@ import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
 /**
- * Aggregates core facets required by all other facet aggregators.
+ * Aggregates core facets required by all other facet aggregators. Installing
+ * this facet will add all the necessary dependencies, profile, and plugin
+ * configurations to run a GWT/Errai project in development mode or compile to production mode.
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */

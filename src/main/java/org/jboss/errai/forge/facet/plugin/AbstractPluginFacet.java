@@ -22,11 +22,33 @@ import org.jboss.forge.project.dependencies.Dependency;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.DependencyFacet;
 
+/**
+ * This is a base class for facets that add Maven plugins to the build section
+ * of the pom file. Concrete subclasses must assign values to the fields
+ * {@link AbstractPluginFacet#pluginArtifact pluginArtifact},
+ * {@link AbstractPluginFacet#configurations configurations},
+ * {@link AbstractPluginFacet#dependencies dependencies}, and
+ * {@link AbstractPluginFacet#executions executions}
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 abstract class AbstractPluginFacet extends AbstractBaseFacet {
 
+  /**
+   * The Maven artifact of the plugin to be installed.
+   */
   protected DependencyArtifact pluginArtifact;
+  /**
+   * Configurations for the plugin.
+   */
   protected Collection<ConfigurationElement> configurations;
+  /**
+   * Dependencies for the plugin.
+   */
   protected Collection<DependencyBuilder> dependencies;
+  /**
+   * Executions for the plugin.
+   */
   protected Collection<Execution> executions;
 
   @Override
@@ -111,7 +133,25 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     return true;
   }
 
-  protected boolean isMatchingConfiguration(final Configuration config, final Collection<ConfigurationElement> elements) {
+  /**
+   * Check that a {@link Configuration} is consistent with a collection of
+   * {@link ConfigurationElement ConfigurationElements}.
+   * 
+   * A configuration is consistent with a collection if for any element in the
+   * collection, {@code elem}, there exists an element in the configuration,
+   * {@code other}, such that
+   * {@link AbstractPluginFacet#isMatchingElement(ConfigurationElement, ConfigurationElement)
+   * isMatchingElement}{@code (elem, matching)} is {@code true}.
+   * 
+   * @param config
+   *          A Maven plugin configuration.
+   * @param elements
+   *          A set of configuration elements for a Maven plugin.
+   * @return True iff the given configuration is consistent with the given
+   *         collection of configuration elements.
+   */
+  protected static boolean isMatchingConfiguration(final Configuration config,
+          final Collection<ConfigurationElement> elements) {
     for (final ConfigurationElement elem : elements) {
       if (!isMatchingElement(config.getConfigurationElement(elem.getName()), elem))
         return false;
@@ -123,7 +163,8 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
   /**
    * Checks that the given {@link ConfigurationElement} is consistent with the
    * expected one. This means that the expected configuration tree is a subtree
-   * of the given.
+   * of the given (i.e. the given configuration can have <i>additional</i>
+   * elements, but must not be missing any).
    * 
    * @param given
    *          The given configuration element.
@@ -131,7 +172,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
    *          The expected configuration element.
    * @return True if expected is a subtree of given.
    */
-  private boolean isMatchingElement(final ConfigurationElement given, final ConfigurationElement expected) {
+  private static boolean isMatchingElement(final ConfigurationElement given, final ConfigurationElement expected) {
     if (given == null)
       return false;
 
@@ -167,6 +208,18 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     return true;
   }
 
+  /**
+   * Merge a {@link ConfigurationElement} into a {@link Configuration}. If there
+   * is no element in the given configuration with a name matching the given
+   * element, the element is simply added. Otherwise, the two elements will be
+   * recursively merged, with any conflicting values in the configuration being
+   * overwritten.
+   * 
+   * @param config
+   *          A Maven plugin configuration.
+   * @param configElem
+   *          A Maven plugin configuration element.
+   */
   protected void mergeConfigurationElement(final Configuration config, final ConfigurationElement configElem) {
     if (!config.hasConfigurationElement(configElem.getName())) {
       config.addConfigurationElement(configElem);
@@ -178,6 +231,17 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     }
   }
 
+  /**
+   * Recursively merge two configuration elements.
+   * 
+   * @param prev
+   *          A Maven plugin configuration element.
+   * @param configElem
+   *          A Maven plugin configuration element. Values in this element and
+   *          it's children will take precedence over conflicting values in the
+   *          other argument.
+   * @return A merged configuration element.
+   */
   protected ConfigurationElement merge(ConfigurationElement prev, ConfigurationElement configElem) {
     // Replace text-only elements
     if (!prev.hasChilderen()) {

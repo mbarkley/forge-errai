@@ -17,16 +17,32 @@ import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.BaseFacet;
 import org.jboss.forge.shell.Shell;
 import org.jboss.forge.shell.ShellColor;
-import org.jboss.forge.shell.plugins.RequiresFacet;
 
-@RequiresFacet({ MavenCoreFacet.class })
+/**
+ * A base class for Errai-related facets providing some basic routines.
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 public abstract class AbstractBaseFacet extends BaseFacet {
 
+  /**
+   * The name of the primary profile used to configure an Errai project.
+   */
   public static final String MAIN_PROFILE = "jboss7";
 
   @Inject
   protected Shell shell;
 
+  /**
+   * Get a Maven {@link Profile} by name from a {@link List}.
+   * 
+   * @param name
+   *          The name of the {@link Profile} to search for.
+   * @param profiles
+   *          A {@link List} of {@link Profile} objects to search.
+   * @return The {@link Profile} in the given {@link List} matching the provided
+   *         name, or {@literal null} if none was found.
+   */
   protected Profile getProfile(final String name, final List<Profile> profiles) {
     for (final Profile profile : profiles) {
       if (profile.getId().equals(name))
@@ -36,6 +52,15 @@ public abstract class AbstractBaseFacet extends BaseFacet {
     return null;
   }
 
+  /**
+   * Print an error message to the {@link Shell}.
+   * 
+   * @param message
+   *          A message to print to the shell.
+   * @param throwable
+   *          A stack trace from this will be printed iff
+   *          {@link Shell#isVerbose()} is {@literal true}.
+   */
   protected void printError(final String message, final Throwable throwable) {
     shell.println(ShellColor.RED, message);
     if (shell.isVerbose() && throwable != null) {
@@ -45,7 +70,21 @@ public abstract class AbstractBaseFacet extends BaseFacet {
     }
   }
 
-  protected boolean makeProfile(final String name, final Collection<DependencyBuilder> deps,
+  /**
+   * Add dependencies to a Maven profile.
+   * 
+   * @param name
+   *          The name of the Maven profile to which dependencies will be added.
+   *          If no profile with this name exists, one will be created.
+   * @param deps
+   *          Dependencies to be added. Note that the versions of these
+   *          dependencies will be ignored, and instead provided by the
+   *          {@link VersionOracle}.
+   * @param versionOracle
+   *          Used to determine the version of dependencies.
+   * @return True iff the dependencies were successfully added.
+   */
+  protected boolean addDependenciesToProfile(final String name, final Collection<DependencyBuilder> deps,
           final VersionOracle versionOracle) {
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     final Model pom = coreFacet.getPOM();

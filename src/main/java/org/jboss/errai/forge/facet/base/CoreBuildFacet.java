@@ -12,6 +12,11 @@ import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
+/**
+ * This facet configures the source folders, build output directory, and pom properties for a project.
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 @RequiresFacet({ MavenCoreFacet.class, DependencyFacet.class })
 public class CoreBuildFacet extends AbstractBaseFacet {
 

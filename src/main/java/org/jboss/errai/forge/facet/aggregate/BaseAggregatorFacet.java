@@ -5,6 +5,8 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 
 /**
  * Acts as top-level aggregator for pulling in other facet dependencies.
+ * Concrete subclasses should be used to simplify the process of installing
+ * complex combinations of facets.
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
@@ -20,7 +22,9 @@ abstract class BaseAggregatorFacet extends BaseFacet {
   public boolean isInstalled() {
     /*
      * An aggregator facet is installed if all of its required facets are
-     * installed.
+     * installed. There is no need to do a recursive traversal, as the presence
+     * of direct dependencies in the project means that forge has already
+     * verified the installation of transitively required facets.
      */
     return getProject().hasAllFacets(getClass().getAnnotation(RequiresFacet.class).value());
   }

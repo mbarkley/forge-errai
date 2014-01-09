@@ -11,6 +11,11 @@ import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.jboss.forge.shell.Shell;
 
+/**
+ * This facet creates a GWT module file if necessary and inherits the {@literal com.google.gwt.user.User} module.
+ *
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 public class ModuleCoreFacet extends AbstractModuleFacet {
 
   final static String emptyModuleContents =

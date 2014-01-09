@@ -13,6 +13,7 @@ import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
+import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.util.MavenConverter;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
@@ -22,11 +23,22 @@ import org.jboss.forge.maven.plugins.MavenPluginAdapter;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.DependencyFacet;
 
+/**
+ * A base class for facets that install Maven plugins within the
+ * {@link AbstractBaseFacet#MAIN_PROFILE main profile} of the pom file. Concrete
+ * subclasses must assign values to the fields
+ * {@link AbstractPluginFacet#pluginArtifact pluginArtifact},
+ * {@link AbstractPluginFacet#configurations configurations},
+ * {@link AbstractPluginFacet#dependencies dependencies}, and
+ * {@link AbstractProfilePluginFacet#executions executions}.
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
-  protected DependencyArtifact pluginArtifact;
-  protected Collection<DependencyBuilder> dependencies;
-  protected Collection<ConfigurationElement> configurations;
+  /**
+   * Executions for the installed plugin.
+   */
   protected Collection<PluginExecution> executions;
   protected boolean extensions = true;
 
@@ -38,7 +50,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
     final VersionOracle oracle = new VersionOracle(getProject().getFacet(DependencyFacet.class));
 
     if (profile == null) {
-      makeProfile(MAIN_PROFILE, Collections.<DependencyBuilder> emptyList(), oracle);
+      addDependenciesToProfile(MAIN_PROFILE, Collections.<DependencyBuilder> emptyList(), oracle);
       pom = coreFacet.getPOM();
       profile = getProfile(MAIN_PROFILE, pom.getProfiles());
     }
@@ -91,18 +103,18 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
     return true;
   }
-  
+
   @Override
   public boolean isInstalled() {
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     final Model pom = coreFacet.getPOM();
-    
+
     final Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
     if (profile == null || profile.getBuild() == null)
       return false;
-    
+
     final Plugin plugin = profile.getBuild().getPluginsAsMap().get(pluginArtifact.toString());
-    
+
     outer: for (final DependencyBuilder dep : dependencies) {
       for (final Dependency pluginDep : plugin.getDependencies()) {
         if (pluginDep.getArtifactId().equals(dep.getArtifactId()) && pluginDep.getGroupId().equals(dep.getGroupId()))
@@ -110,7 +122,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
       }
       return false;
     }
-    
+
     outer: for (final PluginExecution exec : executions) {
       for (final PluginExecution pluginExec : plugin.getExecutions()) {
         if (pluginExec.getId().equals(exec.getId()))
@@ -118,36 +130,36 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
       }
       return false;
     }
-    
+
     final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
-    
+
     if (!isMatchingConfiguration(adapter.getConfig(), configurations))
       return false;
-    
+
     return true;
   }
-  
+
   @Override
   public boolean uninstall() {
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     final Model pom = coreFacet.getPOM();
-    
+
     final Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
     if (profile == null)
       return false;
-    
+
     final BuildBase build = profile.getBuild();
     if (build == null)
       return false;
-    
+
     final Plugin plugin = build.getPluginsAsMap().get(pluginArtifact.toString());
     if (plugin == null)
       return false;
-    
+
     build.removePlugin(plugin);
     profile.setBuild(build);
     coreFacet.setPOM(pom);
-    
+
     return true;
   }
 

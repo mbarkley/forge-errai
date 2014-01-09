@@ -8,6 +8,11 @@ import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 
+/**
+ * This facet adds a GWT host page if none already exists.
+ *
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 public class GwtHostPageFacet extends AbstractFileResourceFacet {
 
   private final String templateName = "host_page_template.html";

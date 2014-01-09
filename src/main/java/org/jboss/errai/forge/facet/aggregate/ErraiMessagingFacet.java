@@ -7,7 +7,9 @@ import org.jboss.errai.forge.facet.resource.ErraiBusServletConfigFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
 /**
- * Aggregator facet for Errai Messaging.
+ * Aggregator facet for Errai Messaging. Installing this facet adds the
+ * necessary dependencies and web.xml configurations to immediately use the
+ * Errai Message Bus in a project.
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */

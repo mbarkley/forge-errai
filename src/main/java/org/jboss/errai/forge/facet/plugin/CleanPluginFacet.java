@@ -11,6 +11,11 @@ import org.jboss.forge.maven.plugins.Execution;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
+/**
+ * This facet configures the maven-clean-plugin in the build section of the projects pom file.
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 @RequiresFacet({ CoreBuildFacet.class })
 public class CleanPluginFacet extends AbstractPluginFacet {
 

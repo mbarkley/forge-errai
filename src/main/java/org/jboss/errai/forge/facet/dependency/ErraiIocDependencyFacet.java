@@ -5,6 +5,11 @@ import org.jboss.forge.project.dependencies.ScopeType;
 
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.*;
 
+/**
+ * This facet sets the Maven dependencies needed to use the errai-ioc project.
+ * 
+ * @author Max Barkley <mbarkley@redhat.com>
+ */
 public class ErraiIocDependencyFacet extends AbstractDependencyFacet {
   
   public ErraiIocDependencyFacet() {
