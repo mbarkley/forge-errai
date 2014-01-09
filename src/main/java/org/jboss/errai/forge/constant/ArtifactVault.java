@@ -94,7 +94,7 @@ public final class ArtifactVault {
    */
   private static final Map<String, Set<String>> blacklist = new HashMap<String, Set<String>>();
 
-  {
+  static {
     // Wildfly/Jboss blacklist
     blacklist.put(AbstractBaseFacet.MAIN_PROFILE, new HashSet<String>());
     final Set<String> mainProfileBlacklist = blacklist.get(AbstractBaseFacet.MAIN_PROFILE);
