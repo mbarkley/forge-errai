@@ -55,11 +55,8 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
   public void testNoProfileEmptyInstall() throws Exception {
     final Project project = initializeJavaProject();
     NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
-    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
 
-    final Model pom = coreFacet.getPOM();
-    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
-    coreFacet.setPOM(pom);
+    prepareProjectPom(project);
 
     project.installFacet(facet);
 
@@ -130,10 +127,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
   public void testConflictingDependency() throws Exception {
     final Project project = initializeJavaProject();
     final NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
-    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
-    Model pom = coreFacet.getPOM();
-    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
-    coreFacet.setPOM(pom);
+    prepareProjectPom(project);
 
     final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
     depFacet.addDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":2.4.2.Final"));
@@ -154,9 +148,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
     final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
 
-    final Model pom = coreFacet.getPOM();
-    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
-    coreFacet.setPOM(pom);
+    prepareProjectPom(project);
 
     project.installFacet(facet);
 
@@ -203,11 +195,8 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     // Setup
     final Project project = initializeJavaProject();
     NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
-    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
 
-    final Model pom = coreFacet.getPOM();
-    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
-    coreFacet.setPOM(pom);
+    prepareProjectPom(project);
     facet.setProject(project);
 
     assertFalse(facet.isInstalled());
@@ -256,9 +245,8 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     final Project project = initializeJavaProject();
     final BlacklistedDependencyFacet facet = new BlacklistedDependencyFacet();
     final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    prepareProjectPom(project);
     Model pom = coreFacet.getPOM();
-    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
-    coreFacet.setPOM(pom);
 
     final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
 
@@ -292,9 +280,8 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     final Project project = initializeJavaProject();
     final BlacklistedDependencyFacet facet = new BlacklistedDependencyFacet();
     final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    prepareProjectPom(project);
     Model pom = coreFacet.getPOM();
-    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
-    coreFacet.setPOM(pom);
 
     final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
 
@@ -336,8 +323,8 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     final BlacklistedDependencyFacet facet = new BlacklistedDependencyFacet();
     final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
     final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+    prepareProjectPom(project);
     Model pom = coreFacet.getPOM();
-    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
 
     /*
      * This is what makes this test different than the last: we want to check
@@ -380,9 +367,8 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     final BlacklistedDependencyFacet installFacet = new BlacklistedDependencyFacet();
     final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
     final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+    prepareProjectPom(project);
     Model pom = coreFacet.getPOM();
-    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
-    coreFacet.setPOM(pom);
 
     project.installFacet(installFacet);
     pom = coreFacet.getPOM();
@@ -426,8 +412,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     final BlacklistedDependencyFacet testFacet = new BlacklistedDependencyFacet();
     final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
     Model pom = coreFacet.getPOM();
-    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
-    coreFacet.setPOM(pom);
+    prepareProjectPom(project);
 
     final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
 
@@ -467,5 +452,19 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     
     testFacet.setProject(project);
     assertFalse(testFacet.isInstalled());
+  }
+  
+  private void prepareProjectPom(final Project project) {
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+    final Model pom = coreFacet.getPOM();
+    
+    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
+    coreFacet.setPOM(pom);
+    
+    depFacet.addDirectManagedDependency(DependencyBuilder.create("org.jboss.errai:errai-parent")
+            .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
+    depFacet.addDirectManagedDependency(DependencyBuilder.create("org.jboss.errai.bom:errai-version-master")
+            .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
   }
 }

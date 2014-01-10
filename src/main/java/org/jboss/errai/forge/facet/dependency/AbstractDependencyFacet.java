@@ -53,12 +53,10 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
   @Override
   public boolean install() {
-    // TODO error handling and reversion
-
     final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     final VersionOracle oracle = new VersionOracle(depFacet);
-
+    
     for (DependencyBuilder dep : coreDependencies) {
       depFacet.addDirectDependency(getDependencyWithVersion(dep, oracle));
     }
@@ -193,10 +191,12 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
   }
 
   private DependencyBuilder getDependencyWithVersion(final DependencyBuilder dep, final VersionOracle oracle) {
-    if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
-      dep.setVersion(Property.ErraiVersion.invoke());
-    else
-      dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+    if (!oracle.isManaged(dep)) {
+      if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
+        dep.setVersion(Property.ErraiVersion.invoke());
+      else
+        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+    }
 
     return dep;
   }

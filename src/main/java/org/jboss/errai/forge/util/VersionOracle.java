@@ -90,4 +90,8 @@ public class VersionOracle {
     return getHighestStableVersion(common.getGroupId(), common.getArtifactId());
   }
 
+  public boolean isManaged(DependencyBuilder dep) {
+    return depFacet.hasEffectiveManagedDependency(dep);
+  }
+
 }

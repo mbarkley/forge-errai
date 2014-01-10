@@ -59,6 +59,9 @@ public final class ArtifactVault {
     JbossPlugin("jboss-as-maven-plugin", "org.jboss.as.plugins"),
 
     // errai
+    ErraiBom("errai-version-master", "org.jboss.errai.bom"),
+    ErraiParent("errai-parent"),
+    
     ErraiNetty("netty", "org.jboss.errai.io.netty"),
     ErraiJboss("errai-cdi-jboss"),
     JbossSupport("errai-jboss-as-support"),

@@ -6,14 +6,18 @@ import java.util.Properties;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
+import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
+import org.jboss.forge.project.dependencies.DependencyBuilder;
+import org.jboss.forge.project.dependencies.ScopeType;
 import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
 /**
- * This facet configures the source folders, build output directory, and pom properties for a project.
+ * This facet configures the source folders, build output directory, and pom
+ * properties for a project.
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
@@ -30,13 +34,14 @@ public class CoreBuildFacet extends AbstractBaseFacet {
   private String getErraiVersion() {
     if (erraiVersion == null)
       erraiVersion = new VersionOracle(getProject().getFacet(DependencyFacet.class)).resolveErraiVersion();
-    
+
     return erraiVersion;
   }
 
   @Override
   public boolean install() {
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+    final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
     final Model pom = coreFacet.getPOM();
     final Build build = pom.getBuild();
 
@@ -59,6 +64,11 @@ public class CoreBuildFacet extends AbstractBaseFacet {
       build.addResource(res);
     }
     coreFacet.setPOM(pom);
+
+    depFacet.addDirectManagedDependency(DependencyBuilder.create(DependencyArtifact.ErraiBom.toString())
+            .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
+    depFacet.addDirectManagedDependency(DependencyBuilder.create(DependencyArtifact.ErraiParent.toString())
+            .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
 
     return true;
   }
