@@ -8,6 +8,7 @@ import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Jb
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
+import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.base.CoreBuildFacet;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.profiles.ProfileBuilder;
@@ -28,7 +29,15 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
     setCoreDependencies(DependencyBuilder.create(ErraiTools.toString()), DependencyBuilder.create(GwtUser.toString())
             .setScopeType(ScopeType.PROVIDED), DependencyBuilder.create(ErraiJboss.toString()), DependencyBuilder
             .create(JUnit.toString()).setScopeType(ScopeType.TEST));
-    setProfileDependencies(MAIN_PROFILE, DependencyBuilder.create(JbossSupport.toString()));
+    setProfileDependencies(MAIN_PROFILE,
+            DependencyBuilder.create(JbossSupport.toString()),
+            /*
+             * TODO: This is a workaround because dependencies put into profiles
+             * don't count under DependencyFacet.getEffectiveDependendencies().
+             * There needs to be a general solution for this.
+             */
+            DependencyBuilder.create(DependencyArtifact.GwtSlf4j.toString()).setScopeType(ScopeType.PROVIDED),
+            DependencyBuilder.create(DependencyArtifact.XmlApis.toString()).setScopeType(ScopeType.PROVIDED));
   }
 
   @Override
