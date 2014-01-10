@@ -62,13 +62,14 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
 
     assertTrue(project.hasFacet(NoProfileDependencyFacet.class));
     assertTrue(project.getFacet(DependencyFacet.class).hasDirectDependency(
-            DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":3.0-SNAPSHOT")));
+            DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString())));
   }
 
   @Test
   public void testProfileEmptyInstall() throws Exception {
     final Project project = initializeJavaProject();
     ProfileDependencyFacet facet = new ProfileDependencyFacet();
+    prepareProjectPom(project);
 
     project.installFacet(facet);
 
@@ -86,9 +87,10 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     final Project project = initializeJavaProject();
     ProfileDependencyFacet facet = new ProfileDependencyFacet();
     MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    prepareProjectPom(project);
     Model pom = coreFacet.getPOM();
     pom.addProfile(ProfileBuilder.create().setId("myProfile")
-            .addDependency(DependencyBuilder.create("org.jboss.errai:errai-ui:3.0-SNAPSHOT")).getAsMavenProfile());
+            .addDependency(DependencyBuilder.create("org.jboss.errai:errai-ui")).getAsMavenProfile());
     coreFacet.setPOM(pom);
 
     project.installFacet(facet);
@@ -107,6 +109,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
   public void testProfileInstallNoDuplication() throws Exception {
     final Project project = initializeJavaProject();
     ProfileDependencyFacet facet = new ProfileDependencyFacet();
+    prepareProjectPom(project);
     MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
     Model pom = coreFacet.getPOM();
     pom.addProfile(ProfileBuilder.create().setId("myProfile")
@@ -156,7 +159,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertTrue(
             "Precondition failed.",
             project.getFacet(DependencyFacet.class).hasDirectDependency(
-                    DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":3.0-SNAPSHOT")));
+                    DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString())));
 
     // Actual test
     facet = new NoProfileDependencyFacet();
@@ -171,6 +174,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     // Setup
     final Project project = initializeJavaProject();
     ProfileDependencyFacet facet = new ProfileDependencyFacet();
+    prepareProjectPom(project);
 
     project.installFacet(facet);
 
@@ -207,7 +211,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertTrue(
             "Precondition failed.",
             project.getFacet(DependencyFacet.class).hasDirectDependency(
-                    DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":3.0-SNAPSHOT")));
+                    DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString())));
 
     // Actual test
     facet = new NoProfileDependencyFacet();
@@ -221,6 +225,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     final Project project = initializeJavaProject();
     ProfileDependencyFacet facet = new ProfileDependencyFacet();
     facet.setProject(project);
+    prepareProjectPom(project);
 
     assertFalse(facet.isInstalled());
 
@@ -466,5 +471,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
             .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
     depFacet.addDirectManagedDependency(DependencyBuilder.create("org.jboss.errai.bom:errai-version-master")
             .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
+    depFacet.addDirectManagedDependency(DependencyBuilder.create(DependencyArtifact.ErraiJboss.toString())
+            .setVersion(Property.ErraiVersion.invoke()));
   }
 }

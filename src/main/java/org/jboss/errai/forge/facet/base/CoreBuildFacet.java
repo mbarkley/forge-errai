@@ -69,6 +69,8 @@ public class CoreBuildFacet extends AbstractBaseFacet {
             .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
     depFacet.addDirectManagedDependency(DependencyBuilder.create(DependencyArtifact.ErraiParent.toString())
             .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
+    depFacet.addDirectManagedDependency(DependencyBuilder.create(DependencyArtifact.ErraiJboss.toString())
+            .setVersion(Property.ErraiVersion.invoke()));
 
     return true;
   }
