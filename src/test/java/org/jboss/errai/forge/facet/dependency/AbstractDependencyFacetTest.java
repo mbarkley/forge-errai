@@ -263,6 +263,10 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertTrue(providedClassifiers.contains(DependencyArtifact.Hsq.toString()));
   }
 
+  /**
+   * Check that the facet won't doubly add a provided scope dependency that is
+   * already set to be added in a profile within the facet.
+   */
   @Test
   public void testBlacklistedDependencyNonDuplication1() throws Exception {
     final Project project = initializeJavaProject();
@@ -302,6 +306,10 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertTrue(providedClassifiers.contains(DependencyArtifact.Hsq.toString()));
   }
 
+  /**
+   * Check that the facet won't double add a provided scope dependency if it is
+   * already in the appropriate profile of the pom.
+   */
   @Test
   public void testBlacklistedDependencyNonDuplication2() throws Exception {
     final Project project = initializeJavaProject();
@@ -343,5 +351,4 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertTrue(providedClassifiers.contains(DependencyArtifact.ErraiTools.toString()));
     assertTrue(providedClassifiers.contains(DependencyArtifact.Hsq.toString()));
   }
-
 }
