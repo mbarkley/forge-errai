@@ -16,6 +16,7 @@ import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
+import org.jboss.errai.forge.util.MavenConverter;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
@@ -42,8 +43,8 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
   /**
    * Dependencies to be added to the build of Maven profiles with names matching
    * the keys of this map. Versions of these dependencies will be assigned from
-   * a {@link VersionOracle} if unspecified. Profiles that do not already exist will be
-   * created.
+   * a {@link VersionOracle} if unspecified. Profiles that do not already exist
+   * will be created.
    */
   protected Map<String, Collection<DependencyBuilder>> profileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
 
@@ -61,13 +62,14 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     for (DependencyBuilder dep : coreDependencies) {
       depFacet.addDirectDependency(getDependencyWithVersion(dep, oracle));
     }
-    
+
     final Model pom = coreFacet.getPOM();
     for (String profileId : ArtifactVault.getBlacklistProfiles()) {
       final Profile profile = getProfile(profileId, pom.getProfiles());
       for (String artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {
         DependencyBuilder dep = DependencyBuilder.create(artifact);
-        if (depFacet.hasEffectiveDependency(dep) && !hasProvidedDependency(profile, dep)) {
+        if (depFacet.hasEffectiveDependency(dep) && !hasPendingProvidedDependency(profileId, dep)
+                && !hasProvidedDependency(profile, dep)) {
           org.jboss.forge.project.dependencies.Dependency existing = depFacet.getEffectiveDependency(dep);
           dep.setVersion(existing.getVersion()).setScopeType(ScopeType.PROVIDED);
           if (!profileDependencies.containsKey(profileId))
@@ -84,15 +86,35 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     return true;
   }
 
+  /**
+   * Returns true iff the given profile as the given dependency (with provided
+   * scope).
+   */
   private boolean hasProvidedDependency(Profile profile, DependencyBuilder dep) {
-    if (profile == null || profile.getDependencies() == null)
+    if (profile == null)
       return false;
-    
+
     for (final Dependency profDep : profile.getDependencies()) {
-      if (dep.getGroupId().equals(profDep.getGroupId()) && dep.getArtifactId().equals(profDep.getArtifactId()) && profDep.getScope().equals("provided"))
+      if (MavenConverter.areSameArtifact(profDep, dep) && profDep.getScope() != null
+              && profDep.getScope().equals("provided"))
         return true;
     }
-    
+
+    return false;
+  }
+
+  /**
+   * Returns true iff there is a pending provided scoped dependency under the
+   * given profile id.
+   */
+  private boolean hasPendingProvidedDependency(final String profileId, final DependencyBuilder dep) {
+    if (profileDependencies.containsKey(profileId)) {
+      for (final DependencyBuilder pendingDep : profileDependencies.get(profileId)) {
+        if (MavenConverter.areSameArtifact(pendingDep, dep) && pendingDep.getScopeTypeEnum().equals(ScopeType.PROVIDED))
+          return true;
+      }
+    }
+
     return false;
   }
 
@@ -111,8 +133,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
         for (DependencyBuilder dep : profileDependencies.get(profile.getId())) {
           List<Dependency> profDeps = profile.getDependencies();
           for (int i = 0; i < profDeps.size(); i++) {
-            if (profDeps.get(i).getArtifactId().equals(dep.getArtifactId())
-                    && profDeps.get(i).getGroupId().equals(dep.getGroupId())) {
+            if (MavenConverter.areSameArtifact(profDeps.get(i), dep)) {
               profDeps.remove(i);
               break;
             }
@@ -144,7 +165,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
       }
       outer: for (final DependencyBuilder dep : profileDependencies.get(profName)) {
         for (final Dependency profDep : profile.getDependencies()) {
-          if (profDep.getArtifactId().equals(dep.getArtifactId()) && profDep.getGroupId().equals(dep.getGroupId())) {
+          if (MavenConverter.areSameArtifact(profDep, dep)) {
             continue outer;
           }
         }
@@ -153,13 +174,6 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     }
 
     return true;
-  }
-
-  private void blacklist(final String profile, final org.jboss.forge.project.dependencies.Dependency dep,
-          final VersionOracle oracle) {
-    final DependencyBuilder providedDep = DependencyBuilder.create(dep);
-    providedDep.setScopeType(ScopeType.PROVIDED);
-    addDependenciesToProfile(profile, Arrays.asList(new DependencyBuilder[] { providedDep }), oracle);
   }
 
   private DependencyBuilder getDependencyWithVersion(final DependencyBuilder dep, final VersionOracle oracle) {

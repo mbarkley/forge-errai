@@ -1,12 +1,17 @@
 package org.jboss.errai.forge.facet.dependency;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
@@ -15,6 +20,7 @@ import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.profiles.ProfileBuilder;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
+import org.jboss.forge.project.dependencies.ScopeType;
 import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.test.AbstractShellTest;
 import org.junit.Test;
@@ -35,6 +41,13 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
       profileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
       profileDependencies.put("myProfile", Arrays.asList(new DependencyBuilder[] { DependencyBuilder
               .create(DependencyArtifact.ErraiCommon.toString()) }));
+    }
+  }
+
+  public static class BlacklistedDependencyFacet extends AbstractDependencyFacet {
+    public BlacklistedDependencyFacet() {
+      coreDependencies = Arrays.asList(new DependencyBuilder[] { DependencyBuilder.create(DependencyArtifact.ErraiTools
+              .toString()) });
     }
   }
 
@@ -176,7 +189,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
     coreFacet.setPOM(pom);
     facet.setProject(project);
-    
+
     assertFalse(facet.isInstalled());
 
     project.installFacet(facet);
@@ -199,7 +212,7 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     final Project project = initializeJavaProject();
     ProfileDependencyFacet facet = new ProfileDependencyFacet();
     facet.setProject(project);
-    
+
     assertFalse(facet.isInstalled());
 
     project.installFacet(facet);
@@ -217,4 +230,118 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     facet.setProject(project);
     assertTrue(facet.isInstalled());
   }
+
+  @Test
+  public void testBlacklistedDependency() throws Exception {
+    final Project project = initializeJavaProject();
+    final BlacklistedDependencyFacet facet = new BlacklistedDependencyFacet();
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    Model pom = coreFacet.getPOM();
+    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
+    coreFacet.setPOM(pom);
+
+    final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+
+    project.installFacet(facet);
+    pom = coreFacet.getPOM();
+
+    assertTrue(project.hasFacet(facet.getClass()));
+    assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiTools.toString())
+            .setVersion(Property.ErraiVersion.invoke())));
+    // This dependency should have been transitively included through
+    // errai-tools
+    assertTrue(depFacet.hasEffectiveDependency(DependencyBuilder.create(DependencyArtifact.Hsq.toString())));
+
+    assertEquals(1, pom.getProfiles().size());
+    assertEquals(2, pom.getProfiles().get(0).getDependencies().size());
+
+    final Set<String> providedClassifiers = new HashSet<String>(2);
+    for (final Dependency provided : pom.getProfiles().get(0).getDependencies())
+      providedClassifiers.add(provided.getGroupId() + ":" + provided.getArtifactId());
+
+    assertTrue(providedClassifiers.contains(DependencyArtifact.ErraiTools.toString()));
+    assertTrue(providedClassifiers.contains(DependencyArtifact.Hsq.toString()));
+  }
+
+  @Test
+  public void testBlacklistedDependencyNonDuplication1() throws Exception {
+    final Project project = initializeJavaProject();
+    final BlacklistedDependencyFacet facet = new BlacklistedDependencyFacet();
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    Model pom = coreFacet.getPOM();
+    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
+    coreFacet.setPOM(pom);
+
+    final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+
+    /*
+     * This is what makes this test different than the last: we want to check
+     * that the facet won't add a dependency that is already scheduled to add.
+     */
+    facet.setProfileDependencies(AbstractDependencyFacet.MAIN_PROFILE,
+            DependencyBuilder.create(DependencyArtifact.Hsq.toString()).setScopeType(ScopeType.PROVIDED));
+
+    project.installFacet(facet);
+    pom = coreFacet.getPOM();
+
+    assertTrue(project.hasFacet(facet.getClass()));
+    assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiTools.toString())
+            .setVersion(Property.ErraiVersion.invoke())));
+    // This dependency should have been transitively included through
+    // errai-tools
+    assertTrue(depFacet.hasEffectiveDependency(DependencyBuilder.create(DependencyArtifact.Hsq.toString())));
+
+    assertEquals(1, pom.getProfiles().size());
+    assertEquals(2, pom.getProfiles().get(0).getDependencies().size());
+
+    final Set<String> providedClassifiers = new HashSet<String>(2);
+    for (final Dependency provided : pom.getProfiles().get(0).getDependencies())
+      providedClassifiers.add(provided.getGroupId() + ":" + provided.getArtifactId());
+
+    assertTrue(providedClassifiers.contains(DependencyArtifact.ErraiTools.toString()));
+    assertTrue(providedClassifiers.contains(DependencyArtifact.Hsq.toString()));
+  }
+
+  @Test
+  public void testBlacklistedDependencyNonDuplication2() throws Exception {
+    final Project project = initializeJavaProject();
+    final BlacklistedDependencyFacet facet = new BlacklistedDependencyFacet();
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+    Model pom = coreFacet.getPOM();
+    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
+
+    /*
+     * This is what makes this test different than the last: we want to check
+     * that the facet won't add a provided scoped dependency if one has been
+     * added already.
+     */
+    pom.addProfile(ProfileBuilder
+            .create()
+            .setId(AbstractDependencyFacet.MAIN_PROFILE)
+            .addDependency(DependencyBuilder.create(DependencyArtifact.Hsq.toString()).setScopeType(ScopeType.PROVIDED))
+            .getAsMavenProfile());
+    coreFacet.setPOM(pom);
+
+    project.installFacet(facet);
+    pom = coreFacet.getPOM();
+
+    assertTrue(project.hasFacet(facet.getClass()));
+    assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiTools.toString())
+            .setVersion(Property.ErraiVersion.invoke())));
+    // This dependency should have been transitively included through
+    // errai-tools
+    assertTrue(depFacet.hasEffectiveDependency(DependencyBuilder.create(DependencyArtifact.Hsq.toString())));
+
+    assertEquals(1, pom.getProfiles().size());
+    assertEquals(2, pom.getProfiles().get(0).getDependencies().size());
+
+    final Set<String> providedClassifiers = new HashSet<String>(2);
+    for (final Dependency provided : pom.getProfiles().get(0).getDependencies())
+      providedClassifiers.add(provided.getGroupId() + ":" + provided.getArtifactId());
+
+    assertTrue(providedClassifiers.contains(DependencyArtifact.ErraiTools.toString()));
+    assertTrue(providedClassifiers.contains(DependencyArtifact.Hsq.toString()));
+  }
+
 }

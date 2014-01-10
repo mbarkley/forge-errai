@@ -35,4 +35,39 @@ public class MavenConverter {
     return retVal;
   }
 
+  /**
+   * @param mavenDep
+   *          A native Maven model of a Maven dependency artifact.
+   * @param forgeDep
+   *          A forge model of a Maven dependency artifact.
+   * @return True iff both models have the same group and artifact IDs.
+   */
+  public static boolean areSameArtifact(final Dependency mavenDep,
+          final org.jboss.forge.project.dependencies.Dependency forgeDep) {
+    return mavenDep.getGroupId().equals(forgeDep.getGroupId())
+            && mavenDep.getArtifactId().equals(forgeDep.getArtifactId());
+  }
+
+  /**
+   * @param dep1
+   *          A forge model of a Maven dependency artifact.
+   * @param dep2
+   *          A forge model of a Maven dependency artifact.
+   * @return True iff both models have the same group and artifact IDs.
+   */
+  public static boolean areSameArtifact(final Dependency dep1, final Dependency dep2) {
+    return dep1.getGroupId().equals(dep2.getGroupId()) && dep1.getArtifactId().equals(dep2.getArtifactId());
+  }
+
+  /**
+   * @param dep1
+   *          A native Maven model of a Maven dependency artifact.
+   * @param dep2
+   *          A native Maven model of a Maven dependency artifact.
+   * @return True iff both models have the same group and artifact IDs.
+   */
+  public static boolean areSameArtifact(final org.jboss.forge.project.dependencies.Dependency dep1,
+          final org.jboss.forge.project.dependencies.Dependency dep2) {
+    return dep1.getGroupId().equals(dep2.getGroupId()) && dep1.getArtifactId().equals(dep2.getArtifactId());
+  }
 }
