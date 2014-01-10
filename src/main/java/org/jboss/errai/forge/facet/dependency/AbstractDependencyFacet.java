@@ -109,8 +109,9 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
         depFacet.removeDependency(dep);
       }
     }
-    
-    // Remove blacklisted dependencies that are no longer transitively in the project
+
+    // Remove blacklisted dependencies that are no longer transitively in the
+    // project
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     Model pom = coreFacet.getPOM();
     for (final Profile profile : pom.getProfiles()) {
@@ -123,7 +124,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
         }
       }
     }
-    
+
     pom = coreFacet.getPOM();
     for (Profile profile : pom.getProfiles()) {
       if (profileDependencies.containsKey(profile.getId())) {
@@ -154,7 +155,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     }
 
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    final Model pom = coreFacet.getPOM();
+    Model pom = coreFacet.getPOM();
     for (final String profName : profileDependencies.keySet()) {
       final Profile profile = getProfile(profName, pom.getProfiles());
       if (profile == null) {
@@ -170,9 +171,27 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
       }
     }
 
+    /*
+     * Check that all blacklisted dependencies that are transitively in the
+     * project have been provided scoped. Note that we are not checking if these
+     * blacklisted dependencies were pulled in transitively through a dependency
+     * in this instance. This should not be an issue, since we don't really care
+     * what sets the blacklisted dependencies to provided, as long as something
+     * does it.
+     */
+    pom = coreFacet.getPOM();
+    for (final String profileId : ArtifactVault.getBlacklistProfiles()) {
+      final Profile profile = getProfile(profileId, pom.getProfiles());
+      for (final String artifactClassifier : ArtifactVault.getBlacklistedArtifacts(profileId)) {
+        final DependencyBuilder dep = DependencyBuilder.create(artifactClassifier);
+        if (depFacet.hasEffectiveDependency(dep) && !hasProvidedDependency(profile, dep))
+          return false;
+      }
+    }
+
     return true;
   }
-  
+
   private DependencyBuilder getDependencyWithVersion(final DependencyBuilder dep, final VersionOracle oracle) {
     if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
       dep.setVersion(Property.ErraiVersion.invoke());

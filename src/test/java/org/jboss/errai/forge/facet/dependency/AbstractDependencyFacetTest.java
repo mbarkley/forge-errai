@@ -418,4 +418,54 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
             .setVersion(Property.ErraiVersion.invoke())));
     assertEquals(0, pom.getProfiles().get(0).getDependencies().size());
   }
+  
+  @Test
+  public void testBlacklistedDependencyIsInstalledNegative() throws Exception {
+    final Project project = initializeJavaProject();
+    final BlacklistedDependencyFacet installFacet = new BlacklistedDependencyFacet();
+    final BlacklistedDependencyFacet testFacet = new BlacklistedDependencyFacet();
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    Model pom = coreFacet.getPOM();
+    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
+    coreFacet.setPOM(pom);
+
+    final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+
+    /*
+     * Setup
+     */
+    project.installFacet(installFacet);
+    pom = coreFacet.getPOM();
+
+    assertTrue(project.hasFacet(installFacet.getClass()));
+    assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiTools.toString())
+            .setVersion(Property.ErraiVersion.invoke())));
+    // This dependency should have been transitively included through
+    // errai-tools
+    assertTrue(depFacet.hasEffectiveDependency(DependencyBuilder.create(DependencyArtifact.Hsq.toString())));
+
+    assertEquals(1, pom.getProfiles().size());
+    assertEquals(2, pom.getProfiles().get(0).getDependencies().size());
+
+    final Set<String> providedClassifiers = new HashSet<String>(2);
+    for (final Dependency provided : pom.getProfiles().get(0).getDependencies())
+      providedClassifiers.add(provided.getGroupId() + ":" + provided.getArtifactId());
+
+    assertTrue(providedClassifiers.contains(DependencyArtifact.ErraiTools.toString()));
+    assertTrue(providedClassifiers.contains(DependencyArtifact.Hsq.toString()));
+    
+    /*
+     * Actual test
+     */
+    for (final Dependency dep : pom.getProfiles().get(0).getDependencies()) {
+      if (DependencyArtifact.Hsq.toString().equals(dep.getGroupId() + ":" + dep.getArtifactId())) {
+        pom.getProfiles().get(0).removeDependency(dep);
+        break;
+      }
+    }
+    coreFacet.setPOM(pom);
+    
+    testFacet.setProject(project);
+    assertFalse(testFacet.isInstalled());
+  }
 }
