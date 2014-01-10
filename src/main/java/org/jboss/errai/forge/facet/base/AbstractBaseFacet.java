@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault;
@@ -97,13 +98,15 @@ public abstract class AbstractBaseFacet extends BaseFacet {
     }
 
     for (DependencyBuilder dep : deps) {
-      if (dep.getVersion() == null || dep.getVersion().equals("")) {
-        if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
-          dep.setVersion(Property.ErraiVersion.invoke());
-        else
-          dep.setVersion(versionOracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+      if (!hasDependency(profile, dep)) {
+        if (dep.getVersion() == null || dep.getVersion().equals("")) {
+          if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
+            dep.setVersion(Property.ErraiVersion.invoke());
+          else
+            dep.setVersion(versionOracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+        }
+        profile.addDependency(MavenConverter.convert(dep));
       }
-      profile.addDependency(MavenConverter.convert(dep));
     }
 
     coreFacet.setPOM(pom);
@@ -111,4 +114,37 @@ public abstract class AbstractBaseFacet extends BaseFacet {
     return true;
   }
 
+  /**
+   * Returns true iff the given profile as the given dependency (with provided
+   * scope).
+   */
+  protected boolean hasProvidedDependency(final Profile profile, final DependencyBuilder dep) {
+    final Dependency profDep = getDependency(profile, dep);
+
+    return profDep != null && profDep.getScope() != null && profDep.getScope().equalsIgnoreCase("provided");
+  }
+
+  /**
+   * Returns true iff the given profile as the given dependency.
+   */
+  protected boolean hasDependency(final Profile profile, final DependencyBuilder dep) {
+    final Dependency profDep = getDependency(profile, dep);
+
+    return profDep != null;
+  }
+
+  /**
+   * Get a dependency if it exists in the given profile, or null.
+   */
+  protected Dependency getDependency(final Profile profile, final DependencyBuilder dep) {
+    if (profile == null)
+      return null;
+
+    for (final Dependency profDep : profile.getDependencies()) {
+      if (MavenConverter.areSameArtifact(profDep, dep))
+        return profDep;
+    }
+
+    return null;
+  }
 }

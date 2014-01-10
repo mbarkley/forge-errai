@@ -87,23 +87,6 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
   }
 
   /**
-   * Returns true iff the given profile as the given dependency (with provided
-   * scope).
-   */
-  private boolean hasProvidedDependency(Profile profile, DependencyBuilder dep) {
-    if (profile == null)
-      return false;
-
-    for (final Dependency profDep : profile.getDependencies()) {
-      if (MavenConverter.areSameArtifact(profDep, dep) && profDep.getScope() != null
-              && profDep.getScope().equals("provided"))
-        return true;
-    }
-
-    return false;
-  }
-
-  /**
    * Returns true iff there is a pending provided scoped dependency under the
    * given profile id.
    */

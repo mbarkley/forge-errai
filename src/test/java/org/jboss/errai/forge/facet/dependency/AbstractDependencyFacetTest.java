@@ -107,6 +107,26 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
   }
 
   @Test
+  public void testProfileInstallNoDuplication() throws Exception {
+    final Project project = initializeJavaProject();
+    ProfileDependencyFacet facet = new ProfileDependencyFacet();
+    MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    Model pom = coreFacet.getPOM();
+    pom.addProfile(ProfileBuilder.create().setId("myProfile")
+            .addDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString())).getAsMavenProfile());
+    coreFacet.setPOM(pom);
+
+    project.installFacet(facet);
+
+    assertTrue(project.hasFacet(facet.getClass()));
+    List<Profile> profiles = coreFacet.getPOM().getProfiles();
+    assertEquals(1, profiles.size());
+    assertEquals("myProfile", profiles.get(0).getId());
+    assertEquals(1, profiles.get(0).getDependencies().size());
+    assertEquals(DependencyArtifact.ErraiCommon.getArtifactId(), profiles.get(0).getDependencies().get(0).getArtifactId());
+  }
+
+  @Test
   public void testConflictingDependency() throws Exception {
     final Project project = initializeJavaProject();
     final NoProfileDependencyFacet facet = new NoProfileDependencyFacet();
