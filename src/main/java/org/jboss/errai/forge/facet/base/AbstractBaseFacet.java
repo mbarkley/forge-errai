@@ -99,11 +99,13 @@ public abstract class AbstractBaseFacet extends BaseFacet {
 
     for (DependencyBuilder dep : deps) {
       if (!hasDependency(profile, dep)) {
-        if (dep.getVersion() == null || dep.getVersion().equals("")) {
-          if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
-            dep.setVersion(Property.ErraiVersion.invoke());
-          else
-            dep.setVersion(versionOracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+        if (!versionOracle.isManaged(dep)) {
+          if (dep.getVersion() == null || dep.getVersion().equals("")) {
+            if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
+              dep.setVersion(Property.ErraiVersion.invoke());
+            else
+              dep.setVersion(versionOracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+          }
         }
         profile.addDependency(MavenConverter.convert(dep));
       }
