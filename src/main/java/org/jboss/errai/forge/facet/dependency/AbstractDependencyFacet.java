@@ -109,8 +109,22 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
         depFacet.removeDependency(dep);
       }
     }
+    
+    // Remove blacklisted dependencies that are no longer transitively in the project
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     Model pom = coreFacet.getPOM();
+    for (final Profile profile : pom.getProfiles()) {
+      for (final String artifactClassifier : ArtifactVault.getBlacklistedArtifacts(profile.getId())) {
+        final DependencyBuilder dep = DependencyBuilder.create(artifactClassifier);
+        if (!depFacet.hasEffectiveDependency(dep)) {
+          if (!profileDependencies.containsKey(profile.getId()))
+            profileDependencies.put(profile.getId(), new ArrayList<DependencyBuilder>());
+          profileDependencies.get(profile.getId()).add(dep.setScopeType(ScopeType.PROVIDED));
+        }
+      }
+    }
+    
+    pom = coreFacet.getPOM();
     for (Profile profile : pom.getProfiles()) {
       if (profileDependencies.containsKey(profile.getId())) {
         for (DependencyBuilder dep : profileDependencies.get(profile.getId())) {
@@ -158,7 +172,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
     return true;
   }
-
+  
   private DependencyBuilder getDependencyWithVersion(final DependencyBuilder dep, final VersionOracle oracle) {
     if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
       dep.setVersion(Property.ErraiVersion.invoke());

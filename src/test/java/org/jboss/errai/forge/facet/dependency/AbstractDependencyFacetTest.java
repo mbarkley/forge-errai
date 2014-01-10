@@ -371,4 +371,51 @@ public class AbstractDependencyFacetTest extends AbstractShellTest {
     assertTrue(providedClassifiers.contains(DependencyArtifact.ErraiTools.toString()));
     assertTrue(providedClassifiers.contains(DependencyArtifact.Hsq.toString()));
   }
+  
+  @Test
+  public void testBlacklistedDependencyUninstall() throws Exception {
+    final Project project = initializeJavaProject();
+    final BlacklistedDependencyFacet facet = new BlacklistedDependencyFacet();
+    // Use a different facet to install and uninstall because this modifies internal state
+    final BlacklistedDependencyFacet installFacet = new BlacklistedDependencyFacet();
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+    Model pom = coreFacet.getPOM();
+    pom.addProperty(Property.ErraiVersion.getName(), "3.0-SNAPSHOT");
+    coreFacet.setPOM(pom);
+
+    project.installFacet(installFacet);
+    pom = coreFacet.getPOM();
+
+    /*
+     * Preconditions
+     */
+    assertTrue(project.hasFacet(installFacet.getClass()));
+    assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiTools.toString())
+            .setVersion(Property.ErraiVersion.invoke())));
+    // This dependency should have been transitively included through
+    // errai-tools
+    assertTrue(depFacet.hasEffectiveDependency(DependencyBuilder.create(DependencyArtifact.Hsq.toString())));
+
+    assertEquals(1, pom.getProfiles().size());
+    assertEquals(2, pom.getProfiles().get(0).getDependencies().size());
+
+    final Set<String> providedClassifiers = new HashSet<String>(2);
+    for (final Dependency provided : pom.getProfiles().get(0).getDependencies())
+      providedClassifiers.add(provided.getGroupId() + ":" + provided.getArtifactId());
+
+    assertTrue(providedClassifiers.contains(DependencyArtifact.ErraiTools.toString()));
+    assertTrue(providedClassifiers.contains(DependencyArtifact.Hsq.toString()));
+    
+    /*
+     * Actual Test
+     */
+    facet.setProject(project);
+    facet.uninstall();
+    pom = coreFacet.getPOM();
+    
+    assertFalse(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiTools.toString())
+            .setVersion(Property.ErraiVersion.invoke())));
+    assertEquals(0, pom.getProfiles().get(0).getDependencies().size());
+  }
 }
