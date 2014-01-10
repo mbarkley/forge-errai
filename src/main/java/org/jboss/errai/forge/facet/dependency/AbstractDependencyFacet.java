@@ -56,12 +56,17 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     final VersionOracle oracle = new VersionOracle(depFacet);
-    
+
     for (DependencyBuilder dep : coreDependencies) {
       depFacet.addDirectDependency(getDependencyWithVersion(dep, oracle));
     }
 
+    for (Entry<String, Collection<DependencyBuilder>> entry : profileDependencies.entrySet()) {
+      addDependenciesToProfile(entry.getKey(), entry.getValue(), oracle);
+    }
+
     final Model pom = coreFacet.getPOM();
+    final Map<String, Collection<DependencyBuilder>> tmpProfileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
     for (String profileId : ArtifactVault.getBlacklistProfiles()) {
       final Profile profile = getProfile(profileId, pom.getProfiles());
       for (String artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {
@@ -70,14 +75,14 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
                 && !hasProvidedDependency(profile, dep)) {
           org.jboss.forge.project.dependencies.Dependency existing = depFacet.getEffectiveDependency(dep);
           dep.setVersion(existing.getVersion()).setScopeType(ScopeType.PROVIDED);
-          if (!profileDependencies.containsKey(profileId))
-            profileDependencies.put(profileId, new ArrayList<DependencyBuilder>());
-          profileDependencies.get(profileId).add(dep);
+          if (!tmpProfileDependencies.containsKey(profileId))
+            tmpProfileDependencies.put(profileId, new ArrayList<DependencyBuilder>());
+          tmpProfileDependencies.get(profileId).add(dep);
         }
       }
     }
-
-    for (Entry<String, Collection<DependencyBuilder>> entry : profileDependencies.entrySet()) {
+    
+    for (Entry<String, Collection<DependencyBuilder>> entry : tmpProfileDependencies.entrySet()) {
       addDependenciesToProfile(entry.getKey(), entry.getValue(), oracle);
     }
 
