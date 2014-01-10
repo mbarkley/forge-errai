@@ -74,7 +74,9 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
         if (depFacet.hasEffectiveDependency(dep) && !hasPendingProvidedDependency(profileId, dep)
                 && !hasProvidedDependency(profile, dep)) {
           org.jboss.forge.project.dependencies.Dependency existing = depFacet.getEffectiveDependency(dep);
-          dep.setVersion(existing.getVersion()).setScopeType(ScopeType.PROVIDED);
+          if (!oracle.isManaged(dep))
+            dep.setVersion(existing.getVersion());
+          dep.setScopeType(ScopeType.PROVIDED);
           if (!tmpProfileDependencies.containsKey(profileId))
             tmpProfileDependencies.put(profileId, new ArrayList<DependencyBuilder>());
           tmpProfileDependencies.get(profileId).add(dep);
