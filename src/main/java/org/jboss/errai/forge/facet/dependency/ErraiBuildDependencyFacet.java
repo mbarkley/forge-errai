@@ -9,6 +9,7 @@ import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Jb
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.facet.base.CoreBuildFacet;
+import org.jboss.errai.forge.facet.base.DependencyManagementFacet;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.maven.profiles.ProfileBuilder;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
@@ -21,7 +22,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ CoreBuildFacet.class })
+@RequiresFacet({ CoreBuildFacet.class, DependencyManagementFacet.class })
 public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
 
   public ErraiBuildDependencyFacet() {

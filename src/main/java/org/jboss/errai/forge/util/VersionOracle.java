@@ -28,7 +28,6 @@ public class VersionOracle {
     versionMap.put(DependencyArtifact.Dependency.toString(), "2.8");
     versionMap.put(DependencyArtifact.War.toString(), "2.2");
     versionMap.put(DependencyArtifact.JbossPlugin.toString(), "7.1.1.Final");
-    versionMap.put(DependencyArtifact.GwtUser.toString(), "2.5.1");
     versionMap.put(DependencyArtifact.GwtPlugin.toString(), "2.5.1");
   }
   
@@ -57,7 +56,7 @@ public class VersionOracle {
     String staticVersion = getStaticVersion(groupId, artifactId);
     if (staticVersion != null)
       return staticVersion;
-    else if (groupId.equals(ArtifactVault.ERRAI_GROUP_ID))
+    else if (groupId.startsWith(ArtifactVault.ERRAI_GROUP_ID))
       return resolveErraiVersion();
     else
       return getHighestStableVersion(groupId, artifactId);
