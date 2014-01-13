@@ -24,7 +24,7 @@ public final class ProjectConfig {
    * @author Max Barkley <mbarkley@redhat.com>
    */
   public static enum ProjectProperty {
-    MODULE_FILE(File.class), MODULE_LOGICAL(String.class);
+    MODULE_FILE(File.class), MODULE_LOGICAL(String.class), ERRAI_VERSION(String.class);
 
     /**
      * The type of value stored by this property.

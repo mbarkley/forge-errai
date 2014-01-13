@@ -1,6 +1,8 @@
 package org.jboss.errai.forge.plugin;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -8,9 +10,13 @@ import javax.inject.Inject;
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
+import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiMessagingFacet;
 import org.jboss.forge.project.Project;
+import org.jboss.forge.project.dependencies.Dependency;
+import org.jboss.forge.project.dependencies.DependencyBuilder;
+import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.project.facets.events.InstallFacets;
 import org.jboss.forge.shell.Shell;
 import org.jboss.forge.shell.ShellMessages;
@@ -58,6 +64,12 @@ public class Main implements Plugin {
               String.class));
       config.setProjectProperty(ProjectProperty.MODULE_FILE, modulePath);
     }
+    
+    // Configure errai version
+    if (config.getProjectProperty(ProjectProperty.ERRAI_VERSION, String.class) == null) {
+      final String version = promptForErraiVersion();
+      config.setProjectProperty(ProjectProperty.ERRAI_VERSION, version);
+    }
 
     if (!project.hasFacet(CoreFacet.class)) {
       installEvent.fire(new InstallFacets(CoreFacet.class));
@@ -68,6 +80,21 @@ public class Main implements Plugin {
     final String moduleName = shell.prompt("Please type the logical name for your module.");
     // TODO check if name is valid and re-prompt
     return moduleName;
+  }
+
+  private String promptForErraiVersion() {
+    final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+    final Dependency erraiDep = DependencyBuilder.create(DependencyArtifact.ErraiParent.toString());
+    final List<String> versions = new ArrayList<String>();
+    for (final Dependency dep : depFacet.resolveAvailableVersions(erraiDep)) {
+      // TODO refactor minimum supported version into separate method and improve logic
+      final Integer majorVersion = Integer.valueOf(dep.getVersion().substring(0, 1));
+      if (majorVersion >= 3)
+        versions.add(dep.getVersion());
+    }
+    int choice = shell.promptChoice("Please select a version of Errai.", versions);
+
+    return versions.get(choice);
   }
 
   private File moduleLogicalNameToFile(final String moduleName) {

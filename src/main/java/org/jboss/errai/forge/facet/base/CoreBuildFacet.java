@@ -3,11 +3,14 @@ package org.jboss.errai.forge.facet.base;
 import java.util.List;
 import java.util.Properties;
 
+import javax.inject.Inject;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
+import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
+import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
-import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
@@ -26,13 +29,12 @@ public class CoreBuildFacet extends AbstractBaseFacet {
   public static final String JAVA_SRC_PATH = "src/main/java";
   public static final String RES_SRC_PATH = "src/main/resources";
   public static final String BUILD_OUTPUT = "src/main/webapp/WEB-INF/classes";
-  private String erraiVersion;
+
+  @Inject
+  private ProjectConfigFactory configFactory;
 
   private String getErraiVersion() {
-    if (erraiVersion == null)
-      erraiVersion = new VersionOracle(getProject().getFacet(DependencyFacet.class)).resolveErraiVersion();
-
-    return erraiVersion;
+    return configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.ERRAI_VERSION, String.class);
   }
 
   @Override

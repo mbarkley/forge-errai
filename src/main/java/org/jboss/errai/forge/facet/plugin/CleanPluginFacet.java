@@ -61,9 +61,9 @@ public class CleanPluginFacet extends AbstractPluginFacet {
       final String moduleName = factory.getProjectConfig(getProject()).getProjectProperty(
               ProjectProperty.MODULE_LOGICAL,
               String.class);
-      ((ConfigurationElementBuilder) configurations.iterator().next().getChildren().get(0))
+      ((ConfigurationElementBuilder) configurations.iterator().next().getChildByName("includes"))
               .addChild(ConfigurationElementBuilder.create().setName("include")
-                      .setText("src/main/webapp/" + moduleName));
+                      .setText("src/main/webapp/" + moduleName + "/"));
       moduleAdded = true;
     }
   }
