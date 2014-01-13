@@ -8,6 +8,7 @@ import org.jboss.errai.forge.facet.plugin.DependencyPluginFacet;
 import org.jboss.errai.forge.facet.plugin.GwtPluginFacet;
 import org.jboss.errai.forge.facet.plugin.JbossPluginFacet;
 import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
+import org.jboss.errai.forge.facet.resource.ErraiAppPropertiesFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
 /**
@@ -19,6 +20,6 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  */
 @RequiresFacet({ ErraiBuildDependencyFacet.class, CleanPluginFacet.class, CompilerPluginFacet.class,
     DependencyPluginFacet.class, GwtPluginFacet.class, JbossPluginFacet.class, WarPluginFacet.class,
-    ModuleCoreFacet.class })
+    ModuleCoreFacet.class, ErraiAppPropertiesFacet.class })
 public class CoreFacet extends BaseAggregatorFacet {
 }
