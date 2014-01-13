@@ -66,44 +66,29 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     }
 
     final Model pom = coreFacet.getPOM();
-    final Map<String, Collection<DependencyBuilder>> tmpProfileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
+    final Map<String, Collection<DependencyBuilder>> blacklistProfileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
     for (String profileId : ArtifactVault.getBlacklistProfiles()) {
       final Profile profile = getProfile(profileId, pom.getProfiles());
       for (String artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {
-        DependencyBuilder dep = DependencyBuilder.create(artifact);
-        if (depFacet.hasEffectiveDependency(dep) && !hasPendingProvidedDependency(profileId, dep)
+        final DependencyBuilder dep = DependencyBuilder.create(artifact);
+        if (depFacet.hasEffectiveDependency(dep)
                 && !hasProvidedDependency(profile, dep)) {
-          org.jboss.forge.project.dependencies.Dependency existing = depFacet.getEffectiveDependency(dep);
+          final org.jboss.forge.project.dependencies.Dependency existing = depFacet.getEffectiveDependency(dep);
           if (!oracle.isManaged(dep))
             dep.setVersion(existing.getVersion());
           dep.setScopeType(ScopeType.PROVIDED);
-          if (!tmpProfileDependencies.containsKey(profileId))
-            tmpProfileDependencies.put(profileId, new ArrayList<DependencyBuilder>());
-          tmpProfileDependencies.get(profileId).add(dep);
+          if (!blacklistProfileDependencies.containsKey(profileId))
+            blacklistProfileDependencies.put(profileId, new ArrayList<DependencyBuilder>());
+          blacklistProfileDependencies.get(profileId).add(dep);
         }
       }
     }
-    
-    for (Entry<String, Collection<DependencyBuilder>> entry : tmpProfileDependencies.entrySet()) {
+
+    for (Entry<String, Collection<DependencyBuilder>> entry : blacklistProfileDependencies.entrySet()) {
       addDependenciesToProfile(entry.getKey(), entry.getValue(), oracle);
     }
 
     return true;
-  }
-
-  /**
-   * Returns true iff there is a pending provided scoped dependency under the
-   * given profile id.
-   */
-  private boolean hasPendingProvidedDependency(final String profileId, final DependencyBuilder dep) {
-    if (profileDependencies.containsKey(profileId)) {
-      for (final DependencyBuilder pendingDep : profileDependencies.get(profileId)) {
-        if (MavenConverter.areSameArtifact(pendingDep, dep) && pendingDep.getScopeTypeEnum().equals(ScopeType.PROVIDED))
-          return true;
-      }
-    }
-
-    return false;
   }
 
   @Override
