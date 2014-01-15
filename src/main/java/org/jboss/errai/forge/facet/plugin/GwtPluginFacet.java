@@ -26,7 +26,9 @@ public class GwtPluginFacet extends AbstractPluginFacet {
     pluginArtifact = DependencyArtifact.GwtPlugin;
     dependencies = new ArrayList<DependencyBuilder>(0);
     executions = Arrays.asList(new Execution[] {
-            ExecutionBuilder.create().addGoal("resources").addGoal("compile").setId("").setPhase("")
+            // Note: phase and id must be explicitly set, otherwise forge will write "null" as values to the tags
+            ExecutionBuilder.create().setId("resources").setPhase("process-resources").addGoal("resources"),
+            ExecutionBuilder.create().setId("compile").setPhase("prepare-package").addGoal("compile")
     });
     configurations = Arrays.asList(new ConfigurationElement[] {
             ConfigurationElementBuilder.create().setName("logLevel").setText("INFO"),
