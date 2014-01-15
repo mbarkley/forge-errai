@@ -34,11 +34,13 @@ public final class ArtifactVault {
     CdiApi("cdi-api", "javax.enterprise"),
     JsrApi("jsr250-api", "javax.annotation"),
     JavaxValidation("validation-api", "javax.validation"),
+    JavaxValidationSources("validation-api", "javax.validation", "sources"),
     HibernateAnnotations("hibernate-commons-annotations", "org.hibernate.common"),
     HibernateJpa("hibernate-jpa-2.0-api", "org.hibernate.javax.persistence"),
     HibernateCore("hibernate-core", "org.hibernate"),
     HibernateEntityManager("hibernate-entitymanager", "org.hibernate"),
     HibernateValidator("hibernate-validator", "org.hibernate"),
+    HibernateValidatorSources("hibernate-validator", "org.hibernate", "sources"),
     JbossLogging("jboss-logging", "org.jboss.logging"),
     JaxrsApi("jaxrs-api", "org.jboss.resteasy"),
     JbossInterceptors("jboss-interceptors-api_1.1_spec", "org.jboss.spec.javax.interceptor"),
@@ -83,10 +85,16 @@ public final class ArtifactVault {
 
     private final String artifactId;
     private final String groupId;
+    private final String classifier;
 
-    private DependencyArtifact(final String artifactId, final String groupId) {
+    private DependencyArtifact(final String artifactId, final String groupId, final String classifier) {
       this.artifactId = artifactId;
       this.groupId = groupId;
+      this.classifier = classifier;
+    }
+    
+    private DependencyArtifact(final String artifactId, final String groupId) {
+      this(artifactId, groupId, null);
     }
 
     private DependencyArtifact(final String id) {
@@ -129,52 +137,59 @@ public final class ArtifactVault {
     public static DependencyArtifact valueOf(String groupId, String artifactId) {
       return artifacts.get(groupId + ":" + artifactId);
     }
+
+    public String getClassifier() {
+      return classifier;
+    }
   }
 
   /**
    * Blacklist of Maven dependencies which cannot be deployed in various
    * profiles.
    */
-  private static final Map<String, Set<String>> blacklist = new HashMap<String, Set<String>>();
+  private static final Map<String, Set<DependencyArtifact>> blacklist = new HashMap<String, Set<DependencyArtifact>>();
 
   static {
     // Wildfly/Jboss blacklist
-    blacklist.put(AbstractBaseFacet.MAIN_PROFILE, new HashSet<String>());
-    final Set<String> mainProfileBlacklist = blacklist.get(AbstractBaseFacet.MAIN_PROFILE);
-    mainProfileBlacklist.add(DependencyArtifact.ErraiTools.toString());
-    mainProfileBlacklist.add(DependencyArtifact.ErraiJboss.toString());
-    mainProfileBlacklist.add(DependencyArtifact.Hsq.toString());
-    mainProfileBlacklist.add(DependencyArtifact.JUnit.toString());
-    mainProfileBlacklist.add(DependencyArtifact.ErraiNetty.toString());
-    mainProfileBlacklist.add(DependencyArtifact.GwtSlf4j.toString());
-    mainProfileBlacklist.add(DependencyArtifact.ErraiCodegenGwt.toString());
-    mainProfileBlacklist.add(DependencyArtifact.JavaxInject.toString());
-    mainProfileBlacklist.add(DependencyArtifact.CdiApi.toString());
-    mainProfileBlacklist.add(DependencyArtifact.ErraiCdiJetty.toString());
-    mainProfileBlacklist.add(DependencyArtifact.GuavaGwt.toString());
-    mainProfileBlacklist.add(DependencyArtifact.JsrApi.toString());
-    mainProfileBlacklist.add(DependencyArtifact.JavaxValidation.toString());
-    mainProfileBlacklist.add(DependencyArtifact.HibernateAnnotations.toString());
-    mainProfileBlacklist.add(DependencyArtifact.HibernateJpa.toString());
-    mainProfileBlacklist.add(DependencyArtifact.HibernateCore.toString());
-    mainProfileBlacklist.add(DependencyArtifact.HibernateEntityManager.toString());
-    mainProfileBlacklist.add(DependencyArtifact.HibernateValidator.toString());
-    mainProfileBlacklist.add(DependencyArtifact.ErraiDataBinding.toString());
-    mainProfileBlacklist.add(DependencyArtifact.ErraiJavaxEnterprise.toString());
-    mainProfileBlacklist.add(DependencyArtifact.ErraiJaxrsClient.toString());
-    mainProfileBlacklist.add(DependencyArtifact.ErraiJpaClient.toString());
-    mainProfileBlacklist.add(DependencyArtifact.ErraiNavigation.toString());
-    mainProfileBlacklist.add(DependencyArtifact.ErraiUi.toString());
-    mainProfileBlacklist.add(DependencyArtifact.JbossLogging.toString());
-    mainProfileBlacklist.add(DependencyArtifact.JaxrsApi.toString());
-    mainProfileBlacklist.add(DependencyArtifact.JbossInterceptors.toString());
-    mainProfileBlacklist.add(DependencyArtifact.JbossTransaction.toString());
-    mainProfileBlacklist.add(DependencyArtifact.WeldServletCore.toString());
-    mainProfileBlacklist.add(DependencyArtifact.WeldCore.toString());
-    mainProfileBlacklist.add(DependencyArtifact.WeldApi.toString());
-    mainProfileBlacklist.add(DependencyArtifact.WeldSpi.toString());
-    mainProfileBlacklist.add(DependencyArtifact.XmlApis.toString());
-    mainProfileBlacklist.add(DependencyArtifact.JettyNaming.toString());
+    blacklist.put(AbstractBaseFacet.MAIN_PROFILE, new HashSet<DependencyArtifact>());
+    final Set<DependencyArtifact> mainProfileBlacklist = blacklist.get(AbstractBaseFacet.MAIN_PROFILE);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiTools);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiJboss);
+    mainProfileBlacklist.add(DependencyArtifact.Hsq);
+    mainProfileBlacklist.add(DependencyArtifact.JUnit);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiNetty);
+    mainProfileBlacklist.add(DependencyArtifact.GwtSlf4j);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiCodegenGwt);
+    mainProfileBlacklist.add(DependencyArtifact.JavaxInject);
+    mainProfileBlacklist.add(DependencyArtifact.CdiApi);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiCdiJetty);
+    mainProfileBlacklist.add(DependencyArtifact.GuavaGwt);
+    mainProfileBlacklist.add(DependencyArtifact.JsrApi);
+    mainProfileBlacklist.add(DependencyArtifact.JavaxValidation);
+    mainProfileBlacklist.add(DependencyArtifact.HibernateAnnotations);
+    mainProfileBlacklist.add(DependencyArtifact.HibernateJpa);
+    mainProfileBlacklist.add(DependencyArtifact.HibernateCore);
+    mainProfileBlacklist.add(DependencyArtifact.HibernateEntityManager);
+    mainProfileBlacklist.add(DependencyArtifact.HibernateValidator);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiDataBinding);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiJavaxEnterprise);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiJaxrsClient);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiJpaClient);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiNavigation);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiUi);
+    mainProfileBlacklist.add(DependencyArtifact.JbossLogging);
+    mainProfileBlacklist.add(DependencyArtifact.JaxrsApi);
+    mainProfileBlacklist.add(DependencyArtifact.JbossInterceptors);
+    mainProfileBlacklist.add(DependencyArtifact.JbossTransaction);
+    mainProfileBlacklist.add(DependencyArtifact.WeldServletCore);
+    mainProfileBlacklist.add(DependencyArtifact.WeldCore);
+    mainProfileBlacklist.add(DependencyArtifact.WeldApi);
+    mainProfileBlacklist.add(DependencyArtifact.WeldSpi);
+    mainProfileBlacklist.add(DependencyArtifact.XmlApis);
+    mainProfileBlacklist.add(DependencyArtifact.JettyNaming);
+    // Source Dependencies
+    mainProfileBlacklist.add(DependencyArtifact.JavaxValidationSources);
+    mainProfileBlacklist.add(DependencyArtifact.HibernateValidatorSources);
   }
 
   public static boolean isBlacklisted(final String identifier) {
@@ -207,10 +222,10 @@ public final class ArtifactVault {
     return blacklist.keySet();
   }
 
-  public static Collection<String> getBlacklistedArtifacts(final String profileId) {
-    final Set<String> artifacts = blacklist.get(profileId);
+  public static Collection<DependencyArtifact> getBlacklistedArtifacts(final String profileId) {
+    final Set<DependencyArtifact> artifacts = blacklist.get(profileId);
 
-    return (artifacts != null ? artifacts : new ArrayList<String>(0));
+    return (artifacts != null ? artifacts : new ArrayList<DependencyArtifact>(0));
   }
 
 }

@@ -14,6 +14,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault;
+import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.util.MavenConverter;
@@ -69,8 +70,8 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     final Map<String, Collection<DependencyBuilder>> blacklistProfileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
     for (String profileId : ArtifactVault.getBlacklistProfiles()) {
       final Profile profile = getProfile(profileId, pom.getProfiles());
-      for (String artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {
-        final DependencyBuilder dep = DependencyBuilder.create(artifact);
+      for (final DependencyArtifact artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {
+        final DependencyBuilder dep = getDependency(artifact);
         if (depFacet.hasEffectiveDependency(dep)
                 && !hasProvidedDependency(profile, dep)) {
           final org.jboss.forge.project.dependencies.Dependency existing = depFacet.getEffectiveDependency(dep);
@@ -105,8 +106,8 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     Model pom = coreFacet.getPOM();
     for (final Profile profile : pom.getProfiles()) {
-      for (final String artifactClassifier : ArtifactVault.getBlacklistedArtifacts(profile.getId())) {
-        final DependencyBuilder dep = DependencyBuilder.create(artifactClassifier);
+      for (final DependencyArtifact artifact : ArtifactVault.getBlacklistedArtifacts(profile.getId())) {
+        final DependencyBuilder dep = getDependency(artifact);
         if (!depFacet.hasEffectiveDependency(dep)) {
           if (!profileDependencies.containsKey(profile.getId()))
             profileDependencies.put(profile.getId(), new ArrayList<DependencyBuilder>());
@@ -172,8 +173,8 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     pom = coreFacet.getPOM();
     for (final String profileId : ArtifactVault.getBlacklistProfiles()) {
       final Profile profile = getProfile(profileId, pom.getProfiles());
-      for (final String artifactClassifier : ArtifactVault.getBlacklistedArtifacts(profileId)) {
-        final DependencyBuilder dep = DependencyBuilder.create(artifactClassifier);
+      for (final DependencyArtifact artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {
+        final DependencyBuilder dep = getDependency(artifact);
         if (depFacet.hasEffectiveDependency(dep) && !hasProvidedDependency(profile, dep))
           return false;
       }

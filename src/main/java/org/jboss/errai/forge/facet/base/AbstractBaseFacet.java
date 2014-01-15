@@ -9,6 +9,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault;
+import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.util.MavenConverter;
 import org.jboss.errai.forge.util.VersionOracle;
@@ -148,5 +149,13 @@ public abstract class AbstractBaseFacet extends BaseFacet {
     }
 
     return null;
+  }
+  
+  protected DependencyBuilder getDependency(final DependencyArtifact artifact) {
+    final DependencyBuilder dep = DependencyBuilder.create(artifact.toString());
+    if (artifact.getClassifier() != null)
+      dep.setClassifier(artifact.getClassifier());
+    
+    return dep;
   }
 }
