@@ -15,7 +15,8 @@ public final class ModuleVault {
     ErraiCommon("org.jboss.errai.common.ErraiCommon"),
     ErraiBus("org.jboss.errai.bus.ErraiBus"),
     ErraiIoc("org.jboss.errai.ioc.Container"),
-    ErraiCdi("org.jboss.errai.enterprise.CDI");
+    ErraiCdi("org.jboss.errai.enterprise.CDI"),
+    ErraiUi("org.jboss.errai.ui.UI");
     
     private final String logicalName;
     private Module(final String logicalName) {
