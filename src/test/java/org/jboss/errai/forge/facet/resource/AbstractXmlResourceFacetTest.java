@@ -1,5 +1,6 @@
 package org.jboss.errai.forge.facet.resource;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -11,12 +12,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jboss.forge.project.Project;
+import org.jboss.forge.shell.Shell;
 import org.jboss.forge.test.AbstractShellTest;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -24,14 +30,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class AbstractXmlResourceFacetTest extends AbstractShellTest {
+  
+  @Inject
+  private Shell shell;
 
-  public static class TestXmlResourceFacet extends AbstractXmlResourceFacet {
+  public class TestXmlResourceFacet extends AbstractXmlResourceFacet {
     private final String relPath;
     private final Collection<Node> nodes;
+    private final Map<Element, Element> replacements;
 
-    public TestXmlResourceFacet(final String relPath, final Collection<Node> nodes) {
+    public TestXmlResourceFacet(final String relPath, final Collection<Node> nodes, Map<Element, Element> replacements) {
       this.relPath = relPath;
       this.nodes = nodes;
+      this.replacements = replacements;
+      this.shell = AbstractXmlResourceFacetTest.this.shell;
     }
 
     @Override
@@ -41,6 +53,16 @@ public class AbstractXmlResourceFacetTest extends AbstractShellTest {
         retVal.add(doc.importNode(node, true));
       }
 
+      return retVal;
+    }
+
+    @Override
+    protected Map<Element, Element> getReplacements(Document doc) throws ParserConfigurationException {
+      final Map<Element, Element> retVal = new HashMap<Element, Element>(replacements.size());
+      for (final Entry<Element, Element> entry : replacements.entrySet()) {
+        retVal.put((Element) doc.importNode(entry.getKey(), true), (Element) doc.importNode(entry.getValue(), true));
+      }
+      
       return retVal;
     }
 
@@ -61,7 +83,7 @@ public class AbstractXmlResourceFacetTest extends AbstractShellTest {
 
     final Project project = initializeJavaProject();
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
-            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), nodes);
+            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), nodes, new HashMap<Element, Element>(0));
     testFacet.setProject(project);
 
     assertTrue(testFacet.isInstalled());
@@ -80,12 +102,35 @@ public class AbstractXmlResourceFacetTest extends AbstractShellTest {
 
     final Project project = initializeJavaProject();
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
-            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), nodes);
+            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), nodes, new HashMap<Element, Element>(0));
     testFacet.setProject(project);
 
     assertFalse(testFacet.isInstalled());
   }
 
+  @Test
+  public void testReplacement() throws Exception {
+    final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+    
+    final Map<Element, Element> replacements = new HashMap<Element, Element>();
+    final Element key = doc.createElement("first");
+    ((Element) key.appendChild(doc.createElement("second"))).setAttribute("name", "test");
+    final Element value = doc.createElement("different");
+    replacements.put(key, value);
+
+    final Project project = initializeJavaProject();
+    final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
+            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), new ArrayList<Node>(0), replacements);
+    testFacet.setProject(project);
+    
+    testFacet.install();
+
+    final Document resDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(testFacet.relPath));
+    
+    assertEquals(1, resDoc.getElementsByTagName("different").getLength());
+    assertEquals(1, resDoc.getElementsByTagName("first").getLength());
+  }
+  
   private String writeResourceToFile(final String res) throws IOException {
     final File file = File.createTempFile(getClass().getSimpleName(), ".xml");
     file.deleteOnExit();

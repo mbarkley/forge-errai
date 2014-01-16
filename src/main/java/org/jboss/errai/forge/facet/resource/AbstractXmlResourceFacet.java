@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -56,10 +57,12 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       final DocumentBuilder builder = factory.newDocumentBuilder();
       final Document doc = builder.parse(file);
       final Collection<Node> toInsert = getElementsToInsert(doc);
+      final Map<Element, Element> replacements = getReplacements(doc);
       final Node root = doc.getDocumentElement();
-      final Map<String, Collection<Node>> elementsByTagName = mapElementsByTagName(toInsert);
+      final Map<String, Collection<Node>> toInsertByTagName = mapElementsByTagName(toInsert);
 
-      safeBatchAdd(root, elementsByTagName);
+      doReplacements(doc, replacements);
+      safeBatchAdd(root, toInsertByTagName);
 
       final TransformerFactory transFactory = TransformerFactory.newInstance();
       final Transformer transformer = transFactory.newTransformer();
@@ -74,6 +77,19 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     }
 
     return true;
+  }
+
+  private void doReplacements(final Document doc, final Map<Element, Element> replacements) {
+    for (final Entry<Element, Element> mapping : replacements.entrySet()) {
+      final NodeList nodeList = doc.getElementsByTagName(mapping.getKey().getNodeName());
+      for (int i = 0; i < nodeList.getLength(); i++) {
+        if (matches(mapping.getKey(), nodeList.item(i))) {
+          final Node parent = nodeList.item(i).getParentNode();
+          parent.replaceChild(mapping.getValue(), nodeList.item(i));
+          break;
+        }
+      }
+    }
   }
 
   @Override
@@ -173,6 +189,16 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
   protected abstract Collection<Node> getElementsToInsert(final Document doc) throws ParserConfigurationException;
 
   /**
+   * Get a Map of nodes to be replaced in an XML configuration file.
+   * 
+   * @param doc
+   *          The document to which all returned nodes should belong.
+   * @return A map where any keys appearing in an XML file will be replaced with
+   *         the corresponding values.
+   */
+  protected abstract Map<Element, Element> getReplacements(final Document doc) throws ParserConfigurationException;
+
+  /**
    * Get the relative path of XML file to be configured by this facet. Concrete
    * subclasses must return the path (relative to the project root directory) of
    * the XML file they are configuring.
@@ -251,8 +277,10 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
    * attribute, or text value in {@code node} exists in the same relative path
    * in {@code other}).
    * 
-   * @param node The primary node for matching against.
-   * @param other The secondary node being matched against the primary node.
+   * @param node
+   *          The primary node for matching against.
+   * @param other
+   *          The secondary node being matched against the primary node.
    * @return True iff {@code other} is consistent with {@code node}.
    */
   protected boolean matches(Node node, Node other) {

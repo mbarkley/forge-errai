@@ -3,6 +3,8 @@ package org.jboss.errai.forge.facet.module;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
@@ -51,6 +53,11 @@ abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
     }
 
     return retVal;
+  }
+  
+  @Override
+  protected Map<Element, Element> getReplacements(Document doc) throws ParserConfigurationException {
+    return new HashMap<Element, Element>(0);
   }
 
   @Override

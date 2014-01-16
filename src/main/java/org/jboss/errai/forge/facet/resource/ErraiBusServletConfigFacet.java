@@ -2,6 +2,8 @@ package org.jboss.errai.forge.facet.resource;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -39,6 +41,11 @@ public class ErraiBusServletConfigFacet extends AbstractXmlResourceFacet {
             servlet,
             servletMapping
     });
+  }
+  
+  @Override
+  protected Map<Element, Element> getReplacements(Document doc) throws ParserConfigurationException {
+    return new HashMap<Element, Element>(0);
   }
 
   @Override
