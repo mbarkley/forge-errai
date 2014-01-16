@@ -14,6 +14,9 @@ import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiCdiFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiDataBindingFacet;
+import org.jboss.errai.forge.facet.aggregate.ErraiJaxrsFacet;
+import org.jboss.errai.forge.facet.aggregate.ErraiJpaClientFacet;
+import org.jboss.errai.forge.facet.aggregate.ErraiJpaDatasyncFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiMessagingFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiNavigationFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiUiFacet;
@@ -121,14 +124,14 @@ public class Main implements Plugin {
     }
   }
 
-  @Command("add-core")
-  public void addCore(PipeOut out) {
-    addFacet(out, CoreFacet.class);
-  }
-
   @Command("version")
   public void pipeVersion(PipeOut out) {
     ShellMessages.info(out, "1.0.0-SNAPSHOT");
+  }
+
+  @Command("add-core")
+  public void addCore(PipeOut out) {
+    addFacet(out, CoreFacet.class);
   }
 
   @Command("add-messaging")
@@ -154,5 +157,20 @@ public class Main implements Plugin {
   @Command("add-databinding")
   public void addDataBinding(PipeOut out) {
     addFacet(out, ErraiDataBindingFacet.class);
+  }
+  
+  @Command("add-jaxrs")
+  public void addJaxrs(PipeOut out) {
+    addFacet(out, ErraiJaxrsFacet.class);
+  }
+  
+  @Command("add-jpa-client")
+  public void addJpaClient(PipeOut out) {
+    addFacet(out, ErraiJpaClientFacet.class);
+  }
+  
+  @Command("add-jpa-datasync")
+  public void addJpaDataSync(PipeOut out) {
+    addFacet(out, ErraiJpaDatasyncFacet.class);
   }
 }
