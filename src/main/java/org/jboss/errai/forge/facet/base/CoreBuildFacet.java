@@ -41,7 +41,11 @@ public class CoreBuildFacet extends AbstractBaseFacet {
   public boolean install() {
     final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
     final Model pom = coreFacet.getPOM();
-    final Build build = pom.getBuild();
+    Build build = pom.getBuild();
+    if (build == null) {
+      build = new Build();
+      pom.setBuild(build);
+    }
 
     build.setOutputDirectory(BUILD_OUTPUT);
     // TODO don't hardcode path
