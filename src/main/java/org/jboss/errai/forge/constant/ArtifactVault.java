@@ -81,6 +81,7 @@ public final class ArtifactVault {
     ErraiJaxrsClient("errai-jaxrs-client"),
     ErraiJaxrsProvider("errai-jaxrs-provider"),
     ErraiJpaClient("errai-jpa-client"),
+    ErraiJpaDatasync("errai-jpa-datasync"),
     ErraiNavigation("errai-navigation"),
     ErraiUi("errai-ui");
 

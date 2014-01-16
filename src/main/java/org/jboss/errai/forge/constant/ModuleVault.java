@@ -18,7 +18,10 @@ public final class ModuleVault {
     ErraiCdi("org.jboss.errai.enterprise.CDI"),
     ErraiUi("org.jboss.errai.ui.UI"),
     ErraiNavigation("org.jboss.errai.ui.nav.Navigation"),
-    ErraiDataBinding("org.jboss.errai.databinding.DataBinding");
+    ErraiDataBinding("org.jboss.errai.databinding.DataBinding"),
+    ErraiJpa("org.jboss.errai.jpa.JPA"),
+    ErraiJpaDatasync("org.jboss.errai.jpa.sync.DataSync"),
+    ErraiJaxrs("org.jboss.errai.enterprise.Jaxrs");
     
     private final String logicalName;
     private Module(final String logicalName) {
