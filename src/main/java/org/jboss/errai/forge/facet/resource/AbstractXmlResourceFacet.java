@@ -135,6 +135,18 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     return true;
   }
 
+  /**
+   * Get a collection of nodes used to verify the installation of this facet.
+   * Nodes in this collection must match nodes in the XML resource if this facet
+   * is installed. If a subclass does not override this, the default value will
+   * be the nodes returned by
+   * {@link AbstractXmlResourceFacet#getElementsToInsert(Document)
+   * getElementsToInsert}.
+   */
+  protected Collection<Node> getElementsToVerify(final Document doc) throws ParserConfigurationException {
+    return getElementsToInsert(doc);
+  }
+
   @Override
   public boolean uninstall() {
     final File file = getResFile(getRelPath());
