@@ -13,6 +13,7 @@ import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiCdiFacet;
+import org.jboss.errai.forge.facet.aggregate.ErraiDataBindingFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiMessagingFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiNavigationFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiUiFacet;
@@ -148,5 +149,10 @@ public class Main implements Plugin {
   @Command("add-navigation")
   public void addNavigation(PipeOut out) {
     addFacet(out, ErraiNavigationFacet.class);
+  }
+  
+  @Command("add-databinding")
+  public void addDataBinding(PipeOut out) {
+    addFacet(out, ErraiDataBindingFacet.class);
   }
 }
