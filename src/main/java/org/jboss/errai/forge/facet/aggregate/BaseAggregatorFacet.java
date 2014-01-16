@@ -1,5 +1,6 @@
 package org.jboss.errai.forge.facet.aggregate;
 
+import org.jboss.forge.project.Facet;
 import org.jboss.forge.project.facets.BaseFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
@@ -27,6 +28,21 @@ abstract class BaseAggregatorFacet extends BaseFacet {
      * verified the installation of transitively required facets.
      */
     return getProject().hasAllFacets(getClass().getAnnotation(RequiresFacet.class).value());
+  }
+
+  @Override
+  public boolean uninstall() {
+    final Class<? extends Facet>[] requirements = getClass().getAnnotation(RequiresFacet.class).value();
+
+    for (int i = 0; i < requirements.length; i++) {
+      if (!requirements[i].equals(CoreFacet.class) && BaseAggregatorFacet.class.isAssignableFrom(requirements[i])
+              && project.hasFacet(requirements[i])) {
+        final Facet facet = project.getFacet(requirements[i]);
+        project.removeFacet(facet);
+      }
+    }
+
+    return true;
   }
 
 }
