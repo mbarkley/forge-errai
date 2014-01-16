@@ -3,13 +3,12 @@ package org.jboss.errai.forge.facet.aggregate;
 import org.jboss.errai.forge.facet.dependency.ErraiJaxrsClientDependencyFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
-@RequiresFacet({ CoreFacet.class, ErraiJaxrsClientDependencyFacet.class, ErraiIocFacet.class,
-    ErraiDataBindingFacet.class })
+@RequiresFacet({ CoreFacet.class, ErraiJaxrsClientDependencyFacet.class })
 public class ErraiJaxrsClientFacet extends BaseAggregatorFacet {
 
   @Override
   public String getFeatureName() {
-    return "Errai Jaxrs";
+    return "Errai JAX-RS";
   }
 
   @Override
