@@ -14,7 +14,8 @@ public final class ModuleVault {
     GwtUser("com.google.gwt.user.User"),
     ErraiCommon("org.jboss.errai.common.ErraiCommon"),
     ErraiBus("org.jboss.errai.bus.ErraiBus"),
-    ErraiIoc("org.jboss.errai.ioc.Container");
+    ErraiIoc("org.jboss.errai.ioc.Container"),
+    ErraiCdi("org.jboss.errai.enterprise.CDI");
     
     private final String logicalName;
     private Module(final String logicalName) {
