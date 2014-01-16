@@ -85,7 +85,10 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       for (int i = 0; i < nodeList.getLength(); i++) {
         if (matches(mapping.getKey(), nodeList.item(i))) {
           final Node parent = nodeList.item(i).getParentNode();
-          parent.replaceChild(mapping.getValue(), nodeList.item(i));
+          if (mapping.getValue() != null)
+            parent.replaceChild(mapping.getValue(), nodeList.item(i));
+          else
+            parent.removeChild(nodeList.item(i));
           break;
         }
       }
