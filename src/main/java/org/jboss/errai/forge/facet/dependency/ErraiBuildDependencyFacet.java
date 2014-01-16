@@ -6,6 +6,7 @@ import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Gw
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.JUnit;
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.JbossSupport;
 
+import org.apache.maven.model.Activation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.facet.base.CoreBuildFacet;
@@ -43,6 +44,8 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
         profile = ProfileBuilder.create().setId(MAIN_PROFILE).getAsMavenProfile();
         pom.addProfile(profile);
       }
+      if (profile.getActivation() == null)
+        profile.setActivation(new Activation());
       profile.getActivation().setActiveByDefault(true);
       coreFacet.setPOM(pom);
 
