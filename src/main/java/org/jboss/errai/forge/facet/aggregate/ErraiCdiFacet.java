@@ -14,4 +14,14 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 @RequiresFacet({ CoreFacet.class, ErraiCdiClientFacet.class, ErraiWeldIntegrationDependencyFacet.class,
     CdiWebXmlFacet.class, BeansXmlFacet.class })
 public class ErraiCdiFacet extends BaseAggregatorFacet {
+
+  @Override
+  public String getFeatureName() {
+    return "Errai CDI Integration";
+  }
+
+  @Override
+  public String getFeatureDescription() {
+    return "Integrates server-side CDI Events and Observers with Errai Client CDI.";
+  }
 }

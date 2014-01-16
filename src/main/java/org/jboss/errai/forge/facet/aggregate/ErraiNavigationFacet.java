@@ -7,4 +7,14 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 @RequiresFacet({ CoreFacet.class, ErraiUiFacet.class, ErraiNavigationDependencyFacet.class,
     ErraiNavigationModuleFacet.class })
 public class ErraiNavigationFacet extends BaseAggregatorFacet {
+
+  @Override
+  public String getFeatureName() {
+    return "Errai Navigation";
+  }
+
+  @Override
+  public String getFeatureDescription() {
+    return "Allows the use of Errai UI Templated Widgets as pages which can be navigated between.";
+  }
 }

@@ -44,5 +44,15 @@ abstract class BaseAggregatorFacet extends BaseFacet {
 
     return true;
   }
+  
+  /**
+   * @return The name of the feature managed by this facet.
+   */
+  public abstract String getFeatureName();
+  
+  /**
+   * @return A short description of the feature managed by this facet.
+   */
+  public abstract String getFeatureDescription();
 
 }

@@ -16,4 +16,15 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 @RequiresFacet({ CoreFacet.class, ErraiBusDependencyFacet.class, ErraiBuildDependencyFacet.class,
     ErraiBusModuleFacet.class, ErraiBusServletConfigFacet.class })
 public class ErraiMessagingFacet extends BaseAggregatorFacet {
+
+  @Override
+  public String getFeatureName() {
+    return "Errai Messaging";
+  }
+
+  @Override
+  public String getFeatureDescription() {
+    return "Enables communication between services, either locally or between client and server,"
+            + "through simple Message Bus API.";
+  }
 }

@@ -14,4 +14,14 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 @RequiresFacet({ CoreFacet.class, ErraiIocDependencyFacet.class, ErraiIocModulFacet.class,
     ErraiAppPropertiesFacet.class })
 public class ErraiIocFacet extends BaseAggregatorFacet {
+
+  @Override
+  public String getFeatureName() {
+    return "Errai IOC";
+  }
+
+  @Override
+  public String getFeatureDescription() {
+    return "An IOC container allowing dependency injection in GWT-compiled code.";
+  }
 }

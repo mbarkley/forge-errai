@@ -22,4 +22,14 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
     DependencyPluginFacet.class, GwtPluginFacet.class, JbossPluginFacet.class, WarPluginFacet.class,
     ModuleCoreFacet.class, ErraiAppPropertiesFacet.class })
 public class CoreFacet extends BaseAggregatorFacet {
+
+  @Override
+  public String getFeatureName() {
+    return "Errai Build Setup";
+  }
+
+  @Override
+  public String getFeatureDescription() {
+    return "The core build setup required for running development mode or compiling for deployment.";
+  }
 }

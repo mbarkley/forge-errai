@@ -7,4 +7,14 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
 @RequiresFacet({ CoreFacet.class, ErraiIocFacet.class, ErraiDataBindingDependencyFacet.class,
     ErraiDataBindingModuleFacet.class })
 public class ErraiDataBindingFacet extends BaseAggregatorFacet {
+
+  @Override
+  public String getFeatureName() {
+    return "Errai Data Binding";
+  }
+
+  @Override
+  public String getFeatureDescription() {
+    return "Bind models to GWT Widgets to have changes in one automatically reflected in the other.";
+  }
 }
