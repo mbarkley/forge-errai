@@ -12,7 +12,11 @@ import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
+import org.jboss.errai.forge.facet.aggregate.ErraiCdiFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiMessagingFacet;
+import org.jboss.errai.forge.facet.aggregate.ErraiNavigationFacet;
+import org.jboss.errai.forge.facet.aggregate.ErraiUiFacet;
+import org.jboss.forge.project.Facet;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.dependencies.Dependency;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
@@ -71,9 +75,7 @@ public class Main implements Plugin {
       config.setProjectProperty(ProjectProperty.ERRAI_VERSION, version);
     }
 
-    if (!project.hasFacet(CoreFacet.class)) {
-      installEvent.fire(new InstallFacets(CoreFacet.class));
-    }
+    addCore(out);
   }
 
   private String promptForModule() {
@@ -108,15 +110,19 @@ public class Main implements Plugin {
 
     return modulePath;
   }
+  
+  private void addFacet(final PipeOut out, final Class<? extends Facet> facetType) {
+    if (!project.hasFacet(facetType)) {
+      installEvent.fire(new InstallFacets(facetType));
+    }
+    else {
+      ShellMessages.info(out, facetType.getSimpleName() + " has already been added to this project.");
+    }
+  }
 
   @Command("add-core")
   public void addCore(PipeOut out) {
-    if (!project.hasFacet(CoreFacet.class)) {
-      installEvent.fire(new InstallFacets(CoreFacet.class));
-    }
-    else {
-      ShellMessages.info(out, "The plugin is already setup.");
-    }
+    addFacet(out, CoreFacet.class);
   }
 
   @Command("version")
@@ -126,12 +132,21 @@ public class Main implements Plugin {
 
   @Command("add-messaging")
   public void addMessaging(PipeOut out) {
-    if (!project.hasFacet(ErraiMessagingFacet.class)) {
-      installEvent.fire(new InstallFacets(ErraiMessagingFacet.class));
-    }
-    else {
-      ShellMessages.info(out, "Errai Messaging has already been added to this project.");
-    }
+    addFacet(out, ErraiMessagingFacet.class);
   }
-
+  
+  @Command("add-cdi")
+  public void addCdi(PipeOut out) {
+    addFacet(out, ErraiCdiFacet.class);
+  }
+  
+  @Command("add-ui")
+  public void addUi(PipeOut out) {
+    addFacet(out, ErraiUiFacet.class);
+  }
+  
+  @Command("add-navigation")
+  public void addNavigation(PipeOut out) {
+    addFacet(out, ErraiNavigationFacet.class);
+  }
 }
