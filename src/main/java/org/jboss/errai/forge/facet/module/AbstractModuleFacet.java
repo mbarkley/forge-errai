@@ -8,6 +8,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
@@ -36,6 +39,8 @@ abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
   protected Shell shell;
   @Inject
   protected ProjectConfigFactory configFactory;
+  
+  protected final String xPathRootExpression = "/module";
 
   /**
    * Generate xml {@link Element Elements} for inheriting the given {@link Module Modules}.
@@ -54,15 +59,32 @@ abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
 
     return retVal;
   }
-  
+
   @Override
-  protected Map<Element, Element> getReplacements(Document doc) throws ParserConfigurationException {
-    return new HashMap<Element, Element>(0);
+  protected Map<XPathExpression, Node> getRemovalMap(final XPath xPath, final Document doc) {
+    return new HashMap<XPathExpression, Node>(0);
   }
 
   @Override
-  protected Collection<Node> getElementsToInsert(Document doc) throws ParserConfigurationException {
-    return generateInsertElements(modules, doc);
+  protected Map<XPathExpression, Collection<Node>> getElementsToInsert(final XPath xPath, final Document doc)
+          throws ParserConfigurationException, XPathExpressionException {
+    final XPathExpression parentExpression = xPath.compile(xPathRootExpression);
+    final Collection<Node> nodes = new ArrayList<Node>(modules.size());
+    for (final Module module : modules) {
+      final Element inherits = doc.createElement("inherits");
+      inherits.setAttribute("name", module.getLogicalName());
+      nodes.add(inherits);
+    }
+    
+    final Map<XPathExpression, Collection<Node>> retVal = new HashMap<XPathExpression, Collection<Node>>(1);
+    retVal.put(parentExpression, nodes);
+    
+    return retVal;
+  }
+
+  @Override
+  protected Map<XPathExpression, Node> getReplacements(final XPath xPath, final Document doc) throws ParserConfigurationException {
+    return new HashMap<XPathExpression, Node>(0);
   }
 
   /**

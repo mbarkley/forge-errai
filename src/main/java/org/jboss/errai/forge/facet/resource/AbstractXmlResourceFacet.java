@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,6 +16,11 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.w3c.dom.Document;
@@ -40,7 +44,8 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
    * @see {@link OutputKeys}, {@link Transformer}
    */
   final protected Properties xmlProperties = new Properties();
-  protected final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+  protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+  protected final XPathFactory xPathFactory = XPathFactory.newInstance();
 
   public AbstractXmlResourceFacet() {
     xmlProperties.setProperty(OutputKeys.INDENT, "yes");
@@ -54,15 +59,29 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
         file.getParentFile().mkdirs();
         file.createNewFile();
       }
-      final DocumentBuilder builder = factory.newDocumentBuilder();
+      final DocumentBuilder builder = docBuilderFactory.newDocumentBuilder();
       final Document doc = builder.parse(file);
-      final Collection<Node> toInsert = getElementsToInsert(doc);
-      final Map<Element, Element> replacements = getReplacements(doc);
-      final Node root = doc.getDocumentElement();
-      final Map<String, Collection<Node>> toInsertByTagName = mapElementsByTagName(toInsert);
+      final XPath xPath = xPathFactory.newXPath();
+      final Map<XPathExpression, Collection<Node>> toInsert = getElementsToInsert(xPath, doc);
+      final Map<XPathExpression, Node> replacements = getReplacements(xPath, doc);
 
-      doReplacements(doc, replacements);
-      safeBatchAdd(root, toInsertByTagName);
+      for (final XPathExpression expression : toInsert.keySet()) {
+        final Node node = (Node) expression.evaluate(doc, XPathConstants.NODE);
+        if (node != null && node.getNodeType() == Node.ELEMENT_NODE) {
+          for (final Node newNode : toInsert.get(expression)) {
+            node.appendChild(newNode);
+          }
+        }
+      }
+
+      for (final XPathExpression expression : replacements.keySet()) {
+        final Node node = (Node) expression.evaluate(doc, XPathConstants.NODE);
+        if (node != null) {
+          final Node parent = node.getParentNode();
+          final Node newNode = replacements.get(expression);
+          parent.replaceChild(newNode, node);
+        }
+      }
 
       final TransformerFactory transFactory = TransformerFactory.newInstance();
       final Transformer transformer = transFactory.newTransformer();
@@ -79,22 +98,6 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     return true;
   }
 
-  private void doReplacements(final Document doc, final Map<Element, Element> replacements) {
-    for (final Entry<Element, Element> mapping : replacements.entrySet()) {
-      final NodeList nodeList = doc.getElementsByTagName(mapping.getKey().getNodeName());
-      for (int i = 0; i < nodeList.getLength(); i++) {
-        if (matches(mapping.getKey(), nodeList.item(i))) {
-          final Node parent = nodeList.item(i).getParentNode();
-          if (mapping.getValue() != null)
-            parent.replaceChild(mapping.getValue(), nodeList.item(i));
-          else
-            parent.removeChild(nodeList.item(i));
-          break;
-        }
-      }
-    }
-  }
-
   @Override
   public boolean isInstalled() {
     final String relPath = getRelPath();
@@ -107,25 +110,30 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       return false;
 
     try {
-      final DocumentBuilder builder = factory.newDocumentBuilder();
+      final DocumentBuilder builder = docBuilderFactory.newDocumentBuilder();
       final Document doc = builder.parse(file);
-      final Collection<Node> toCheck = getElementsToInsert(doc);
-      final Element root = doc.getDocumentElement();
-      final Map<String, Collection<Node>> elementsByTagName = mapElementsByTagName(toCheck);
-      final Map<String, Collection<Node>> existingByTagName = mapElementsByTagName(root.getChildNodes());
+      final XPath xPath = xPathFactory.newXPath();
+      final Map<XPathExpression, Collection<Node>> insertedToCheck = getElementsToVerify(xPath, doc);
+      final Map<XPathExpression, Node> replacedToCheck = getReplacements(xPath, doc);
 
-      for (final String name : elementsByTagName.keySet()) {
-        if (!existingByTagName.containsKey(name))
-          return false;
-
-        findLoop: for (final Node node : elementsByTagName.get(name)) {
-          for (final Node existing : existingByTagName.get(name)) {
-            if (node.getNodeType() == Node.ELEMENT_NODE && matches(node, existing))
-              continue findLoop;
+      for (final XPathExpression expression : insertedToCheck.keySet()) {
+        final Node parent = (Node) expression.evaluate(doc, XPathConstants.NODE);
+        if (parent != null) {
+          for (final Node inserted : insertedToCheck.get(expression)) {
+            if (!hasMatchingChild(parent, inserted)) {
+              return false;
+            }
           }
+        }
+      }
+
+      for (final XPathExpression expression : replacedToCheck.keySet()) {
+        final Node replaced = (Node) expression.evaluate(doc, XPathConstants.NODE);
+        if (replaced != null) {
           return false;
         }
       }
+
     }
     catch (Exception e) {
       printError("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
@@ -133,6 +141,19 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     }
 
     return true;
+  }
+
+  protected Node getMatchingChild(final Node parent, final Node inserted) {
+    for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
+      if (matches(inserted, parent.getChildNodes().item(i)))
+        return parent.getChildNodes().item(i);
+    }
+    
+    return null;
+  }
+
+  protected boolean hasMatchingChild(final Node parent, final Node inserted) {
+    return getMatchingChild(parent, inserted) != null;
   }
 
   /**
@@ -143,8 +164,9 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
    * {@link AbstractXmlResourceFacet#getElementsToInsert(Document)
    * getElementsToInsert}.
    */
-  protected Collection<Node> getElementsToVerify(final Document doc) throws ParserConfigurationException {
-    return getElementsToInsert(doc);
+  protected Map<XPathExpression, Collection<Node>> getElementsToVerify(final XPath xPath, final Document doc)
+          throws ParserConfigurationException, XPathExpressionException {
+    return getElementsToInsert(xPath, doc);
   }
 
   @Override
@@ -155,23 +177,30 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       return true;
 
     try {
-      final DocumentBuilder builder = factory.newDocumentBuilder();
+      final DocumentBuilder builder = docBuilderFactory.newDocumentBuilder();
       final Document doc = builder.parse(file);
-      final Collection<Node> toRemove = getElementsToInsert(doc);
-      final Element root = doc.getDocumentElement();
-      final Map<String, Collection<Node>> elementsByTagName = mapElementsByTagName(toRemove);
-      final Map<String, Collection<Node>> existingByTagName = mapElementsByTagName(root.getChildNodes());
+      final XPath xPath = xPathFactory.newXPath();
+      final Map<XPathExpression, Collection<Node>> insertedNodes = getElementsToInsert(xPath, doc);
+      final Map<XPathExpression, Node> replacedNodes = getRemovalMap(xPath, doc);
 
-      for (final String name : elementsByTagName.keySet()) {
-        if (!existingByTagName.containsKey(name))
-          continue;
-
-        for (final Node node : elementsByTagName.get(name)) {
-          for (final Node existing : existingByTagName.get(name)) {
-            if (node.getNodeType() == Node.ELEMENT_NODE && matches(node, existing)) {
-              existing.getParentNode().removeChild(existing);
+      for (final XPathExpression expression : insertedNodes.keySet()) {
+        final Node parent = (Node) expression.evaluate(doc, XPathConstants.NODE);
+        if (parent != null) {
+          for (final Node inserted : insertedNodes.get(expression)) {
+            final Node match = getMatchingChild(parent, inserted);
+            if (match != null) {
+              parent.removeChild(match);
             }
           }
+        }
+      }
+
+      for (final XPathExpression expression : replacedNodes.keySet()) {
+        final Node replaced = (Node) expression.evaluate(doc, XPathConstants.NODE);
+        if (replaced != null) {
+          final Node parent = replaced.getParentNode();
+          final Node newNode = replacedNodes.get(expression);
+          parent.replaceChild(newNode, replaced);
         }
       }
     }
@@ -182,6 +211,9 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
 
     return true;
   }
+
+  protected abstract Map<XPathExpression, Node> getRemovalMap(XPath xPath, Document doc)
+          throws ParserConfigurationException, XPathExpressionException;
 
   protected File getResFile(final String relPath) {
     File file = new File(relPath);
@@ -199,19 +231,29 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
    * @param doc
    *          The returned nodes should be created with or imported into this
    *          document.
-   * @return A collection of nodes, which are part of the given document.
+   * @param xPath
+   *          Used to generate xpath expressions for finding nodes to add
+   *          children to.
+   * @return A map of {@link XPathExpression XPathExpressions} (for finding
+   *         parent nodes), to collections of {@link Node Nodes} to add as
+   *         children.
    */
-  protected abstract Collection<Node> getElementsToInsert(final Document doc) throws ParserConfigurationException;
+  protected abstract Map<XPathExpression, Collection<Node>> getElementsToInsert(final XPath xPath, final Document doc)
+          throws ParserConfigurationException, XPathExpressionException;
 
   /**
    * Get a Map of nodes to be replaced in an XML configuration file.
    * 
    * @param doc
    *          The document to which all returned nodes should belong.
-   * @return A map where any keys appearing in an XML file will be replaced with
-   *         the corresponding values.
+   * @param xPath
+   *          Used to generate xpath expressions for finding nodes to replace.
+   * @return A map of {@link XPathExpression XPathExpressions} (for finding
+   *         nodes to replace), to collections of {@link Node Nodes} to add as
+   *         children.
    */
-  protected abstract Map<Element, Element> getReplacements(final Document doc) throws ParserConfigurationException;
+  protected abstract Map<XPathExpression, Node> getReplacements(final XPath xPath, final Document doc)
+          throws ParserConfigurationException, XPathExpressionException;
 
   /**
    * Get the relative path of XML file to be configured by this facet. Concrete

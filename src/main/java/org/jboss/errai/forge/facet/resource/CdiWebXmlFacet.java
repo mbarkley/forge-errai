@@ -1,11 +1,13 @@
 package org.jboss.errai.forge.facet.resource;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.jboss.forge.shell.plugins.RequiresFacet;
 import org.w3c.dom.Document;
@@ -19,23 +21,26 @@ import org.w3c.dom.Node;
  */
 @RequiresFacet({ ErraiBusServletConfigFacet.class })
 public class CdiWebXmlFacet extends AbstractXmlResourceFacet {
+  
+  public final String erraiServletExpression = "/servlet/servlet-name[text()='ErraiServlet']/..";
+  public final String autoDiscoverParamSubExpression = "/init-param/param-name[text()='auto-discover-services']/..";
+  public final String autoDiscoverParamExpression = erraiServletExpression + autoDiscoverParamSubExpression;
 
   @Override
-  protected Collection<Node> getElementsToInsert(Document doc) throws ParserConfigurationException {
-    return new ArrayList<Node>(0);
+  protected Map<XPathExpression, Collection<Node>> getElementsToInsert(final XPath xPath, final Document doc) {
+    return new HashMap<XPathExpression, Collection<Node>>(0);
   }
 
   @Override
-  protected Map<Element, Element> getReplacements(Document doc) throws ParserConfigurationException {
-    final Element key = doc.createElement("init-param");
-    key.appendChild(doc.createElement("param-name")).setTextContent("auto-discover-services");
-    key.appendChild(doc.createElement("param-value")).setTextContent("true");
+  protected Map<XPathExpression, Node> getReplacements(final XPath xPath, final Document doc)
+          throws ParserConfigurationException, XPathExpressionException {
+    final XPathExpression key = xPath.compile(autoDiscoverParamExpression);
 
     final Element value = doc.createElement("init-param");
     value.appendChild(doc.createElement("param-name")).setTextContent("auto-discover-services");
     value.appendChild(doc.createElement("param-value")).setTextContent("false");
 
-    final Map<Element, Element> replacements = new HashMap<Element, Element>(1);
+    final Map<XPathExpression, Node> replacements = new HashMap<XPathExpression, Node>(1);
     replacements.put(key, value);
 
     return replacements;
@@ -44,6 +49,21 @@ public class CdiWebXmlFacet extends AbstractXmlResourceFacet {
   @Override
   protected String getRelPath() {
     return "src/main/webapp/WEB-INF/web.xml";
+  }
+
+  @Override
+  protected Map<XPathExpression, Node> getRemovalMap(XPath xPath, Document doc) throws ParserConfigurationException,
+          XPathExpressionException {
+    final XPathExpression key = xPath.compile(autoDiscoverParamExpression);
+
+    final Element value = doc.createElement("init-param");
+    value.appendChild(doc.createElement("param-name")).setTextContent("auto-discover-services");
+    value.appendChild(doc.createElement("param-value")).setTextContent("true");
+
+    final Map<XPathExpression, Node> replacements = new HashMap<XPathExpression, Node>(1);
+    replacements.put(key, value);
+
+    return replacements;
   }
 
 }

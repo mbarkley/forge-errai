@@ -15,60 +15,86 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.jboss.forge.project.Project;
 import org.jboss.forge.shell.Shell;
 import org.jboss.forge.test.AbstractShellTest;
 import org.junit.Test;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class AbstractXmlResourceFacetTest extends AbstractShellTest {
-  
+
   @Inject
   private Shell shell;
 
   public class TestXmlResourceFacet extends AbstractXmlResourceFacet {
     private final String relPath;
-    private final Collection<Node> nodes;
-    private final Map<Element, Element> replacements;
+    private final Map<String, Collection<Node>> nodes;
+    private final Map<String, Node> replacements;
+    private final Map<String, Node> replacementsRemoval;
 
-    public TestXmlResourceFacet(final String relPath, final Collection<Node> nodes, Map<Element, Element> replacements) {
+    public TestXmlResourceFacet(final String relPath, final Map<String, Collection<Node>> nodes,
+            final Map<String, Node> replacements, final Map<String, Node> replacementsRemoval) {
       this.relPath = relPath;
       this.nodes = nodes;
       this.replacements = replacements;
+      this.replacementsRemoval = replacementsRemoval;
+      // Prevent NPEs if there is an error
       this.shell = AbstractXmlResourceFacetTest.this.shell;
     }
 
     @Override
-    protected Collection<Node> getElementsToInsert(Document doc) throws ParserConfigurationException {
-      final Collection<Node> retVal = new ArrayList<Node>();
-      for (final Node node : nodes) {
-        retVal.add(doc.importNode(node, true));
+    protected Map<XPathExpression, Collection<Node>> getElementsToInsert(final XPath xPath, final Document doc)
+            throws ParserConfigurationException, XPathExpressionException {
+      final Map<XPathExpression, Collection<Node>> retVal = new HashMap<XPathExpression, Collection<Node>>(nodes.size());
+
+      for (final String rawExpression : nodes.keySet()) {
+        final Collection<Node> value = new ArrayList<Node>(nodes.get(rawExpression).size());
+        for (final Node importNode : nodes.get(rawExpression)) {
+          value.add(doc.importNode(importNode, true));
+        }
+        retVal.put(xPath.compile(rawExpression), value);
+      }
+
+      return retVal;
+    }
+
+    private Map<XPathExpression, Node> prepMap(final XPath xPath, final Document doc, final Map<String, Node> map)
+            throws XPathExpressionException, DOMException {
+      final Map<XPathExpression, Node> retVal = new HashMap<XPathExpression, Node>(map.size());
+
+      for (final String rawExpression : map.keySet()) {
+        retVal.put(xPath.compile(rawExpression), doc.importNode(map.get(rawExpression), true));
       }
 
       return retVal;
     }
 
     @Override
-    protected Map<Element, Element> getReplacements(Document doc) throws ParserConfigurationException {
-      final Map<Element, Element> retVal = new HashMap<Element, Element>(replacements.size());
-      for (final Entry<Element, Element> entry : replacements.entrySet()) {
-        retVal.put((Element) doc.importNode(entry.getKey(), true), (Element) doc.importNode(entry.getValue(), true));
-      }
-      
-      return retVal;
+    protected Map<XPathExpression, Node> getReplacements(final XPath xPath, final Document doc)
+            throws ParserConfigurationException, XPathExpressionException, DOMException {
+      return prepMap(xPath, doc, replacements);
     }
 
     @Override
     protected String getRelPath() {
       return relPath;
+    }
+
+    @Override
+    protected Map<XPathExpression, Node> getRemovalMap(XPath xPath, Document doc) throws ParserConfigurationException,
+            XPathExpressionException {
+      return prepMap(xPath, doc, replacementsRemoval);
     }
   }
 
@@ -81,9 +107,14 @@ public class AbstractXmlResourceFacetTest extends AbstractShellTest {
     nodes.get(0).appendChild(doc.createElement("fifth"));
     ((Element) nodes.get(1).appendChild(doc.createElement("second"))).setAttribute("name", "test");
 
+    final Map<String, Collection<Node>> insertMap = new HashMap<String, Collection<Node>>(1);
+    insertMap.put("/main", nodes);
+
+    final Map<String, Node> empty = new HashMap<String, Node>(0);
+
     final Project project = initializeJavaProject();
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
-            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), nodes, new HashMap<Element, Element>(0));
+            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), insertMap, empty, empty);
     testFacet.setProject(project);
 
     assertTrue(testFacet.isInstalled());
@@ -100,37 +131,43 @@ public class AbstractXmlResourceFacetTest extends AbstractShellTest {
     nodes.get(0).appendChild(doc.createElement("fifth"));
     ((Element) nodes.get(1).appendChild(doc.createElement("second"))).setAttribute("name", "test");
 
+    final Map<String, Collection<Node>> insertMap = new HashMap<String, Collection<Node>>(1);
+    insertMap.put("/main", nodes);
+
+    final Map<String, Node> empty = new HashMap<String, Node>(0);
+
     final Project project = initializeJavaProject();
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
-            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), nodes, new HashMap<Element, Element>(0));
+            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), insertMap, empty, empty);
     testFacet.setProject(project);
 
     assertFalse(testFacet.isInstalled());
   }
 
   @Test
-  public void testReplacement() throws Exception {
+  public void testSimpleReplacement() throws Exception {
     final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-    
-    final Map<Element, Element> replacements = new HashMap<Element, Element>();
-    final Element key = doc.createElement("first");
-    ((Element) key.appendChild(doc.createElement("second"))).setAttribute("name", "test");
+
+    final Map<String, Node> replacements = new HashMap<String, Node>(1);
+    final String key = "/main/first/second[@name='test']/..";
     final Element value = doc.createElement("different");
     replacements.put(key, value);
 
     final Project project = initializeJavaProject();
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
-            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), new ArrayList<Node>(0), replacements);
+            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), new HashMap<String, Collection<Node>>(0),
+            replacements, new HashMap<String, Node>(0));
     testFacet.setProject(project);
-    
+
     testFacet.install();
 
-    final Document resDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(testFacet.relPath));
-    
+    final Document resDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+            .parse(new File(testFacet.relPath));
+
     assertEquals(1, resDoc.getElementsByTagName("different").getLength());
     assertEquals(1, resDoc.getElementsByTagName("first").getLength());
   }
-  
+
   private String writeResourceToFile(final String res) throws IOException {
     final File file = File.createTempFile(getClass().getSimpleName(), ".xml");
     file.deleteOnExit();
