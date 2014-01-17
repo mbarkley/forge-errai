@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -41,17 +40,11 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
    * @see {@link OutputKeys}, {@link Transformer}
    */
   final protected Properties xmlProperties = new Properties();
-  protected DocumentBuilderFactory docBuilderFactory;
-  protected XPathFactory xPathFactory;
+  protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+  protected final XPathFactory xPathFactory = XPathFactory.newInstance();
 
   public AbstractXmlResourceFacet() {
     xmlProperties.setProperty(OutputKeys.INDENT, "yes");
-  }
-  
-  @PostConstruct
-  private void init() {
-    docBuilderFactory = DocumentBuilderFactory.newInstance();
-    xPathFactory = XPathFactory.newInstance();
   }
 
   @Override
