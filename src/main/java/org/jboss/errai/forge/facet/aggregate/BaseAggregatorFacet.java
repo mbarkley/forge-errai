@@ -11,7 +11,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-abstract class BaseAggregatorFacet extends BaseFacet {
+public abstract class BaseAggregatorFacet extends BaseFacet {
   // TODO Implement uninstall
 
   @Override

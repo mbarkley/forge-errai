@@ -3,14 +3,17 @@ package org.jboss.errai.forge.plugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import org.jboss.errai.forge.config.ProjectConfig;
-import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
+import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
+import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections;
+import org.jboss.errai.forge.facet.aggregate.BaseAggregatorFacet;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiCdiFacet;
 import org.jboss.errai.forge.facet.aggregate.ErraiDataBindingFacet;
@@ -30,6 +33,7 @@ import org.jboss.forge.shell.Shell;
 import org.jboss.forge.shell.ShellMessages;
 import org.jboss.forge.shell.plugins.Alias;
 import org.jboss.forge.shell.plugins.Command;
+import org.jboss.forge.shell.plugins.Option;
 import org.jboss.forge.shell.plugins.PipeOut;
 import org.jboss.forge.shell.plugins.Plugin;
 import org.jboss.forge.shell.plugins.RequiresFacet;
@@ -57,6 +61,9 @@ public class Main implements Plugin {
 
   @Inject
   private ProjectConfigFactory configFactory;
+  
+  @Inject
+  private AggregatorFacetReflections aggregatorReflections;
 
   @SetupCommand
   public void setup(PipeOut out) {
@@ -127,6 +134,20 @@ public class Main implements Plugin {
   @Command("version")
   public void pipeVersion(PipeOut out) {
     ShellMessages.info(out, "1.0.0-SNAPSHOT");
+  }
+  
+  @Command("list-features")
+  public void listFeatures(PipeOut out, @Option(name="verbose", shortName="v", flagOnly=true) Boolean verbose) {
+    final Map<Class<? extends BaseAggregatorFacet>, String> names = aggregatorReflections.getNames();
+    final Map<Class<? extends BaseAggregatorFacet>, String> descriptions = aggregatorReflections.getDescriptions();
+    
+    for (final Class<? extends BaseAggregatorFacet> clazz : names.keySet()) {
+      out.print(names.get(clazz));
+      if (verbose) {
+        out.print(String.format(": %s", descriptions.get(clazz)));
+      }
+      out.println();
+    }
   }
 
   @Command("add-core")
