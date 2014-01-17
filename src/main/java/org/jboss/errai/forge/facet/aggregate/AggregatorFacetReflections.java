@@ -2,12 +2,8 @@ package org.jboss.errai.forge.facet.aggregate;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
-
-import org.reflections.Reflections;
 
 @Singleton
 public class AggregatorFacetReflections {
@@ -15,13 +11,23 @@ public class AggregatorFacetReflections {
   private final Map<Class<? extends BaseAggregatorFacet>, BaseAggregatorFacet> aggregators =
           new LinkedHashMap<Class<? extends BaseAggregatorFacet>, BaseAggregatorFacet>();
 
-  @PostConstruct
-  private void init() throws InstantiationException, IllegalAccessException {
-    final Reflections reflections = new Reflections("org.jboss.errai.forge");
-    final Set<Class<? extends BaseAggregatorFacet>> aggregatorTypes = reflections.getSubTypesOf(BaseAggregatorFacet.class);
+  public AggregatorFacetReflections() throws InstantiationException, IllegalAccessException {
+    @SuppressWarnings("unchecked")
+    final Class<? extends BaseAggregatorFacet>[] types = new Class[] {
+            CoreFacet.class,
+            ErraiMessagingFacet.class,
+            ErraiIocFacet.class,
+            ErraiCdiFacet.class,
+            ErraiUiFacet.class,
+            ErraiNavigationFacet.class,
+            ErraiDataBindingFacet.class,
+            ErraiJaxrsFacet.class,
+            ErraiJpaClientFacet.class,
+            ErraiJpaDatasyncFacet.class
+    };
     
-    for (final Class<? extends BaseAggregatorFacet> clazz : aggregatorTypes) {
-      aggregators.put(clazz, clazz.newInstance());
+    for (int i = 0; i < types.length; i++) {
+      aggregators.put(types[i], types[i].newInstance());
     }
   }
 
