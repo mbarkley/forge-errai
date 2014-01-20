@@ -32,4 +32,9 @@ public class CoreFacet extends BaseAggregatorFacet {
   public String getFeatureDescription() {
     return "The core build setup required for running development mode or compiling for deployment.";
   }
+
+  @Override
+  public String getShortName() {
+    return "core";
+  }
 }

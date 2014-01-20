@@ -16,4 +16,8 @@ public class ErraiJaxrsFacet extends BaseAggregatorFacet {
     return "Use REST-ful JAX-RS endpoints with a simple declarative syntax.";
   }
 
+  @Override
+  public String getShortName() {
+    return "jaxrs";
+  }
 }

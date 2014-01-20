@@ -51,8 +51,12 @@ public abstract class BaseAggregatorFacet extends BaseFacet {
   public abstract String getFeatureName();
   
   /**
+   * @return The short name of the feature managed by this facet, used for referencing it through the shell.
+   */
+  public abstract String getShortName();
+  
+  /**
    * @return A short description of the feature managed by this facet.
    */
   public abstract String getFeatureDescription();
-
 }

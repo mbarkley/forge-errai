@@ -24,4 +24,9 @@ public class ErraiCdiFacet extends BaseAggregatorFacet {
   public String getFeatureDescription() {
     return "Integrates server-side CDI Events and Observers with Errai Client CDI.";
   }
+
+  @Override
+  public String getShortName() {
+    return "cdi";
+  }
 }

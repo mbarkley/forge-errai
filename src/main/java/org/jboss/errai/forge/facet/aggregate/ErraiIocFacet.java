@@ -24,4 +24,9 @@ public class ErraiIocFacet extends BaseAggregatorFacet {
   public String getFeatureDescription() {
     return "An IOC container allowing dependency injection in GWT-compiled code.";
   }
+
+  @Override
+  public String getShortName() {
+    return "ioc";
+  }
 }

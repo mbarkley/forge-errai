@@ -18,4 +18,8 @@ public class ErraiJpaDatasyncFacet extends BaseAggregatorFacet {
     return "Synchronize client-side persisted data with server-side JPA.";
   }
 
+  @Override
+  public String getShortName() {
+    return "jpa-datasync";
+  }
 }

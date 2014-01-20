@@ -23,4 +23,9 @@ public class ErraiCdiClientFacet extends BaseAggregatorFacet {
   public String getFeatureDescription() {
     return "Allows the use of CDI Events and Observers in GWT-compiled code.";
   }
+
+  @Override
+  public String getShortName() {
+    return "cdi-client";
+  }
 }

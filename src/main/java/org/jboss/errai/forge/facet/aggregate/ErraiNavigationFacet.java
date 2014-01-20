@@ -17,4 +17,9 @@ public class ErraiNavigationFacet extends BaseAggregatorFacet {
   public String getFeatureDescription() {
     return "Allows the use of Errai UI Templated Widgets as pages which can be navigated between.";
   }
+
+  @Override
+  public String getShortName() {
+    return "navigation";
+  }
 }

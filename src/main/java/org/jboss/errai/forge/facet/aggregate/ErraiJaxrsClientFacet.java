@@ -17,4 +17,8 @@ public class ErraiJaxrsClientFacet extends BaseAggregatorFacet {
     return "A simple API for accessing server-side JAX-RS endpoints.";
   }
 
+  @Override
+  public String getShortName() {
+    return "jaxrs-client";
+  }
 }

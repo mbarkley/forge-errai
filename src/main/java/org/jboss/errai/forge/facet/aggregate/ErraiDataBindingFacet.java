@@ -17,4 +17,9 @@ public class ErraiDataBindingFacet extends BaseAggregatorFacet {
   public String getFeatureDescription() {
     return "Bind models to GWT Widgets to have changes in one automatically reflected in the other.";
   }
+
+  @Override
+  public String getShortName() {
+    return "data-binding";
+  }
 }

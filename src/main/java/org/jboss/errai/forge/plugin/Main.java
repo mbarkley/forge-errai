@@ -3,7 +3,6 @@ package org.jboss.errai.forge.plugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -13,16 +12,9 @@ import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections;
-import org.jboss.errai.forge.facet.aggregate.BaseAggregatorFacet;
+import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections.Feature;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
-import org.jboss.errai.forge.facet.aggregate.ErraiCdiFacet;
-import org.jboss.errai.forge.facet.aggregate.ErraiDataBindingFacet;
-import org.jboss.errai.forge.facet.aggregate.ErraiJaxrsFacet;
-import org.jboss.errai.forge.facet.aggregate.ErraiJpaClientFacet;
-import org.jboss.errai.forge.facet.aggregate.ErraiJpaDatasyncFacet;
-import org.jboss.errai.forge.facet.aggregate.ErraiMessagingFacet;
-import org.jboss.errai.forge.facet.aggregate.ErraiNavigationFacet;
-import org.jboss.errai.forge.facet.aggregate.ErraiUiFacet;
+import org.jboss.errai.forge.util.FeatureCompleter;
 import org.jboss.forge.project.Facet;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.dependencies.Dependency;
@@ -30,6 +22,7 @@ import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.DependencyFacet;
 import org.jboss.forge.project.facets.events.InstallFacets;
 import org.jboss.forge.shell.Shell;
+import org.jboss.forge.shell.ShellColor;
 import org.jboss.forge.shell.ShellMessages;
 import org.jboss.forge.shell.plugins.Alias;
 import org.jboss.forge.shell.plugins.Command;
@@ -61,7 +54,7 @@ public class Main implements Plugin {
 
   @Inject
   private ProjectConfigFactory configFactory;
-  
+
   @Inject
   private AggregatorFacetReflections aggregatorReflections;
 
@@ -79,14 +72,14 @@ public class Main implements Plugin {
               String.class));
       config.setProjectProperty(ProjectProperty.MODULE_FILE, modulePath);
     }
-    
+
     // Configure errai version
     if (config.getProjectProperty(ProjectProperty.ERRAI_VERSION, String.class) == null) {
       final String version = promptForErraiVersion();
       config.setProjectProperty(ProjectProperty.ERRAI_VERSION, version);
     }
 
-    addCore(out);
+    addFacet(out, CoreFacet.class);
   }
 
   private String promptForModule() {
@@ -100,7 +93,8 @@ public class Main implements Plugin {
     final Dependency erraiDep = DependencyBuilder.create(DependencyArtifact.ErraiParent.toString());
     final List<String> versions = new ArrayList<String>();
     for (final Dependency dep : depFacet.resolveAvailableVersions(erraiDep)) {
-      // TODO refactor minimum supported version into separate method and improve logic
+      // TODO refactor minimum supported version into separate method and
+      // improve logic
       final Integer majorVersion = Integer.valueOf(dep.getVersion().substring(0, 1));
       if (majorVersion >= 3)
         versions.add(dep.getVersion());
@@ -121,7 +115,7 @@ public class Main implements Plugin {
 
     return modulePath;
   }
-  
+
   private void addFacet(final PipeOut out, final Class<? extends Facet> facetType) {
     if (!project.hasFacet(facetType)) {
       installEvent.fire(new InstallFacets(facetType));
@@ -135,63 +129,33 @@ public class Main implements Plugin {
   public void pipeVersion(PipeOut out) {
     ShellMessages.info(out, "1.0.0-SNAPSHOT");
   }
-  
+
   @Command("list-features")
-  public void listFeatures(PipeOut out, @Option(name="verbose", shortName="v", flagOnly=true) Boolean verbose) {
-    final Map<Class<? extends BaseAggregatorFacet>, String> names = aggregatorReflections.getNames();
-    final Map<Class<? extends BaseAggregatorFacet>, String> descriptions = aggregatorReflections.getDescriptions();
-    
-    for (final Class<? extends BaseAggregatorFacet> clazz : names.keySet()) {
-      out.print(names.get(clazz));
-      if (verbose) {
-        out.print(String.format(": %s", descriptions.get(clazz)));
-      }
-      out.println();
+  public void listFeatures(final PipeOut out,
+          @Option(name = "verbose", shortName = "v", flagOnly = true) final Boolean verbose) {
+    for (final Feature feature : aggregatorReflections.iterable()) {
+      printFeatureInfo(out, feature, verbose);
     }
   }
 
-  @Command("add-core")
-  public void addCore(PipeOut out) {
-    addFacet(out, CoreFacet.class);
+  public void printFeatureInfo(final PipeOut out, final Feature feature, final Boolean verbose) {
+    out.println(String.format("%s : %s", feature.getShortName(), feature.getName()));
+    if (verbose) {
+      out.println(String.format("\t%s", feature.getDescription()));
+    }
   }
 
-  @Command("add-messaging")
-  public void addMessaging(PipeOut out) {
-    addFacet(out, ErraiMessagingFacet.class);
-  }
-  
-  @Command("add-cdi")
-  public void addCdi(PipeOut out) {
-    addFacet(out, ErraiCdiFacet.class);
-  }
-  
-  @Command("add-ui")
-  public void addUi(PipeOut out) {
-    addFacet(out, ErraiUiFacet.class);
-  }
-  
-  @Command("add-navigation")
-  public void addNavigation(PipeOut out) {
-    addFacet(out, ErraiNavigationFacet.class);
-  }
-  
-  @Command("add-databinding")
-  public void addDataBinding(PipeOut out) {
-    addFacet(out, ErraiDataBindingFacet.class);
-  }
-  
-  @Command("add-jaxrs")
-  public void addJaxrs(PipeOut out) {
-    addFacet(out, ErraiJaxrsFacet.class);
-  }
-  
-  @Command("add-jpa-client")
-  public void addJpaClient(PipeOut out) {
-    addFacet(out, ErraiJpaClientFacet.class);
-  }
-  
-  @Command("add-jpa-datasync")
-  public void addJpaDataSync(PipeOut out) {
-    addFacet(out, ErraiJpaDatasyncFacet.class);
+  @Command("add-feature")
+  public void addFeature(final PipeOut out,
+          @Option(required = true, completer = FeatureCompleter.class) final String featureName) {
+    final Feature feature = aggregatorReflections.getFeature(featureName);
+    if (feature != null) {
+      addFacet(out, feature.getFeatureClass());
+    }
+    else {
+      out.print(ShellColor.RED, "Error: ");
+      out.println(String.format("Unrecognized feature name, %s. See %s for available features.", featureName,
+              "list-features"));
+    }
   }
 }

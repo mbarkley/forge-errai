@@ -18,4 +18,8 @@ public class ErraiJpaClientFacet extends BaseAggregatorFacet {
     return "An implementation of JPA for GWT.";
   }
 
+  @Override
+  public String getShortName() {
+    return "jpa-client";
+  }
 }

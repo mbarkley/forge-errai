@@ -18,4 +18,9 @@ public class ErraiUiFacet extends BaseAggregatorFacet {
     return "Create your own custom Widgets using HTML5 templates. "
             + "Elements in the template can be bound to fields in Java classes with a simple declarative syntax.";
   }
+
+  @Override
+  public String getShortName() {
+    return "ui";
+  }
 }
