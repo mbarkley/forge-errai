@@ -66,6 +66,7 @@ public abstract class AbstractBaseFacet extends BaseFacet {
   protected void printError(final String message, final Throwable throwable) {
     shell.println(ShellColor.RED, message);
     if (shell.isVerbose() && throwable != null) {
+      shell.println(throwable.toString());
       for (final StackTraceElement trace : throwable.getStackTrace()) {
         shell.println(trace.toString());
       }
