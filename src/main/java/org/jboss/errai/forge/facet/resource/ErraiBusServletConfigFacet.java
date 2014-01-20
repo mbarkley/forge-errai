@@ -23,7 +23,7 @@ import org.w3c.dom.NodeList;
  */
 @RequiresFacet({ WebXmlFacet.class })
 public class ErraiBusServletConfigFacet extends AbstractXmlResourceFacet {
-  
+
   public static final String webXmlRootExpression = "/web-app";
 
   @Override
@@ -43,10 +43,10 @@ public class ErraiBusServletConfigFacet extends AbstractXmlResourceFacet {
     final Element servletMapping = doc.createElement("servlet-mapping");
     servletMapping.appendChild(doc.createElement("servlet-name")).setTextContent("ErraiServlet");
     servletMapping.appendChild(doc.createElement("url-pattern")).setTextContent("*.erraiBus");
-    
+
     final Map<XPathExpression, Collection<Node>> retVal = new HashMap<XPathExpression, Collection<Node>>(1);
     final Collection<Node> nodes = new ArrayList<Node>(2);
-    
+
     nodes.add(servlet);
     nodes.add(servletMapping);
     retVal.put(xPath.compile(webXmlRootExpression), nodes);
@@ -70,7 +70,8 @@ public class ErraiBusServletConfigFacet extends AbstractXmlResourceFacet {
         final Element servlet = (Element) node;
         final NodeList values = servlet.getElementsByTagName("param-value");
         for (int i = 0; i < values.getLength(); i++) {
-          if (values.item(i).getPreviousSibling().getNodeValue().equals("auto-discover-services")) {
+          final Node prevSibling = values.item(i).getPreviousSibling();
+          if (prevSibling != null && prevSibling.getNodeValue() != null && prevSibling.equals("auto-discover-services")) {
             values.item(i).getParentNode().removeChild(values.item(i));
             break outer;
           }
