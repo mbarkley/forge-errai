@@ -2,6 +2,8 @@ package org.jboss.errai.forge.plugin;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.enterprise.event.Event;
@@ -20,7 +22,9 @@ import org.jboss.forge.project.Project;
 import org.jboss.forge.project.dependencies.Dependency;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.project.facets.DependencyFacet;
+import org.jboss.forge.project.facets.JavaSourceFacet;
 import org.jboss.forge.project.facets.events.InstallFacets;
+import org.jboss.forge.resources.DirectoryResource;
 import org.jboss.forge.shell.Shell;
 import org.jboss.forge.shell.ShellColor;
 import org.jboss.forge.shell.ShellMessages;
@@ -60,6 +64,10 @@ public class Main implements Plugin {
 
   @SetupCommand
   public void setup(PipeOut out) {
+    if (!project.hasFacet(JavaSourceFacet.class)) {
+      installEvent.fire(new InstallFacets(JavaSourceFacet.class));
+    }
+    
     final ProjectConfig config = configFactory.getProjectConfig(project);
 
     // Configure gwt module
@@ -82,8 +90,72 @@ public class Main implements Plugin {
     addFacet(out, CoreFacet.class);
   }
 
+  private List<String> getExistingModules() {
+    final JavaSourceFacet sourceFacet = project.getFacet(JavaSourceFacet.class);
+    // XXX could a gwt module also be in a resource folder?
+    final List<DirectoryResource> sourceFolder = sourceFacet.getSourceFolders();
+
+    final List<String> retVal = new ArrayList<String>();
+    
+    for (final DirectoryResource dir : sourceFolder) {
+      if (dir.exists()) {
+        final File underlyingDir = dir.getUnderlyingResourceObject();
+        final Collection<File> found = findGwtModuleFiles(underlyingDir);
+        for (File file : found) {
+          String relPath = file.getAbsolutePath().replace(underlyingDir.getAbsolutePath(), "");
+          if (relPath.charAt(0) == File.separatorChar)
+            relPath = relPath.substring(1);
+          
+          retVal.add(relPath.replace(File.separatorChar, '.').replaceFirst("\\.gwt\\.xml$", ""));
+        }
+      }
+    }
+
+    return retVal;
+  }
+
+  private static Collection<File> findGwtModuleFiles(final File f) {
+    if (f.exists()) {
+      if (f.isDirectory()) {
+        Collection<File> retVal = new LinkedList<File>();
+        for (final File child : f.listFiles()) {
+          final Collection<File> result = findGwtModuleFiles(child);
+          if (result.size() > 0) {
+            retVal.addAll(result);
+          }
+        }
+
+        return retVal;
+      }
+      else if (f.isFile()) {
+        if (f.getName().endsWith(".gwt.xml")) {
+          final Collection<File> retVal = new LinkedList<File>();
+          retVal.add(f);
+
+          return retVal;
+        }
+      }
+    }
+
+    return new LinkedList<File>();
+  }
+
   private String promptForModule() {
-    final String moduleName = shell.prompt("Please type the logical name for your module.");
+    final List<String> modules = getExistingModules();
+    if (!modules.isEmpty()) {
+      modules.add("Create new module");
+      int choice = shell.promptChoice("Please select a GWT module in which to add Errai dependencies.", modules);
+      
+      if (choice < modules.size() - 1) {
+        return modules.get(choice);
+      }
+    }
+    
+    return promptForNewModuleName();
+  }
+  
+  private String promptForNewModuleName() {
+    final String moduleName = shell.prompt("Please type the logical name for your new module.");
     // TODO check if name is valid and re-prompt
     return moduleName;
   }
