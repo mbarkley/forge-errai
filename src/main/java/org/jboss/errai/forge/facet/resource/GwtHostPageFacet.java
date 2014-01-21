@@ -29,7 +29,7 @@ public class GwtHostPageFacet extends AbstractFileResourceFacet {
   protected String getResourceContent() throws Exception {
     final StringBuilder builder = readResource(templateName);
     final ProjectConfig config = configFactory.getProjectConfig(getProject());
-    final String moduleName = config.getProjectProperty(ProjectProperty.MODULE_LOGICAL, String.class);
+    final String moduleName = config.getProjectProperty(ProjectProperty.MODULE_NAME, String.class);
     // Replace filler with actual module js file
     replace(builder, FILLER_VALUE, getJsFilePath(moduleName));
 

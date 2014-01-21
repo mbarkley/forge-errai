@@ -1,6 +1,7 @@
 package org.jboss.errai.forge.plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -8,6 +9,8 @@ import java.util.List;
 
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
@@ -16,6 +19,7 @@ import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections.Feature;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
+import org.jboss.errai.forge.facet.module.ModuleCoreFacet;
 import org.jboss.errai.forge.util.FeatureCompleter;
 import org.jboss.forge.project.Facet;
 import org.jboss.forge.project.Project;
@@ -35,6 +39,7 @@ import org.jboss.forge.shell.plugins.PipeOut;
 import org.jboss.forge.shell.plugins.Plugin;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 import org.jboss.forge.shell.plugins.SetupCommand;
+import org.xml.sax.SAXException;
 
 /**
  * The Errai Forge Plugin implementation. Configures the Maven pom file, GWT
@@ -63,11 +68,13 @@ public class Main implements Plugin {
   private AggregatorFacetReflections aggregatorReflections;
 
   @SetupCommand
-  public void setup(PipeOut out) {
+  public void setup(PipeOut out) throws ParserConfigurationException, SAXException, IOException, TransformerException {
+    // This facet is prerequisite for installing other required facets (used in
+    // getExistingModules)
     if (!project.hasFacet(JavaSourceFacet.class)) {
       installEvent.fire(new InstallFacets(JavaSourceFacet.class));
     }
-    
+
     final ProjectConfig config = configFactory.getProjectConfig(project);
 
     // Configure gwt module
@@ -80,6 +87,9 @@ public class Main implements Plugin {
               String.class));
       config.setProjectProperty(ProjectProperty.MODULE_FILE, modulePath);
     }
+    if (config.getProjectProperty(ProjectProperty.MODULE_NAME, String.class) == null) {
+      config.setProjectProperty(ProjectProperty.MODULE_NAME, promptForModuleName());
+    }
 
     // Configure errai version
     if (config.getProjectProperty(ProjectProperty.ERRAI_VERSION, String.class) == null) {
@@ -90,13 +100,36 @@ public class Main implements Plugin {
     addFacet(out, CoreFacet.class);
   }
 
+  /**
+   * Prompt the user for a module name, set the "rename-to" attribute in the
+   * file, and return the new name.
+   */
+  private String promptForModuleName() throws ParserConfigurationException, SAXException, IOException,
+          TransformerException {
+    if (!project.hasFacet(ModuleCoreFacet.class))
+      installEvent.fire(new InstallFacets(ModuleCoreFacet.class));
+
+    final ModuleCoreFacet moduleFacet = project.getFacet(ModuleCoreFacet.class);
+    String moduleName = moduleFacet.getModuleName();
+    final boolean response = shell.promptBoolean(
+            String.format("Would you like to rename the module? (Current name: %s)", moduleName),
+            false);
+
+    if (response) {
+      moduleName = shell.prompt("Enter the new module name.");
+      moduleFacet.setModuleName(moduleName);
+    }
+
+    return moduleName;
+  }
+
   private List<String> getExistingModules() {
     final JavaSourceFacet sourceFacet = project.getFacet(JavaSourceFacet.class);
     // XXX could a gwt module also be in a resource folder?
     final List<DirectoryResource> sourceFolder = sourceFacet.getSourceFolders();
 
     final List<String> retVal = new ArrayList<String>();
-    
+
     for (final DirectoryResource dir : sourceFolder) {
       if (dir.exists()) {
         final File underlyingDir = dir.getUnderlyingResourceObject();
@@ -105,7 +138,7 @@ public class Main implements Plugin {
           String relPath = file.getAbsolutePath().replace(underlyingDir.getAbsolutePath(), "");
           if (relPath.charAt(0) == File.separatorChar)
             relPath = relPath.substring(1);
-          
+
           retVal.add(relPath.replace(File.separatorChar, '.').replaceFirst("\\.gwt\\.xml$", ""));
         }
       }
@@ -145,15 +178,15 @@ public class Main implements Plugin {
     if (!modules.isEmpty()) {
       modules.add("Create new module");
       int choice = shell.promptChoice("Please select a GWT module in which to add Errai dependencies.", modules);
-      
+
       if (choice < modules.size() - 1) {
         return modules.get(choice);
       }
     }
-    
+
     return promptForNewModuleName();
   }
-  
+
   private String promptForNewModuleName() {
     final String moduleName = shell.prompt("Please type the logical name for your new module.");
     // TODO check if name is valid and re-prompt

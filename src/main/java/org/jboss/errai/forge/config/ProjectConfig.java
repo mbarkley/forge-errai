@@ -24,7 +24,14 @@ public final class ProjectConfig {
    * @author Max Barkley <mbarkley@redhat.com>
    */
   public static enum ProjectProperty {
-    MODULE_FILE(File.class), MODULE_LOGICAL(String.class), ERRAI_VERSION(String.class);
+    MODULE_FILE(File.class),
+    MODULE_LOGICAL(String.class),
+    /*
+     * This can be different than the logical name if the module uses the
+     * "rename-to" attribute.
+     */
+    MODULE_NAME(String.class),
+    ERRAI_VERSION(String.class);
 
     /**
      * The type of value stored by this property.
@@ -104,7 +111,8 @@ public final class ProjectConfig {
   }
 
   /**
-   * @return The name used to store and retrieve persistent project configurations.
+   * @return The name used to store and retrieve persistent project
+   *         configurations.
    */
   public static String getProjectAttribute(final ProjectProperty prop) {
     return PREFIX + prop.name();
