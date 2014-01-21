@@ -63,7 +63,8 @@ public class AggregatorFacetReflections {
         ErraiDataBindingFacet.class,
         ErraiJaxrsFacet.class,
         ErraiJpaClientFacet.class,
-        ErraiJpaDatasyncFacet.class
+        ErraiJpaDatasyncFacet.class,
+        ErraiCordovaFacet.class
     };
 
     for (int i = 0; i < types.length; i++) {

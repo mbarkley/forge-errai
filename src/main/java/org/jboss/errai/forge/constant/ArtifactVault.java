@@ -83,7 +83,9 @@ public final class ArtifactVault {
     ErraiJpaClient("errai-jpa-client"),
     ErraiJpaDatasync("errai-jpa-datasync"),
     ErraiNavigation("errai-navigation"),
-    ErraiUi("errai-ui");
+    ErraiUi("errai-ui"),
+    ErraiCordova("errai-cordova"),
+    CordovaPlugin("cordova-maven-plugin");
 
     private final String artifactId;
     private final String groupId;
