@@ -12,8 +12,6 @@ import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.forge.maven.MavenCoreFacet;
-import org.jboss.forge.project.facets.DependencyFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
 
 /**
  * This facet configures the source folders, build output directory, and pom
@@ -21,7 +19,6 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ MavenCoreFacet.class, DependencyFacet.class })
 public class CoreBuildFacet extends AbstractBaseFacet {
 
   public static final String DEV_CONTEXT = "${project.artifactId}";

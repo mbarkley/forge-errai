@@ -134,5 +134,11 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
   protected File getAbsoluteFilePath() {
     return new File(getProject().getProjectRoot().getUnderlyingResourceObject(), relFilePath);
   }
+  
+  @Override
+  public boolean uninstall() {
+    // Do not actually delete file
+    return true;
+  }
 
 }

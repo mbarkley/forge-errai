@@ -31,6 +31,7 @@ public final class ProjectConfig {
      * "rename-to" attribute.
      */
     MODULE_NAME(String.class),
+    INSTALLED_FEATURES(SerializableSet.class),
     ERRAI_VERSION(String.class);
 
     /**
@@ -59,6 +60,9 @@ public final class ProjectConfig {
       if (val != null && !val.equals("")) {
         if (prop.valueType.equals(File.class)) {
           properties.put(prop, new File(val));
+        }
+        else if (prop.valueType.equals(SerializableSet.class)) {
+          properties.put(prop, SerializableSet.deserialize(val));
         }
         else {
           properties.put(prop, val);
@@ -104,6 +108,9 @@ public final class ProjectConfig {
     properties.put(property, value);
     if (property.valueType.equals(File.class)) {
       config.setProperty(getProjectAttribute(property), File.class.cast(value).getAbsolutePath());
+    }
+    else if (property.valueType.equals(SerializableSet.class)) {
+      config.setProperty(getProjectAttribute(property), SerializableSet.class.cast(value).serialize());
     }
     else {
       config.setProperty(getProjectAttribute(property), value);

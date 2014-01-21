@@ -13,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.jboss.errai.forge.config.ProjectConfig;
+import org.jboss.errai.forge.config.SerializableSet;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
@@ -221,12 +222,16 @@ public class Main implements Plugin {
     return modulePath;
   }
 
-  private void addFacet(final PipeOut out, final Class<? extends Facet> facetType) {
+  private boolean addFacet(final PipeOut out, final Class<? extends Facet> facetType) {
     if (!project.hasFacet(facetType)) {
       installEvent.fire(new InstallFacets(facetType));
+      
+      return project.hasFacet(facetType);
     }
     else {
       ShellMessages.info(out, facetType.getSimpleName() + " has already been added to this project.");
+      
+      return false;
     }
   }
 
@@ -245,7 +250,7 @@ public class Main implements Plugin {
     }
   }
 
-  public void printFeatureInfo(final PipeOut out, final Feature feature, final Boolean verbose) {
+  private void printFeatureInfo(final PipeOut out, final Feature feature, final Boolean verbose) {
     out.println(String.format("%s : %s", feature.getShortName(), feature.getName()));
     if (verbose) {
       out.println(String.format("\t%s", feature.getDescription()));
@@ -257,12 +262,51 @@ public class Main implements Plugin {
           @Option(required = true, completer = FeatureCompleter.class) final String featureName) {
     final Feature feature = aggregatorReflections.getFeature(featureName);
     if (feature != null) {
-      addFacet(out, feature.getFeatureClass());
+      final boolean result = addFacet(out, feature.getFeatureClass());
+      
+      if (result) {
+        final ProjectConfig config = configFactory.getProjectConfig(project);
+        SerializableSet set = config.getProjectProperty(ProjectProperty.INSTALLED_FEATURES, SerializableSet.class);
+        
+        if (set == null)
+          set = new SerializableSet();
+        
+        set.add(feature.getShortName());
+        config.setProjectProperty(ProjectProperty.INSTALLED_FEATURES, set);
+      }
     }
     else {
-      out.print(ShellColor.RED, "Error: ");
-      out.println(String.format("Unrecognized feature name, %s. See %s for available features.", featureName,
-              "list-features"));
+      printUnregcoznizedFeatureError(out, featureName);
     }
+  }
+
+  @Command("remove-feature")
+  public void removeFeature(final PipeOut out,
+          @Option(required = true, completer = FeatureCompleter.class) final String featureName) {
+    final Feature feature = aggregatorReflections.getFeature(featureName);
+    if (feature != null) {
+      project.removeFacet(project.getFacet(feature.getFeatureClass()));
+      
+      if (!project.hasFacet(feature.getFeatureClass())) {
+        final ProjectConfig config = configFactory.getProjectConfig(project);
+        final SerializableSet directlyInstalled = config.getProjectProperty(ProjectProperty.INSTALLED_FEATURES, SerializableSet.class);
+        directlyInstalled.remove(featureName);
+        
+        config.setProjectProperty(ProjectProperty.INSTALLED_FEATURES, directlyInstalled);
+      }
+    }
+    else {
+      printUnregcoznizedFeatureError(out, featureName);
+    }
+  }
+
+  private void printError(final PipeOut out, final String message) {
+    out.print(ShellColor.RED, "Error: ");
+    out.println(message);
+  }
+
+  private void printUnregcoznizedFeatureError(final PipeOut out, final String name) {
+    printError(out, String.format("Unrecognized feature name, %s. See %s for available features.", name,
+            "list-features"));
   }
 }
