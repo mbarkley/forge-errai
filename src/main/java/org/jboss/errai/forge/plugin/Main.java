@@ -237,9 +237,11 @@ public class Main implements Plugin {
 
   @Command("list-features")
   public void listFeatures(final PipeOut out,
-          @Option(name = "verbose", shortName = "v", flagOnly = true) final Boolean verbose) {
+          @Option(name = "verbose", shortName = "v", flagOnly = true) final Boolean verbose,
+          @Option(name = "installed", shortName = "i", flagOnly = true) final Boolean installed) {
     for (final Feature feature : aggregatorReflections.iterable()) {
-      printFeatureInfo(out, feature, verbose);
+      if (!installed || project.hasFacet(feature.getFeatureClass()))
+        printFeatureInfo(out, feature, verbose);
     }
   }
 
