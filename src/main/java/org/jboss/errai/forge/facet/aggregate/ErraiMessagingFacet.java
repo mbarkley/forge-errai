@@ -25,7 +25,7 @@ public class ErraiMessagingFacet extends BaseAggregatorFacet {
   @Override
   public String getFeatureDescription() {
     return "Enables communication between services, either locally or between client and server,"
-            + "through simple Message Bus API.";
+            + " through a simple Message Bus API.";
   }
 
   @Override
