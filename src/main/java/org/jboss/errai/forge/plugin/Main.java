@@ -13,12 +13,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.jboss.errai.forge.config.ProjectConfig;
-import org.jboss.errai.forge.config.SerializableSet;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
+import org.jboss.errai.forge.config.SerializableSet;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections.Feature;
+import org.jboss.errai.forge.facet.aggregate.BaseAggregatorFacet.UninstallationExecption;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
 import org.jboss.errai.forge.facet.module.ModuleCoreFacet;
 import org.jboss.errai.forge.util.FeatureCompleter;
@@ -225,12 +226,12 @@ public class Main implements Plugin {
   private boolean addFacet(final PipeOut out, final Class<? extends Facet> facetType) {
     if (!project.hasFacet(facetType)) {
       installEvent.fire(new InstallFacets(facetType));
-      
+
       return project.hasFacet(facetType);
     }
     else {
       ShellMessages.info(out, facetType.getSimpleName() + " has already been added to this project.");
-      
+
       return false;
     }
   }
@@ -263,14 +264,14 @@ public class Main implements Plugin {
     final Feature feature = aggregatorReflections.getFeature(featureName);
     if (feature != null) {
       final boolean result = addFacet(out, feature.getFeatureClass());
-      
+
       if (result) {
         final ProjectConfig config = configFactory.getProjectConfig(project);
         SerializableSet set = config.getProjectProperty(ProjectProperty.INSTALLED_FEATURES, SerializableSet.class);
-        
+
         if (set == null)
           set = new SerializableSet();
-        
+
         set.add(feature.getShortName());
         config.setProjectProperty(ProjectProperty.INSTALLED_FEATURES, set);
       }
@@ -285,13 +286,31 @@ public class Main implements Plugin {
           @Option(required = true, completer = FeatureCompleter.class) final String featureName) {
     final Feature feature = aggregatorReflections.getFeature(featureName);
     if (feature != null) {
-      project.removeFacet(project.getFacet(feature.getFeatureClass()));
+      if (!project.hasFacet(feature.getFeatureClass())) {
+        printError(out, String.format("The feature %s is not installed.", feature.getShortName()));
+        return;
+      }
       
+      boolean uninstallResult = false;
+      
+      try {
+        uninstallResult = !project.getFacet(feature.getFeatureClass()).uninstallRequirements();
+      }
+      catch (UninstallationExecption e) {
+        printError(out, e.getMessage());
+      }
+      
+      if (uninstallResult) {
+        printError(out, String.format("Could not remove some of the required projects for %s.", feature.getShortName()));
+        return;
+      }
+
       if (!project.hasFacet(feature.getFeatureClass())) {
         final ProjectConfig config = configFactory.getProjectConfig(project);
-        final SerializableSet directlyInstalled = config.getProjectProperty(ProjectProperty.INSTALLED_FEATURES, SerializableSet.class);
+        final SerializableSet directlyInstalled = config.getProjectProperty(ProjectProperty.INSTALLED_FEATURES,
+                SerializableSet.class);
         directlyInstalled.remove(featureName);
-        
+
         config.setProjectProperty(ProjectProperty.INSTALLED_FEATURES, directlyInstalled);
       }
     }

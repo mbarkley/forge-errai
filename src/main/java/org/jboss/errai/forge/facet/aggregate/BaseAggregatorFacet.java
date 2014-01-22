@@ -1,6 +1,5 @@
 package org.jboss.errai.forge.facet.aggregate;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,9 +13,9 @@ import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.config.SerializableSet;
-import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections.Feature;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.forge.project.Facet;
+import org.jboss.forge.project.Project;
 import org.jboss.forge.project.facets.BaseFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
@@ -28,6 +27,28 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * @author Max Barkley <mbarkley@redhat.com>
  */
 public abstract class BaseAggregatorFacet extends BaseFacet {
+
+  @SuppressWarnings("serial")
+  public static class UninstallationExecption extends Exception {
+
+    private UninstallationExecption(final Class<? extends Facet> dependentFacetType, final Project project,
+            final BaseAggregatorFacet toUninstall) {
+      super(generateMessage(dependentFacetType, project, toUninstall));
+    }
+
+    private static String generateMessage(final Class<? extends Facet> facetType, final Project project,
+            final BaseAggregatorFacet toUninstall) {
+      if (BaseAggregatorFacet.class.isAssignableFrom(facetType) && project.hasFacet(facetType)) {
+        final BaseAggregatorFacet facet = BaseAggregatorFacet.class.cast(project.getFacet(facetType));
+
+        return String.format("%s (%s) still requires %s.", facet.getFeatureName(), facet.getShortName(),
+                toUninstall.getFeatureName());
+      }
+      else {
+        return String.format("The facet %s still requires %s.", facetType.getSimpleName());
+      }
+    }
+  }
 
   @Inject
   private AggregatorFacetReflections reflections;
@@ -53,6 +74,18 @@ public abstract class BaseAggregatorFacet extends BaseFacet {
 
   @Override
   public boolean uninstall() {
+    return true;
+  }
+
+  /**
+   * Uninstall this facet and all required facets which will not be otherwise
+   * required after this facet is removed.
+   * 
+   * @return True on successful uninstallation.
+   * @throws UninstallationExecption
+   *           Thrown if this class is still required by another facet.
+   */
+  public boolean uninstallRequirements() throws UninstallationExecption {
     final ProjectConfig config = configFactory.getProjectConfig(project);
     final SerializableSet installedFeatureNames = config.getProjectProperty(ProjectProperty.INSTALLED_FEATURES,
             SerializableSet.class);
@@ -62,27 +95,15 @@ public abstract class BaseAggregatorFacet extends BaseFacet {
       directlyInstalled.add(reflections.getFeature(featureName).getFeatureClass());
     }
     directlyInstalled.remove(getClass());
+    directlyInstalled.add(CoreFacet.class);
 
     final Set<Class<? extends Facet>> toUninstall = traverseUninstallable(directlyInstalled);
 
-    /*
-     * Traverse requirements for remaining aggregators to keep facets that are
-     * still required.
-     */
-    final Collection<Class<? extends Facet>> installedFeatures = new ArrayList<Class<? extends Facet>>();
-    for (final Feature feature : reflections.iterable()) {
-      final Class<? extends BaseAggregatorFacet> featureClass = feature.getFeatureClass();
-      if (project.hasFacet(featureClass) && !featureClass.equals(getClass()) && !toUninstall.contains(featureClass)) {
-        installedFeatures.add(featureClass);
-      }
-    }
-    installedFeatures.add(CoreFacet.class);
-    toUninstall.remove(CoreFacet.class);
-
-    keepRequired(installedFeatures, toUninstall);
+    keepRequired(directlyInstalled, toUninstall);
 
     for (final Class<? extends Facet> facetType : toUninstall) {
-      project.removeFacet(project.getFacet(facetType));
+      if (project.hasFacet(facetType))
+        project.removeFacet(project.getFacet(facetType));
     }
 
     return true;
@@ -91,9 +112,12 @@ public abstract class BaseAggregatorFacet extends BaseFacet {
   /**
    * Traverse the required facets of the featureClasses, and remove all of the
    * traversed facets from the removable set.
+   * 
+   * @throws UninstallationExecption
+   *           Thrown if this feature is still required by another facet.
    */
   private void keepRequired(final Collection<Class<? extends Facet>> featureClasses,
-          final Set<Class<? extends Facet>> removable) {
+          final Set<Class<? extends Facet>> removable) throws UninstallationExecption {
     final Set<Class<? extends Facet>> traversed = new HashSet<Class<? extends Facet>>();
     final Queue<Class<? extends Facet>> toVisit = new LinkedList<Class<? extends Facet>>();
     toVisit.addAll(featureClasses);
@@ -107,6 +131,10 @@ public abstract class BaseAggregatorFacet extends BaseFacet {
           final Class<? extends Facet>[] requirements = cur.getAnnotation(RequiresFacet.class).value();
           for (int i = 0; i < requirements.length; i++) {
             if (!traversed.contains(requirements[i])) {
+              // Some other feature still depends on this class...
+              if (requirements[i].equals(getClass()))
+                throw new UninstallationExecption(cur, project, this);
+
               toVisit.add(requirements[i]);
               removable.remove(requirements[i]);
             }
