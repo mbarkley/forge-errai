@@ -23,6 +23,7 @@ import org.jboss.errai.forge.facet.aggregate.BaseAggregatorFacet.UninstallationE
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
 import org.jboss.errai.forge.facet.module.ModuleCoreFacet;
 import org.jboss.errai.forge.util.FeatureCompleter;
+import org.jboss.errai.forge.util.ShellPrintFormatter;
 import org.jboss.forge.project.Facet;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.dependencies.Dependency;
@@ -32,10 +33,10 @@ import org.jboss.forge.project.facets.JavaSourceFacet;
 import org.jboss.forge.project.facets.events.InstallFacets;
 import org.jboss.forge.resources.DirectoryResource;
 import org.jboss.forge.shell.Shell;
-import org.jboss.forge.shell.ShellColor;
 import org.jboss.forge.shell.ShellMessages;
 import org.jboss.forge.shell.plugins.Alias;
 import org.jboss.forge.shell.plugins.Command;
+import org.jboss.forge.shell.plugins.Help;
 import org.jboss.forge.shell.plugins.Option;
 import org.jboss.forge.shell.plugins.PipeOut;
 import org.jboss.forge.shell.plugins.Plugin;
@@ -52,6 +53,7 @@ import org.xml.sax.SAXException;
  */
 @Alias("errai-setup")
 @RequiresFacet({ CoreFacet.class })
+@Help(value = "Add dependencies and other configurations for Errai to a Maven project.")
 public class Main implements Plugin {
 
   @Inject
@@ -69,7 +71,7 @@ public class Main implements Plugin {
   @Inject
   private AggregatorFacetReflections aggregatorReflections;
 
-  @SetupCommand
+  @SetupCommand(help = "Install the core components used by all Errai features.")
   public void setup(PipeOut out) throws ParserConfigurationException, SAXException, IOException, TransformerException {
     // This facet is prerequisite for installing other required facets (used in
     // getExistingModules)
@@ -200,15 +202,27 @@ public class Main implements Plugin {
     final Dependency erraiDep = DependencyBuilder.create(DependencyArtifact.ErraiParent.toString());
     final List<String> versions = new ArrayList<String>();
     for (final Dependency dep : depFacet.resolveAvailableVersions(erraiDep)) {
-      // TODO refactor minimum supported version into separate method and
-      // improve logic
-      final Integer majorVersion = Integer.valueOf(dep.getVersion().substring(0, 1));
-      if (majorVersion >= 3)
+      if (isValidVersion(dep.getVersion()))
         versions.add(dep.getVersion());
     }
     int choice = shell.promptChoice("Please select a version of Errai.", versions);
 
     return versions.get(choice);
+  }
+
+  private boolean isValidVersion(final String version) {
+    final Integer majorVersion;
+
+    try {
+      majorVersion = Integer.valueOf(version.substring(0, 1));
+    }
+    catch (NumberFormatException e) {
+      return false;
+    }
+
+    return (majorVersion > 3
+    || (majorVersion == 3
+            && (version.contains("SNAPSHOT")) || version.compareTo("3.0.0.20131205-M3") > 0));
   }
 
   private File moduleLogicalNameToFile(final String moduleName) {
@@ -236,15 +250,11 @@ public class Main implements Plugin {
     }
   }
 
-  @Command("version")
-  public void pipeVersion(PipeOut out) {
-    ShellMessages.info(out, "1.0.0-SNAPSHOT");
-  }
-
-  @Command("list-features")
-  public void listFeatures(final PipeOut out,
-          @Option(name = "verbose", shortName = "v", flagOnly = true) final Boolean verbose,
-          @Option(name = "installed", shortName = "i", flagOnly = true) final Boolean installed) {
+  @Command(value = "list-features", help = "Display a list of Errai features.")
+  public void listFeatures(
+          final PipeOut out,
+          @Option(name = "verbose", shortName = "v", flagOnly = true, help = "Display a short description of each feature.") final Boolean verbose,
+          @Option(name = "installed", shortName = "i", flagOnly = true, help = "Only show currently installed features.") final Boolean installed) {
     for (final Feature feature : aggregatorReflections.iterable()) {
       if (!installed || project.hasFacet(feature.getFeatureClass()))
         printFeatureInfo(out, feature, verbose);
@@ -252,15 +262,26 @@ public class Main implements Plugin {
   }
 
   private void printFeatureInfo(final PipeOut out, final Feature feature, final Boolean verbose) {
-    out.println(String.format("%s : %s", feature.getShortName(), feature.getName()));
+    final int width = 15;
+    
+    ShellPrintFormatter.printTitle(out, "Feature:", width);
+    out.println(feature.getName());
+
+    ShellPrintFormatter.printTitle(out,"Short Name:", width);
+    out.println(feature.getShortName());
+
     if (verbose) {
-      out.println(String.format("\t%s", feature.getDescription()));
+      ShellPrintFormatter.printTitle(out, "Description:", width);
+      out.println(feature.getDescription());
     }
+
+    out.println();
   }
 
-  @Command("add-feature")
-  public void addFeature(final PipeOut out,
-          @Option(required = true, completer = FeatureCompleter.class) final String featureName) {
+  @Command(value = "add-feature", help = "Add an Errai feature to your project. See list-features for an inventory of features.")
+  public void addFeature(
+          final PipeOut out,
+          @Option(required = true, completer = FeatureCompleter.class, help = "The short name of the feature to add.") final String featureName) {
     final Feature feature = aggregatorReflections.getFeature(featureName);
     if (feature != null) {
       final boolean result = addFacet(out, feature.getFeatureClass());
@@ -281,27 +302,29 @@ public class Main implements Plugin {
     }
   }
 
-  @Command("remove-feature")
-  public void removeFeature(final PipeOut out,
-          @Option(required = true, completer = FeatureCompleter.class) final String featureName) {
+  @Command(value = "remove-feature", help = "Remove an Errai feature from this project.")
+  public void removeFeature(
+          final PipeOut out,
+          @Option(required = true, completer = FeatureCompleter.class, help = "The short name of the feature to remove.") final String featureName) {
     final Feature feature = aggregatorReflections.getFeature(featureName);
     if (feature != null) {
       if (!project.hasFacet(feature.getFeatureClass())) {
-        printError(out, String.format("The feature %s is not installed.", feature.getShortName()));
+        ShellPrintFormatter.printError(out, String.format("The feature %s is not installed.", feature.getShortName()));
         return;
       }
-      
+
       boolean uninstallResult = false;
-      
+
       try {
         uninstallResult = !project.getFacet(feature.getFeatureClass()).uninstallRequirements();
       }
       catch (UninstallationExecption e) {
-        printError(out, e.getMessage());
+        ShellPrintFormatter.printError(out, e.getMessage());
       }
-      
+
       if (uninstallResult) {
-        printError(out, String.format("Could not remove some of the required projects for %s.", feature.getShortName()));
+        ShellPrintFormatter.printError(out,
+                String.format("Could not remove some of the required projects for %s.", feature.getShortName()));
         return;
       }
 
@@ -319,13 +342,9 @@ public class Main implements Plugin {
     }
   }
 
-  private void printError(final PipeOut out, final String message) {
-    out.print(ShellColor.RED, "Error: ");
-    out.println(message);
-  }
-
   private void printUnregcoznizedFeatureError(final PipeOut out, final String name) {
-    printError(out, String.format("Unrecognized feature name, %s. See %s for available features.", name,
-            "list-features"));
+    ShellPrintFormatter.printError(out,
+            String.format("Unrecognized feature name, %s. See %s for available features.", name,
+                    "list-features"));
   }
 }
