@@ -62,7 +62,7 @@ public abstract class BaseAggregatorFacet extends BaseFacet {
       directlyInstalled.add(reflections.getFeature(featureName).getFeatureClass());
     }
     directlyInstalled.remove(getClass());
-    
+
     final Set<Class<? extends Facet>> toUninstall = traverseUninstallable(directlyInstalled);
 
     /*
@@ -88,6 +88,10 @@ public abstract class BaseAggregatorFacet extends BaseFacet {
     return true;
   }
 
+  /**
+   * Traverse the required facets of the featureClasses, and remove all of the
+   * traversed facets from the removable set.
+   */
   private void keepRequired(final Collection<Class<? extends Facet>> featureClasses,
           final Set<Class<? extends Facet>> removable) {
     final Set<Class<? extends Facet>> traversed = new HashSet<Class<? extends Facet>>();
@@ -112,6 +116,10 @@ public abstract class BaseAggregatorFacet extends BaseFacet {
     }
   }
 
+  /**
+   * Traverse the required facets of this class and add them to collection. But
+   * ignore required facets in the intentionally installed facet.
+   */
   private Set<Class<? extends Facet>> traverseUninstallable(final Set<Class<? extends Facet>> intentionallyInstalled) {
     final Set<Class<? extends Facet>> traversed = new HashSet<Class<? extends Facet>>();
 
@@ -136,7 +144,7 @@ public abstract class BaseAggregatorFacet extends BaseFacet {
         }
       }
     }
-    
+
     return traversed;
   }
 
