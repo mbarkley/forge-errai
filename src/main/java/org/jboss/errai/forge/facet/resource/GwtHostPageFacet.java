@@ -21,10 +21,6 @@ public class GwtHostPageFacet extends AbstractFileResourceFacet {
   @Inject
   private ProjectConfigFactory configFactory;
 
-  public GwtHostPageFacet() {
-    relFilePath = "src/main/webapp/index.html";
-  }
-
   @Override
   protected String getResourceContent() throws Exception {
     final StringBuilder builder = readResource(templateName);
@@ -38,6 +34,11 @@ public class GwtHostPageFacet extends AbstractFileResourceFacet {
 
   private String getJsFilePath(final String moduleName) {
     return moduleName + File.separator + moduleName + ".nocache.js";
+  }
+
+  @Override
+  public String getRelFilePath() {
+    return "src/main/webapp/index.html";
   }
 
 }

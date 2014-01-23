@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.maven.model.Build;
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
@@ -21,9 +22,11 @@ import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections.Feature;
 import org.jboss.errai.forge.facet.aggregate.BaseAggregatorFacet.UninstallationExecption;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
+import org.jboss.errai.forge.facet.base.CoreBuildFacet;
 import org.jboss.errai.forge.facet.module.ModuleCoreFacet;
 import org.jboss.errai.forge.util.FeatureCompleter;
 import org.jboss.errai.forge.util.ShellPrintFormatter;
+import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.project.Facet;
 import org.jboss.forge.project.Project;
 import org.jboss.forge.project.dependencies.Dependency;
@@ -227,9 +230,12 @@ public class Main implements Plugin {
 
   private File moduleLogicalNameToFile(final String moduleName) {
     final String relModuleFile = moduleName.replace('.', File.separatorChar) + ".gwt.xml";
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    final Build build = coreFacet.getPOM().getBuild();
 
-    // TODO make this dynamic to project settings
-    final String relSrcRoot = "src/main/java";
+    final String relSrcRoot = (build == null || build.getSourceDirectory() == null) ?
+            CoreBuildFacet.DEFAULT_SRC_DIRECTORY :
+            build.getSourceDirectory();
 
     final File modulePath = new File(new File(project.getProjectRoot().getUnderlyingResourceObject(), relSrcRoot),
             relModuleFile);
@@ -263,11 +269,11 @@ public class Main implements Plugin {
 
   private void printFeatureInfo(final PipeOut out, final Feature feature, final Boolean verbose) {
     final int width = 15;
-    
+
     ShellPrintFormatter.printTitle(out, "Feature:", width);
     out.println(feature.getName());
 
-    ShellPrintFormatter.printTitle(out,"Short Name:", width);
+    ShellPrintFormatter.printTitle(out, "Short Name:", width);
     out.println(feature.getShortName());
 
     if (verbose) {
@@ -316,13 +322,13 @@ public class Main implements Plugin {
       boolean uninstallResult = false;
 
       try {
-        uninstallResult = !project.getFacet(feature.getFeatureClass()).uninstallRequirements();
+        uninstallResult = project.getFacet(feature.getFeatureClass()).uninstallRequirements();
       }
       catch (UninstallationExecption e) {
         ShellPrintFormatter.printError(out, e.getMessage());
       }
 
-      if (uninstallResult) {
+      if (!uninstallResult) {
         ShellPrintFormatter.printError(out,
                 String.format("Could not remove some of the required projects for %s.", feature.getShortName()));
         return;

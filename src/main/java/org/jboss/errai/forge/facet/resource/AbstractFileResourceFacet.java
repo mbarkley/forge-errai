@@ -27,7 +27,7 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
    * The path (relative to the project root directory) of the file resource to
    * be installed.
    */
-  protected String relFilePath;
+  public abstract String getRelFilePath();
 
   @Override
   public boolean install() {
@@ -52,7 +52,7 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
       return false;
     }
     catch (Exception e) {
-      printError("Unexpected error while trying to add resource " + relFilePath, e);
+      printError("Unexpected error while trying to add resource " + getRelFilePath(), e);
       return false;
     }
     finally {
@@ -132,7 +132,7 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
   }
 
   protected File getAbsoluteFilePath() {
-    return new File(getProject().getProjectRoot().getUnderlyingResourceObject(), relFilePath);
+    return new File(getProject().getProjectRoot().getUnderlyingResourceObject(), getRelFilePath());
   }
   
   @Override

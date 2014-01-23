@@ -1,6 +1,5 @@
 package org.jboss.errai.forge.facet.aggregate;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -152,7 +151,7 @@ public abstract class BaseAggregatorFacet extends BaseFacet {
     final Set<Class<? extends Facet>> traversed = new HashSet<Class<? extends Facet>>();
 
     final Queue<Class<? extends Facet>> toVisit = new LinkedList<Class<? extends Facet>>();
-    toVisit.addAll(Arrays.asList(getClass().getAnnotation(RequiresFacet.class).value()));
+    toVisit.add(getClass());
 
     while (!toVisit.isEmpty()) {
       final Class<? extends Facet> cur = toVisit.poll();

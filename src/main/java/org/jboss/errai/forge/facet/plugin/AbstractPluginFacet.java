@@ -53,8 +53,6 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
 
   @Override
   public boolean install() {
-    // TODO logging and error-handling
-
     final MavenPluginFacet pluginFacet = getProject().getFacet(MavenPluginFacet.class);
     final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
     final VersionOracle oracle = new VersionOracle(depFacet);

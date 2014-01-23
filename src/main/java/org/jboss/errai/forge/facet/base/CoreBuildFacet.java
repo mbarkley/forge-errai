@@ -1,5 +1,7 @@
 package org.jboss.errai.forge.facet.base;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -12,6 +14,7 @@ import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.forge.maven.MavenCoreFacet;
+import org.jboss.forge.project.Project;
 
 /**
  * This facet configures the source folders, build output directory, and pom
@@ -23,15 +26,53 @@ public class CoreBuildFacet extends AbstractBaseFacet {
 
   public static final String DEV_CONTEXT = "${project.artifactId}";
   public static final String JBOSS_HOME = "${project.build.directory}/jboss-as-7.1.1.Final";
-  public static final String JAVA_SRC_PATH = "src/main/java";
-  public static final String RES_SRC_PATH = "src/main/resources";
-  public static final String BUILD_OUTPUT = "src/main/webapp/WEB-INF/classes";
+  public static final String DEFAULT_SRC_DIRECTORY = "src/main/java";
+  public static final String DEFAULT_RES_DIRECTORY = "src/main/resources";
 
   @Inject
   private ProjectConfigFactory configFactory;
 
   private String getErraiVersion() {
     return configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.ERRAI_VERSION, String.class);
+  }
+
+  public static String getSourceDirectory(final Project project) {
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+
+    return coreFacet.getPOM().getBuild().getSourceDirectory();
+  }
+  
+  public String getSourceDirectory() {
+    return getSourceDirectory(project);
+  }
+  
+  public String getResourceDirectory() {
+    return getResourceDirectory(project);
+  }
+
+  public static String getResourceDirectory(final Project project) {
+    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    final List<Resource> resources = coreFacet.getPOM().getBuild().getResources();
+
+    /*
+     * FIXME need to decide on a better way to select a resource directory. For
+     * now, sort by directory paths and return the first path that is not the
+     * source folder (so that the result is at least consistent).
+     */
+    
+    final List<String> directories = new ArrayList<String>(resources.size());
+    for (final Resource res : resources) {
+      if (!res.getDirectory().equals(getSourceDirectory(project))) {
+        directories.add(res.getDirectory());
+      }
+    }
+    
+    if (directories.isEmpty())
+      return null;
+
+    Collections.sort(directories);
+
+    return directories.get(0);
   }
 
   @Override
@@ -44,24 +85,29 @@ public class CoreBuildFacet extends AbstractBaseFacet {
       pom.setBuild(build);
     }
 
-    build.setOutputDirectory(BUILD_OUTPUT);
-    // TODO don't hardcode path
     pom.addProperty(Property.JbossHome.getName(), JBOSS_HOME);
     pom.addProperty(Property.DevContext.getName(), DEV_CONTEXT);
     pom.addProperty(Property.ErraiVersion.getName(), getErraiVersion());
+    
+    if (build.getSourceDirectory() == null)
+      build.setSourceDirectory(DEFAULT_SRC_DIRECTORY);
 
-    Resource res = getResource(JAVA_SRC_PATH, build.getResources());
+    Resource res = getResource(build.getSourceDirectory(), build.getResources());
     if (res == null) {
       res = new Resource();
-      res.setDirectory(JAVA_SRC_PATH);
+      res.setDirectory(build.getSourceDirectory());
       build.addResource(res);
     }
-    res = getResource(RES_SRC_PATH, build.getResources());
-    if (res == null) {
-      res = new Resource();
-      res.setDirectory(RES_SRC_PATH);
-      build.addResource(res);
+
+    if (build.getResources().size() < 2) {
+      res = getResource(DEFAULT_RES_DIRECTORY, build.getResources());
+      if (res == null) {
+        res = new Resource();
+        res.setDirectory(DEFAULT_RES_DIRECTORY);
+        build.addResource(res);
+      }
     }
+
     coreFacet.setPOM(pom);
 
     return true;
@@ -74,20 +120,20 @@ public class CoreBuildFacet extends AbstractBaseFacet {
     final Build build = pom.getBuild();
 
     Properties properties = pom.getProperties();
-    return !(build == null || build.getOutputDirectory() == null || !build.getOutputDirectory().equals(BUILD_OUTPUT)
+    return !(build == null
             || !properties.containsKey(Property.JbossHome.getName())
             || !properties.get(Property.JbossHome.getName()).equals(JBOSS_HOME)
             || !properties.containsKey(Property.DevContext.getName())
             || !properties.get(Property.DevContext.getName()).equals(DEV_CONTEXT)
             || !properties.containsKey(Property.ErraiVersion.getName())
             || !properties.get(Property.ErraiVersion.getName()).equals(getErraiVersion())
-            || getResource(JAVA_SRC_PATH, build.getResources()) == null
-            || getResource(RES_SRC_PATH, build.getResources()) == null);
+            || getResource(build.getSourceDirectory(), build.getResources()) == null
+            || build.getResources().size() < 2);
   }
 
   private Resource getResource(String relPath, List<Resource> resources) {
     for (final Resource res : resources) {
-      if (res.getDirectory().endsWith(relPath))
+      if (res.getDirectory().equals(relPath))
         return res;
     }
 

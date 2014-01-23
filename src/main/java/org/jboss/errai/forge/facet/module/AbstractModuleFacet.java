@@ -39,14 +39,17 @@ abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
   protected Shell shell;
   @Inject
   protected ProjectConfigFactory configFactory;
-  
+
   protected final String xPathRootExpression = "/module";
 
   /**
-   * Generate xml {@link Element Elements} for inheriting the given {@link Module Modules}.
+   * Generate xml {@link Element Elements} for inheriting the given
+   * {@link Module Modules}.
    * 
-   * @param modules The modules to generate {@link Element Elements} for.
-   * @param doc Used to generate the {@link Element Elements}.
+   * @param modules
+   *          The modules to generate {@link Element Elements} for.
+   * @param doc
+   *          Used to generate the {@link Element Elements}.
    */
   protected Collection<Node> generateInsertElements(final Collection<Module> modules, final Document doc)
           throws ParserConfigurationException {
@@ -75,15 +78,16 @@ abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
       inherits.setAttribute("name", module.getLogicalName());
       nodes.add(inherits);
     }
-    
+
     final Map<XPathExpression, Collection<Node>> retVal = new HashMap<XPathExpression, Collection<Node>>(1);
     retVal.put(parentExpression, nodes);
-    
+
     return retVal;
   }
 
   @Override
-  protected Map<XPathExpression, Node> getReplacements(final XPath xPath, final Document doc) throws ParserConfigurationException {
+  protected Map<XPathExpression, Node> getReplacements(final XPath xPath, final Document doc)
+          throws ParserConfigurationException {
     return new HashMap<XPathExpression, Node>(0);
   }
 

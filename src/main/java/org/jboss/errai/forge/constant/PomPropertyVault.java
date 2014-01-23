@@ -11,7 +11,9 @@ public class PomPropertyVault {
    * @author Max Barkley <mbarkley@redhat.com>
    */
   public static enum Property {
-    JbossHome("errai.jboss.home"), ErraiVersion("errai.version"), DevContext("errai.dev.context");
+    JbossHome("errai.jboss.home"),
+    ErraiVersion("errai.version"),
+    DevContext("errai.dev.context");
 
     private String name;
 

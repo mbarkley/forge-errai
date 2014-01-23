@@ -1,14 +1,18 @@
 package org.jboss.errai.forge.facet.resource;
 
+import org.jboss.errai.forge.facet.base.CoreBuildFacet;
+
+
 public class ErraiAppPropertiesFacet extends AbstractFileResourceFacet {
-  
-  public ErraiAppPropertiesFacet() {
-    relFilePath = "src/main/resources/ErraiApp.properties";
-  }
 
   @Override
   protected String getResourceContent() throws Exception {
     return "";
   }
 
+  @Override
+  public String getRelFilePath() {
+    return CoreBuildFacet.getResourceDirectory(project) + "/ErraiApp.properties";
+  }
+  
 }
