@@ -42,6 +42,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
   final protected Properties xmlProperties = new Properties();
   protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
   protected final XPathFactory xPathFactory = XPathFactory.newInstance();
+  protected final TransformerFactory transFactory = TransformerFactory.newInstance();
 
   public AbstractXmlResourceFacet() {
     xmlProperties.setProperty(OutputKeys.INDENT, "yes");
@@ -79,7 +80,6 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
         }
       }
 
-      final TransformerFactory transFactory = TransformerFactory.newInstance();
       final Transformer transformer = transFactory.newTransformer();
       final DOMSource source = new DOMSource(doc);
       final StreamResult res = new StreamResult(file);
@@ -222,6 +222,12 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
           parent.replaceChild(newNode, replaced);
         }
       }
+      
+      final Transformer transformer = transFactory.newTransformer();
+      final DOMSource source = new DOMSource(doc);
+      final StreamResult res = new StreamResult(file);
+      transformer.setOutputProperties(xmlProperties);
+      transformer.transform(source, res);
     }
     catch (Exception e) {
       printError("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
