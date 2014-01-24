@@ -54,7 +54,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@Alias("errai-setup")
+@Alias("errai")
 @RequiresFacet({ CoreFacet.class })
 @Help(value = "Add dependencies and other configurations for Errai to a Maven project.")
 public class Main implements Plugin {
