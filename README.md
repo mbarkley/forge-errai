@@ -18,13 +18,13 @@ To start a new project with Forge, use the following command:
 
 ## Add the Errai plugin to the Project
 
-In the root directory of your new project, having installed the Errai Forge plugin, start Forge and run:
+In the root directory of your new project, having installed the Errai Forge plugin, start Forge and run
 
     errai setup
 
 This will prompt you for:
 
-* The logical name of the [GWT module](http://www.gwtproject.org/doc/latest/DevGuideOrganizingProjects.html#DevGuideModuleXml) for your project. (So if you want a module called *App* in the package `org.jboss.errai`, the logical name would be `org.jboss.errai.App` .)
+* The logical name of the [GWT module](http://www.gwtproject.org/doc/latest/DevGuideOrganizingProjects.html#DevGuideModuleXml) for your project. (So if you want a module called *App* in the package `org.jboss.errai`, the logical name would be `org.jboss.errai.App`)
 
 * An option to give your module a different name with the "rename-to" attribute (for example, you could rename a logical module `org.jboss.errai.App` to just `app` to help shorten urls).
 
