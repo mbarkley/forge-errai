@@ -2,7 +2,7 @@
 
 ## What is this?
 
-	This [Forge](http://forge.jboss.org/) plugin can be used to create a new Maven project with Errai, or add Errai to an existing Maven project.
+This [Forge](http://forge.jboss.org/) plugin can be used to create a new Maven project with Errai, or add Errai to an existing Maven project.
 
 ## Install the plugin in Forge
 
