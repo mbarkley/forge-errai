@@ -1,5 +1,7 @@
 package org.jboss.errai.forge.facet.resource;
 
+import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
+
 /**
  * This facet creates a web.xml file if none exists in the project.
  *
@@ -16,7 +18,7 @@ public class WebXmlFacet extends AbstractFileResourceFacet {
 
   @Override
   public String getRelFilePath() {
-    return "src/main/webapp/WEB-INF/web.xml";
+    return WarPluginFacet.getWarSourceDirectory(project) + "/WEB-INF/web.xml";
   }
 
 }

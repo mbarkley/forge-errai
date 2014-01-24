@@ -45,7 +45,7 @@ public abstract class AbstractBaseFacet extends BaseFacet {
    * @return The {@link Profile} in the given {@link List} matching the provided
    *         name, or {@literal null} if none was found.
    */
-  protected Profile getProfile(final String name, final List<Profile> profiles) {
+  protected static Profile getProfile(final String name, final List<Profile> profiles) {
     for (final Profile profile : profiles) {
       if (profile.getId().equals(name))
         return profile;

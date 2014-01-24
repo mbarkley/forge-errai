@@ -1,5 +1,7 @@
 package org.jboss.errai.forge.facet.resource;
 
+import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
+
 public class ConfigXmlFacet extends AbstractFileResourceFacet {
 
   @Override
@@ -9,7 +11,7 @@ public class ConfigXmlFacet extends AbstractFileResourceFacet {
 
   @Override
   public String getRelFilePath() {
-    return "src/main/webapp/config.xml";
+    return WarPluginFacet.getWarSourceDirectory(project) + "/config.xml";
   }
 
 }

@@ -10,6 +10,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -89,7 +90,7 @@ public class ErraiBusServletConfigFacet extends AbstractXmlResourceFacet {
 
   @Override
   protected String getRelPath() {
-    return "src/main/webapp/WEB-INF/web.xml";
+    return WarPluginFacet.getWarSourceDirectory(project) + "/WEB-INF/web.xml";
   }
 
   @Override

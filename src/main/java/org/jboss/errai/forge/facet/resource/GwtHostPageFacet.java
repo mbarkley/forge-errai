@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
+import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
 
 /**
  * This facet adds a GWT host page if none already exists.
@@ -38,7 +39,7 @@ public class GwtHostPageFacet extends AbstractFileResourceFacet {
 
   @Override
   public String getRelFilePath() {
-    return "src/main/webapp/index.html";
+    return WarPluginFacet.getWarSourceDirectory(project) + "/index.html";
   }
 
 }

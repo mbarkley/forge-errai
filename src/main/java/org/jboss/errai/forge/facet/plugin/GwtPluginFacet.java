@@ -11,6 +11,7 @@ import org.jboss.forge.maven.plugins.ConfigurationElement;
 import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
 import org.jboss.forge.maven.plugins.Execution;
 import org.jboss.forge.maven.plugins.ExecutionBuilder;
+import org.jboss.forge.project.Project;
 import org.jboss.forge.project.dependencies.DependencyBuilder;
 import org.jboss.forge.shell.plugins.RequiresFacet;
 
@@ -21,6 +22,8 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  */
 @RequiresFacet({ CoreBuildFacet.class, GwtHostPageFacet.class })
 public class GwtPluginFacet extends AbstractPluginFacet {
+  
+  private boolean init = false;
 
   public GwtPluginFacet() {
     pluginArtifact = DependencyArtifact.GwtPlugin;
@@ -38,7 +41,7 @@ public class GwtPluginFacet extends AbstractPluginFacet {
             ConfigurationElementBuilder.create().setName("disableCastChecking").setText("true"),
             ConfigurationElementBuilder.create().setName("runTarget").setText("${errai.dev.context}/index.html"),
             ConfigurationElementBuilder.create().setName("soyc").setText("false"),
-            ConfigurationElementBuilder.create().setName("hostedWebapp").setText("src/main/webapp"),
+            ConfigurationElementBuilder.create().setName("hostedWebapp"),
             ConfigurationElementBuilder.create().setName("extraJvmArgs").setText(
                       "-Xmx712m "
                     + "-XX:CompileThreshold=7000 "
@@ -50,6 +53,21 @@ public class GwtPluginFacet extends AbstractPluginFacet {
                       + Property.ErraiVersion.invoke() + ".jar"
             )
     });
+  }
+  
+  @Override
+  public void setProject(Project project) {
+    super.setProject(project);
+    
+    if (!init) {
+      for (final ConfigurationElement elem : configurations) {
+        if (elem.getName().equals("hostedWebapp")) {
+          ConfigurationElementBuilder.class.cast(elem).setText(WarPluginFacet.getWarSourceDirectory(project));
+          break;
+        }
+      }
+      init = true;
+    }
   }
 
 }

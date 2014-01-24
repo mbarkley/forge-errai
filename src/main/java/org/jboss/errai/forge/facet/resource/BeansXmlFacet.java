@@ -1,5 +1,7 @@
 package org.jboss.errai.forge.facet.resource;
 
+import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
+
 public class BeansXmlFacet extends AbstractFileResourceFacet {
   
   private final String templateResource = "template-beans.xml";
@@ -11,7 +13,7 @@ public class BeansXmlFacet extends AbstractFileResourceFacet {
 
   @Override
   public String getRelFilePath() {
-    return "src/main/webapp/WEB-INF/beans.xml";
+    return WarPluginFacet.getWarSourceDirectory(project) + "/WEB-INF/beans.xml";
   }
 
 }

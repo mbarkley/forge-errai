@@ -12,6 +12,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
+import org.jboss.errai.forge.constant.DefaultVault.DefaultValue;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.forge.maven.MavenCoreFacet;
 import org.jboss.forge.project.Project;
@@ -26,8 +27,6 @@ public class CoreBuildFacet extends AbstractBaseFacet {
 
   public static final String DEV_CONTEXT = "${project.artifactId}";
   public static final String JBOSS_HOME = "${project.build.directory}/jboss-as-7.1.1.Final";
-  public static final String DEFAULT_SRC_DIRECTORY = "src/main/java";
-  public static final String DEFAULT_RES_DIRECTORY = "src/main/resources";
 
   @Inject
   private ProjectConfigFactory configFactory;
@@ -90,7 +89,7 @@ public class CoreBuildFacet extends AbstractBaseFacet {
     pom.addProperty(Property.ErraiVersion.getName(), getErraiVersion());
     
     if (build.getSourceDirectory() == null)
-      build.setSourceDirectory(DEFAULT_SRC_DIRECTORY);
+      build.setSourceDirectory(DefaultValue.SourceDirectory.getDefaultValue());
 
     Resource res = getResource(build.getSourceDirectory(), build.getResources());
     if (res == null) {
@@ -100,10 +99,10 @@ public class CoreBuildFacet extends AbstractBaseFacet {
     }
 
     if (build.getResources().size() < 2) {
-      res = getResource(DEFAULT_RES_DIRECTORY, build.getResources());
+      res = getResource(DefaultValue.ResourceDirectory.getDefaultValue(), build.getResources());
       if (res == null) {
         res = new Resource();
-        res.setDirectory(DEFAULT_RES_DIRECTORY);
+        res.setDirectory(DefaultValue.ResourceDirectory.getDefaultValue());
         build.addResource(res);
       }
     }

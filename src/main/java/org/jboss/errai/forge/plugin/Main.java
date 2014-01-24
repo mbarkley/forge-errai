@@ -18,11 +18,11 @@ import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.config.SerializableSet;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
+import org.jboss.errai.forge.constant.DefaultVault.DefaultValue;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections.Feature;
 import org.jboss.errai.forge.facet.aggregate.BaseAggregatorFacet.UninstallationExecption;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
-import org.jboss.errai.forge.facet.base.CoreBuildFacet;
 import org.jboss.errai.forge.facet.module.ModuleCoreFacet;
 import org.jboss.errai.forge.util.FeatureCompleter;
 import org.jboss.errai.forge.util.ShellPrintFormatter;
@@ -234,7 +234,7 @@ public class Main implements Plugin {
     final Build build = coreFacet.getPOM().getBuild();
 
     final String relSrcRoot = (build == null || build.getSourceDirectory() == null) ?
-            CoreBuildFacet.DEFAULT_SRC_DIRECTORY :
+            DefaultValue.SourceDirectory.getDefaultValue() :
             build.getSourceDirectory();
 
     final File modulePath = new File(new File(project.getProjectRoot().getUnderlyingResourceObject(), relSrcRoot),
