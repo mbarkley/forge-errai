@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jboss.errai.forge</groupId>
   <artifactId>errai-forge-plugin</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <properties>
     <forge.api.version>1.4.4.Final</forge.api.version>
+    <maven.model.version>3.0.3</maven.model.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -20,6 +22,12 @@
       <dependency>
         <groupId>org.jboss.forge</groupId>
         <artifactId>forge-shell-api</artifactId>
+        <version>${forge.api.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.forge</groupId>
+        <artifactId>forge-maven-api</artifactId>
         <version>${forge.api.version}</version>
         <scope>provided</scope>
       </dependency>
@@ -60,8 +68,13 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.forge</groupId>
-      <artifactId>forge-shell</artifactId>
+      <artifactId>forge-maven-api</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.forge</groupId>
+      <artifactId>forge-shell</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <repositories>
