@@ -10,13 +10,13 @@ import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.DefaultVault.DefaultValue;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.facet.base.CoreBuildFacet;
-import org.jboss.forge.maven.MavenCoreFacet;
-import org.jboss.forge.maven.plugins.ConfigurationElement;
-import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
-import org.jboss.forge.maven.plugins.MavenPluginAdapter;
-import org.jboss.forge.project.Project;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElement;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElementBuilder;
+import org.jboss.forge.addon.maven.plugins.MavenPluginAdapter;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
+import org.jboss.forge.addon.projects.Project;
 
 /**
  * This facet configures the maven-war-plugin in the
@@ -24,7 +24,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ CoreBuildFacet.class })
+@FacetConstraint({ CoreBuildFacet.class })
 public class WarPluginFacet extends AbstractProfilePluginFacet {
 
   public WarPluginFacet() {
@@ -39,7 +39,7 @@ public class WarPluginFacet extends AbstractProfilePluginFacet {
   }
 
   public static String getWarSourceDirectory(final Project project) {
-    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
     final Profile profile = getProfile(MAIN_PROFILE, coreFacet.getPOM().getProfiles());
 
     if (profile != null && profile.getBuild() != null

@@ -6,9 +6,9 @@ import org.apache.maven.model.PluginExecution;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.facet.base.CoreBuildFacet;
-import org.jboss.forge.maven.plugins.ConfigurationElement;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElement;
 
 /**
  * This facet configures the jboss-as-maven-plugin in the
@@ -16,7 +16,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ CoreBuildFacet.class })
+@FacetConstraint({ CoreBuildFacet.class })
 public class JbossPluginFacet extends AbstractProfilePluginFacet {
 
   public JbossPluginFacet() {

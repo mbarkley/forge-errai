@@ -1,6 +1,8 @@
 package org.jboss.errai.forge.facet.module;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileReader;
@@ -10,30 +12,23 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
-import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ModuleVault;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
-import org.jboss.forge.maven.MavenCoreFacet;
-import org.jboss.forge.project.Project;
-import org.jboss.forge.test.AbstractShellTest;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.errai.forge.test.base.ForgeTest;
+import org.jboss.forge.addon.facets.Faceted;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
+import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.ProjectFacet;
 import org.junit.Test;
 
-public class ModuleFacetTest extends AbstractShellTest {
+public class ModuleFacetTest extends ForgeTest {
 
   public static class SimpleModuleFacet extends AbstractModuleFacet {
     public SimpleModuleFacet() {
       modules = Arrays.asList(new ModuleVault.Module[] { Module.GwtUser, Module.ErraiCommon });
     }
-  }
-
-  @Deployment
-  public static JavaArchive getDeployment() {
-    return AbstractShellTest.getDeployment().addClasses(ProjectConfig.class, ModuleCoreFacet.class,
-            ProjectConfigFactory.class);
   }
 
   @Test
@@ -42,7 +37,7 @@ public class ModuleFacetTest extends AbstractShellTest {
     final File moduleFile = makeBlankModuleFile(project, ModuleCoreFacet.emptyModuleContents);
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
-    project.installFacet(facet);
+    facetFactory.install((Faceted<ProjectFacet>) project, SimpleModuleFacet.class);
 
     final String moduleContent = getFileContentAsString(moduleFile);
     assertTrue(moduleContent, moduleContent.contains("<inherits name=\"org.jboss.errai.common.ErraiCommon\"/>"));
@@ -58,7 +53,7 @@ public class ModuleFacetTest extends AbstractShellTest {
     final File moduleFile = makeBlankModuleFile(project, body);
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
-    project.installFacet(facet);
+    facetFactory.install((Faceted<ProjectFacet>) project, SimpleModuleFacet.class);
 
     final String moduleContent = getFileContentAsString(moduleFile);
     assertTrue(moduleContent, moduleContent.contains("<inherits name=\"org.jboss.errai.common.Logging\"/>"));
@@ -73,7 +68,7 @@ public class ModuleFacetTest extends AbstractShellTest {
     final File moduleFile = makeBlankModuleFile(project, ModuleCoreFacet.emptyModuleContents);
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
-    project.installFacet(facet);
+    facetFactory.install((Faceted<ProjectFacet>) project, ModuleCoreFacet.class);
 
     final String moduleContent = getFileContentAsString(moduleFile);
     assertTrue(moduleContent, moduleContent.contains("<inherits name=\"com.google.gwt.user.User\"/>"));
@@ -87,7 +82,7 @@ public class ModuleFacetTest extends AbstractShellTest {
     moduleFile.delete();
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
-    project.installFacet(facet);
+    facetFactory.install((Faceted<ProjectFacet>) project, ModuleCoreFacet.class);
 
     final String moduleContent = getFileContentAsString(moduleFile);
     assertTrue(moduleContent, moduleContent.contains("<inherits name=\"com.google.gwt.user.User\"/>"));
@@ -102,7 +97,7 @@ public class ModuleFacetTest extends AbstractShellTest {
                     + "</module>");
     final File moduleFile = makeBlankModuleFile(project, body);
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
-    facet.setProject(project);
+    facet.setFaceted(project);
 
     assertTrue(facet.isInstalled());
   }
@@ -114,7 +109,7 @@ public class ModuleFacetTest extends AbstractShellTest {
     String body = ModuleCoreFacet.emptyModuleContents;
     final File moduleFile = makeBlankModuleFile(project, body);
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
-    facet.setProject(project);
+    facet.setFaceted(project);
 
     assertFalse(facet.isInstalled());
   }
@@ -127,7 +122,7 @@ public class ModuleFacetTest extends AbstractShellTest {
                     + "</module>");
     final File moduleFile = makeBlankModuleFile(project, body);
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
-    facet.setProject(project);
+    facet.setFaceted(project);
 
     boolean res = facet.uninstall();
 
@@ -147,7 +142,7 @@ public class ModuleFacetTest extends AbstractShellTest {
   }
 
   private File makeBlankModuleFile(final Project project, final String body) throws IOException {
-    final File moduleFile = new File(project.getFacet(MavenCoreFacet.class).getMavenProject().getBuild()
+    final File moduleFile = new File(project.getFacet(MavenFacet.class).getPOM().getBuild()
             .getSourceDirectory(), "org/jboss/errai/Test.gwt.xml");
     moduleFile.getParentFile().mkdirs();
     moduleFile.createNewFile();

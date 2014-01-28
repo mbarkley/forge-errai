@@ -38,7 +38,7 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
         file.createNewFile();
       }
       catch (IOException e) {
-        printError(getClass().getSimpleName() + ": Could not make the file " + file.getAbsolutePath(), e);
+        error(getClass().getSimpleName() + ": Could not make the file " + file.getAbsolutePath(), e);
         return false;
       }
     }
@@ -48,11 +48,11 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
       writer.write(getResourceContent());
     }
     catch (IOException e) {
-      printError("Could not write to " + file.getAbsolutePath(), e);
+      error("Could not write to " + file.getAbsolutePath(), e);
       return false;
     }
     catch (Exception e) {
-      printError("Unexpected error while trying to add resource " + getRelFilePath(), e);
+      error("Unexpected error while trying to add resource " + getRelFilePath(), e);
       return false;
     }
     finally {
@@ -61,7 +61,7 @@ abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
           writer.close();
       }
       catch (IOException e) {
-        printError("Could not close FileWriter for " + file.getAbsolutePath(), e);
+        error("Could not close FileWriter for " + file.getAbsolutePath(), e);
       }
     }
 

@@ -39,7 +39,7 @@ public class GwtHostPageFacet extends AbstractFileResourceFacet {
 
   @Override
   public String getRelFilePath() {
-    return WarPluginFacet.getWarSourceDirectory(project) + "/index.html";
+    return WarPluginFacet.getWarSourceDirectory(getProject()) + "/index.html";
   }
 
 }

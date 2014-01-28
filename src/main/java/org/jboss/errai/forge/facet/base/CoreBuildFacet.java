@@ -14,8 +14,8 @@ import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.DefaultVault.DefaultValue;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
-import org.jboss.forge.maven.MavenCoreFacet;
-import org.jboss.forge.project.Project;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
+import org.jboss.forge.addon.projects.Project;
 
 /**
  * This facet configures the source folders, build output directory, and pom
@@ -36,21 +36,21 @@ public class CoreBuildFacet extends AbstractBaseFacet {
   }
 
   public static String getSourceDirectory(final Project project) {
-    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
 
     return coreFacet.getPOM().getBuild().getSourceDirectory();
   }
   
   public String getSourceDirectory() {
-    return getSourceDirectory(project);
+    return getSourceDirectory(getProject());
   }
   
   public String getResourceDirectory() {
-    return getResourceDirectory(project);
+    return getResourceDirectory(getProject());
   }
 
   public static String getResourceDirectory(final Project project) {
-    final MavenCoreFacet coreFacet = project.getFacet(MavenCoreFacet.class);
+    final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
     final List<Resource> resources = coreFacet.getPOM().getBuild().getResources();
 
     /*
@@ -76,7 +76,7 @@ public class CoreBuildFacet extends AbstractBaseFacet {
 
   @Override
   public boolean install() {
-    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+    final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
     final Model pom = coreFacet.getPOM();
     Build build = pom.getBuild();
     if (build == null) {
@@ -114,7 +114,7 @@ public class CoreBuildFacet extends AbstractBaseFacet {
 
   @Override
   public boolean isInstalled() {
-    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+    final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
     final Model pom = coreFacet.getPOM();
     final Build build = pom.getBuild();
 

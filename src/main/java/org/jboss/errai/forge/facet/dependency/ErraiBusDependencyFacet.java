@@ -5,7 +5,7 @@ import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.Er
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.jboss.forge.project.dependencies.DependencyBuilder;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 
 /**
  * This facet sets the Maven dependencies necessary for using the errai-bus project.

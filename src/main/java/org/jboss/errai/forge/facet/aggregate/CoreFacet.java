@@ -9,7 +9,7 @@ import org.jboss.errai.forge.facet.plugin.GwtPluginFacet;
 import org.jboss.errai.forge.facet.plugin.JbossPluginFacet;
 import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
 import org.jboss.errai.forge.facet.resource.ErraiAppPropertiesFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 
 /**
  * Aggregates core facets required by all other facet aggregators. Installing
@@ -18,7 +18,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ ErraiBuildDependencyFacet.class, CleanPluginFacet.class, CompilerPluginFacet.class,
+@FacetConstraint({ ErraiBuildDependencyFacet.class, CleanPluginFacet.class, CompilerPluginFacet.class,
     DependencyPluginFacet.class, GwtPluginFacet.class, JbossPluginFacet.class, WarPluginFacet.class,
     ModuleCoreFacet.class, ErraiAppPropertiesFacet.class })
 public class CoreFacet extends BaseAggregatorFacet {

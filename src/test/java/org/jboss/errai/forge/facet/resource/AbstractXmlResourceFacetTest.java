@@ -16,26 +16,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.jboss.forge.project.Project;
-import org.jboss.forge.shell.Shell;
-import org.jboss.forge.test.AbstractShellTest;
+import org.jboss.errai.forge.test.base.ForgeTest;
+import org.jboss.forge.addon.projects.Project;
 import org.junit.Test;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-public class AbstractXmlResourceFacetTest extends AbstractShellTest {
-
-  @Inject
-  private Shell shell;
+public class AbstractXmlResourceFacetTest extends ForgeTest {
 
   public class TestXmlResourceFacet extends AbstractXmlResourceFacet {
     private final String relPath;
@@ -49,8 +44,6 @@ public class AbstractXmlResourceFacetTest extends AbstractShellTest {
       this.nodes = nodes;
       this.replacements = replacements;
       this.replacementsRemoval = replacementsRemoval;
-      // Prevent NPEs if there is an error
-      this.shell = AbstractXmlResourceFacetTest.this.shell;
     }
 
     @Override
@@ -115,7 +108,7 @@ public class AbstractXmlResourceFacetTest extends AbstractShellTest {
     final Project project = initializeJavaProject();
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
             writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), insertMap, empty, empty);
-    testFacet.setProject(project);
+    testFacet.setFaceted(project);
 
     assertTrue(testFacet.isInstalled());
   }
@@ -139,7 +132,7 @@ public class AbstractXmlResourceFacetTest extends AbstractShellTest {
     final Project project = initializeJavaProject();
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
             writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), insertMap, empty, empty);
-    testFacet.setProject(project);
+    testFacet.setFaceted(project);
 
     assertFalse(testFacet.isInstalled());
   }
@@ -157,7 +150,7 @@ public class AbstractXmlResourceFacetTest extends AbstractShellTest {
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
             writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), new HashMap<String, Collection<Node>>(0),
             replacements, new HashMap<String, Node>(0));
-    testFacet.setProject(project);
+    testFacet.setFaceted(project);
 
     testFacet.install();
 

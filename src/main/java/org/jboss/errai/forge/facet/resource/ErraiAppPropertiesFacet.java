@@ -12,7 +12,7 @@ public class ErraiAppPropertiesFacet extends AbstractFileResourceFacet {
 
   @Override
   public String getRelFilePath() {
-    return CoreBuildFacet.getResourceDirectory(project) + "/ErraiApp.properties";
+    return CoreBuildFacet.getResourceDirectory(getProject()) + "/ErraiApp.properties";
   }
   
 }

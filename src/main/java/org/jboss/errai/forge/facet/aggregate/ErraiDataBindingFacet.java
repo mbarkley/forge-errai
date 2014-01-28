@@ -2,9 +2,9 @@ package org.jboss.errai.forge.facet.aggregate;
 
 import org.jboss.errai.forge.facet.dependency.ErraiDataBindingDependencyFacet;
 import org.jboss.errai.forge.facet.module.ErraiDataBindingModuleFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 
-@RequiresFacet({ CoreFacet.class, ErraiIocFacet.class, ErraiDataBindingDependencyFacet.class,
+@FacetConstraint({ CoreFacet.class, ErraiIocFacet.class, ErraiDataBindingDependencyFacet.class,
     ErraiDataBindingModuleFacet.class })
 public class ErraiDataBindingFacet extends BaseAggregatorFacet {
 

@@ -6,9 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Singleton;
 
-import org.jboss.forge.env.Configuration;
-import org.jboss.forge.env.ConfigurationFactory;
-import org.jboss.forge.project.Project;
+import org.jboss.forge.addon.configuration.Configuration;
+import org.jboss.forge.addon.configuration.facets.ConfigurationFacet;
+import org.jboss.forge.addon.projects.Project;
 
 /**
  * A singleton class for accessing project-wide plugin settings.
@@ -48,13 +48,11 @@ public final class ProjectConfig {
 
   private final Map<ProjectProperty, Object> properties = new ConcurrentHashMap<ProjectProperty, Object>();
 
-  private final ConfigurationFactory configFactory;
-
   private final Project project;
 
-  ProjectConfig(final ConfigurationFactory factory, final Project project) {
+  ProjectConfig(final Project project) {
     this.project = project;
-    final Configuration config = factory.getProjectConfig(project);
+    final Configuration config = project.getFacet(ConfigurationFacet.class).getConfiguration();
     for (final ProjectProperty prop : ProjectProperty.values()) {
       String val = config.getString(getProjectAttribute(prop));
       if (val != null && !val.equals("")) {
@@ -69,7 +67,6 @@ public final class ProjectConfig {
         }
       }
     }
-    configFactory = factory;
   }
 
   /**
@@ -104,7 +101,7 @@ public final class ProjectConfig {
               + property.valueType + ", not " + value.getClass());
     }
 
-    final Configuration config = configFactory.getProjectConfig(project);
+    final Configuration config = project.getFacet(ConfigurationFacet.class).getConfiguration();
     properties.put(property, value);
     if (property.valueType.equals(File.class)) {
       config.setProperty(getProjectAttribute(property), File.class.cast(value).getAbsolutePath());

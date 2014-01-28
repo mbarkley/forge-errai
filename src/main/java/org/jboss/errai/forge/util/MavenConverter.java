@@ -2,7 +2,7 @@ package org.jboss.errai.forge.util;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
-import org.jboss.forge.project.dependencies.ScopeType;
+import org.jboss.forge.addon.dependencies.Coordinate;
 
 /**
  * @author Max Barkley <mbarkley@redhat.com>
@@ -13,19 +13,20 @@ public class MavenConverter {
    * Convert a forge {@link org.jboss.forge.project.dependencies.Dependency} to
    * a Maven {@link Dependency}.
    */
-  public static Dependency convert(org.jboss.forge.project.dependencies.Dependency forgeDep) {
+  public static Dependency convert(org.jboss.forge.addon.dependencies.Dependency forgeDep) {
     Dependency retVal = new Dependency();
+    final Coordinate coord = forgeDep.getCoordinate();
 
-    retVal.setArtifactId(forgeDep.getArtifactId());
-    retVal.setGroupId(forgeDep.getGroupId());
-    retVal.setVersion(forgeDep.getVersion());
+    retVal.setArtifactId(coord.getArtifactId());
+    retVal.setGroupId(coord.getGroupId());
+    retVal.setVersion(coord.getVersion());
     retVal.setScope(forgeDep.getScopeType());
-    if (ScopeType.SYSTEM.equals(forgeDep.getScopeTypeEnum()))
-      retVal.setSystemPath(forgeDep.getSystemPath());
-    retVal.setClassifier(forgeDep.getClassifier());
-    retVal.setType(forgeDep.getPackagingType());
+    if ("system".equalsIgnoreCase(forgeDep.getScopeType()))
+      retVal.setSystemPath(coord.getSystemPath());
+    retVal.setClassifier(coord.getClassifier());
+    retVal.setType(coord.getPackaging());
 
-    for (org.jboss.forge.project.dependencies.Dependency dep : forgeDep.getExcludedDependencies()) {
+    for (final Coordinate dep : forgeDep.getExcludedCoordinates()) {
       Exclusion exclude = new Exclusion();
       exclude.setArtifactId(dep.getArtifactId());
       exclude.setGroupId(dep.getGroupId());
@@ -43,9 +44,9 @@ public class MavenConverter {
    * @return True iff both models have the same group and artifact IDs.
    */
   public static boolean areSameArtifact(final Dependency mavenDep,
-          final org.jboss.forge.project.dependencies.Dependency forgeDep) {
-    return mavenDep.getGroupId().equals(forgeDep.getGroupId())
-            && mavenDep.getArtifactId().equals(forgeDep.getArtifactId());
+          final org.jboss.forge.addon.dependencies.Dependency forgeDep) {
+    return mavenDep.getGroupId().equals(forgeDep.getCoordinate().getGroupId())
+            && mavenDep.getArtifactId().equals(forgeDep.getCoordinate().getArtifactId());
   }
 
   /**
@@ -66,8 +67,9 @@ public class MavenConverter {
    *          A native Maven model of a Maven dependency artifact.
    * @return True iff both models have the same group and artifact IDs.
    */
-  public static boolean areSameArtifact(final org.jboss.forge.project.dependencies.Dependency dep1,
-          final org.jboss.forge.project.dependencies.Dependency dep2) {
-    return dep1.getGroupId().equals(dep2.getGroupId()) && dep1.getArtifactId().equals(dep2.getArtifactId());
+  public static boolean areSameArtifact(final org.jboss.forge.addon.dependencies.Dependency dep1,
+          final org.jboss.forge.addon.dependencies.Dependency dep2) {
+    return dep1.getCoordinate().getGroupId().equals(dep2.getCoordinate().getGroupId())
+            && dep1.getCoordinate().getArtifactId().equals(dep2.getCoordinate().getArtifactId());
   }
 }

@@ -10,7 +10,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ ErraiBusServletConfigFacet.class })
+@FacetConstraint({ ErraiBusServletConfigFacet.class })
 public class CdiWebXmlFacet extends AbstractXmlResourceFacet {
   
   public final String erraiServletExpression = "/servlet/servlet-name[text()='ErraiServlet']/..";
@@ -49,7 +49,7 @@ public class CdiWebXmlFacet extends AbstractXmlResourceFacet {
 
   @Override
   protected String getRelPath() {
-    return WarPluginFacet.getWarSourceDirectory(project) + "/WEB-INF/web.xml";
+    return WarPluginFacet.getWarSourceDirectory(getProject()) + "/WEB-INF/web.xml";
   }
 
   @Override

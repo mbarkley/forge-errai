@@ -5,20 +5,20 @@ import java.util.Arrays;
 
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.base.CoreBuildFacet;
-import org.jboss.forge.maven.plugins.ConfigurationBuilder;
-import org.jboss.forge.maven.plugins.ConfigurationElement;
-import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
-import org.jboss.forge.maven.plugins.Execution;
-import org.jboss.forge.maven.plugins.ExecutionBuilder;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
+import org.jboss.forge.addon.maven.plugins.ConfigurationBuilder;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElement;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElementBuilder;
+import org.jboss.forge.addon.maven.plugins.Execution;
+import org.jboss.forge.addon.maven.plugins.ExecutionBuilder;
 
 /**
  * This facet configures the maven-dependency-plugin in the build section of the pom file.
  *
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ CoreBuildFacet.class })
+@FacetConstraint({ CoreBuildFacet.class })
 public class DependencyPluginFacet extends AbstractPluginFacet {
 
   public DependencyPluginFacet() {

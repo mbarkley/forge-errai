@@ -11,11 +11,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.facet.base.CoreBuildFacet;
 import org.jboss.errai.forge.facet.base.DependencyManagementFacet;
-import org.jboss.forge.maven.MavenCoreFacet;
-import org.jboss.forge.maven.profiles.ProfileBuilder;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.project.dependencies.ScopeType;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
 
 /**
  * This facet sets all the common Maven dependencies required to build or run in
@@ -23,13 +21,13 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ CoreBuildFacet.class, DependencyManagementFacet.class })
+@FacetConstraint({ CoreBuildFacet.class, DependencyManagementFacet.class })
 public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
 
   public ErraiBuildDependencyFacet() {
     setCoreDependencies(DependencyBuilder.create(ErraiTools.toString()), DependencyBuilder.create(GwtUser.toString())
-            .setScopeType(ScopeType.PROVIDED), DependencyBuilder.create(ErraiJboss.toString()), DependencyBuilder
-            .create(JUnit.toString()).setScopeType(ScopeType.TEST),
+            .setScopeType("provided"), DependencyBuilder.create(ErraiJboss.toString()), DependencyBuilder
+            .create(JUnit.toString()).setScopeType("test"),
             DependencyBuilder.create(JbossSupport.toString()));
   }
 
@@ -37,11 +35,12 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
   public boolean install() {
     if (super.install()) {
       // Set main profile to be active by default
-      final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+      final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
       final Model pom = coreFacet.getPOM();
       Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
       if (profile == null) {
-        profile = ProfileBuilder.create().setId(MAIN_PROFILE).getAsMavenProfile();
+        profile = new Profile();
+        profile.setId(MAIN_PROFILE);
         pom.addProfile(profile);
       }
       if (profile.getActivation() == null)

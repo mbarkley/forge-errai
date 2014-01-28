@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
-import org.jboss.forge.project.dependencies.Dependency;
+import org.jboss.forge.addon.dependencies.Dependency;
 
 /**
  * @author Max Barkley <mbarkley@redhat.com>
@@ -64,7 +64,7 @@ public final class ArtifactVault {
     ErraiVersionMaster("errai-version-master", "org.jboss.errai.bom"),
     ErraiBom("errai-bom", "org.jboss.errai.bom"),
     ErraiParent("errai-parent"),
-    
+
     ErraiNetty("netty", "org.jboss.errai.io.netty"),
     ErraiJboss("errai-cdi-jboss"),
     JbossSupport("errai-jboss-as-support"),
@@ -96,7 +96,7 @@ public final class ArtifactVault {
       this.groupId = groupId;
       this.classifier = classifier;
     }
-    
+
     private DependencyArtifact(final String artifactId, final String groupId) {
       this(artifactId, groupId, null);
     }
@@ -206,7 +206,7 @@ public final class ArtifactVault {
   }
 
   public static boolean isBlacklisted(final Dependency dep) {
-    return isBlacklisted(dep.getGroupId() + ":" + dep.getArtifactId());
+    return isBlacklisted(dep.getCoordinate().getGroupId() + ":" + dep.getCoordinate().getArtifactId());
   }
 
   public static String getBlacklistedProfile(final String identifier) {
@@ -219,7 +219,7 @@ public final class ArtifactVault {
   }
 
   public static String getBlacklistedProfile(final Dependency dep) {
-    return getBlacklistedProfile(dep.getGroupId() + ":" + dep.getArtifactId());
+    return getBlacklistedProfile(dep.getCoordinate().getGroupId() + ":" + dep.getCoordinate().getArtifactId());
   }
 
   public static Collection<String> getBlacklistProfiles() {

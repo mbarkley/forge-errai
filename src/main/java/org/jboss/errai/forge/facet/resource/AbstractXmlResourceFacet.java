@@ -87,7 +87,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       transformer.transform(source, res);
     }
     catch (Exception e) {
-      printError("Error: failed to add required inheritance to module.", e);
+      error("Error: failed to add required inheritance to module.", e);
       return false;
     }
 
@@ -132,7 +132,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
 
     }
     catch (Exception e) {
-      printError("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
+      error("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
       return false;
     }
 
@@ -230,7 +230,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       transformer.transform(source, res);
     }
     catch (Exception e) {
-      printError("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
+      error("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
       return false;
     }
 

@@ -12,11 +12,11 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.codehaus.plexus.util.cli.shell.Shell;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.jboss.errai.forge.facet.resource.AbstractXmlResourceFacet;
-import org.jboss.forge.shell.Shell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
