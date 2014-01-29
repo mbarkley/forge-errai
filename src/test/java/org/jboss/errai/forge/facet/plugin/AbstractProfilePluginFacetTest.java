@@ -179,7 +179,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   protected void checkPlugin(Project project, AbstractProfilePluginFacet facet, String profileId) {
     final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
     Profile profile = null;
-    for (final Profile prof : coreFacet.getPOM().getProfiles()) {
+    for (final Profile prof : coreFacet.getModel().getProfiles()) {
       if (profileId.equals(prof.getId())) {
         profile = prof;
         break;
@@ -212,7 +212,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   private void checkUninstalled(Project project, AbstractProfilePluginFacet facet, String profileId) {
     final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
     Profile profile = null;
-    for (final Profile prof : coreFacet.getPOM().getProfiles()) {
+    for (final Profile prof : coreFacet.getModel().getProfiles()) {
       if (profileId.equals(prof.getId())) {
         profile = prof;
         break;

@@ -214,7 +214,7 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
     checkHasPlugin(project, facet, artifactDef);
     checkExecutions(pluginFacet.getPlugin(DependencyBuilder.create(artifactDef).getCoordinate()), facet.executions);
-    Build build = coreFacet.getPOM().getBuild();
+    Build build = coreFacet.getModel().getBuild();
     if (build == null)
       build = new Build();
     checkDependencies(build, facet.dependencies, build.getPluginsAsMap().get(facet.pluginArtifact.toString())

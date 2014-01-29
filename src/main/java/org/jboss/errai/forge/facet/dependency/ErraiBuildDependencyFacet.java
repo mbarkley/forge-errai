@@ -36,7 +36,7 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
     if (super.install()) {
       // Set main profile to be active by default
       final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
-      final Model pom = coreFacet.getPOM();
+      final Model pom = coreFacet.getModel();
       Profile profile = getProfile(MAIN_PROFILE, pom.getProfiles());
       if (profile == null) {
         profile = new Profile();
@@ -46,7 +46,7 @@ public class ErraiBuildDependencyFacet extends AbstractDependencyFacet {
       if (profile.getActivation() == null)
         profile.setActivation(new Activation());
       profile.getActivation().setActiveByDefault(true);
-      coreFacet.setPOM(pom);
+      coreFacet.setModel(pom);
 
       return true;
     }

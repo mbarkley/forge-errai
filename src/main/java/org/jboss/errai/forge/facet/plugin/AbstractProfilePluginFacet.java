@@ -51,13 +51,13 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
   @Override
   public boolean install() {
     final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
-    Model pom = coreFacet.getPOM();
+    Model pom = coreFacet.getModel();
     Profile profile = getProfile(profileId, pom.getProfiles());
     final VersionOracle oracle = new VersionOracle(getProject().getFacet(DependencyFacet.class));
 
     if (profile == null) {
       addDependenciesToProfile(profileId, Collections.<DependencyBuilder> emptyList(), oracle);
-      pom = coreFacet.getPOM();
+      pom = coreFacet.getModel();
       profile = getProfile(profileId, pom.getProfiles());
     }
 
@@ -108,7 +108,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
     plugin.setExecutions(adapter.getExecutions());
     plugin.setDependencies(adapter.getDependencies());
 
-    coreFacet.setPOM(pom);
+    coreFacet.setModel(pom);
 
     return true;
   }
@@ -116,7 +116,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
   @Override
   public boolean isInstalled() {
     final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
-    final Model pom = coreFacet.getPOM();
+    final Model pom = coreFacet.getModel();
 
     final Profile profile = getProfile(profileId, pom.getProfiles());
     if (profile == null || profile.getBuild() == null)
@@ -152,7 +152,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
   @Override
   public boolean uninstall() {
     final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
-    final Model pom = coreFacet.getPOM();
+    final Model pom = coreFacet.getModel();
 
     final Profile profile = getProfile(profileId, pom.getProfiles());
     if (profile == null)
@@ -168,7 +168,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
     build.removePlugin(plugin);
     profile.setBuild(build);
-    coreFacet.setPOM(pom);
+    coreFacet.setModel(pom);
 
     return true;
   }

@@ -40,7 +40,7 @@ public class WarPluginFacet extends AbstractProfilePluginFacet {
 
   public static String getWarSourceDirectory(final Project project) {
     final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
-    final Profile profile = getProfile(MAIN_PROFILE, coreFacet.getPOM().getProfiles());
+    final Profile profile = getProfile(MAIN_PROFILE, coreFacet.getModel().getProfiles());
 
     if (profile != null && profile.getBuild() != null
             && profile.getBuild().getPluginsAsMap().containsKey(DependencyArtifact.War.toString())) {

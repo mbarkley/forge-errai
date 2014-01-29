@@ -38,7 +38,7 @@ public class CoreBuildFacet extends AbstractBaseFacet {
   public static String getSourceDirectory(final Project project) {
     final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
 
-    return coreFacet.getPOM().getBuild().getSourceDirectory();
+    return coreFacet.getModel().getBuild().getSourceDirectory();
   }
   
   public String getSourceDirectory() {
@@ -51,7 +51,7 @@ public class CoreBuildFacet extends AbstractBaseFacet {
 
   public static String getResourceDirectory(final Project project) {
     final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
-    final List<Resource> resources = coreFacet.getPOM().getBuild().getResources();
+    final List<Resource> resources = coreFacet.getModel().getBuild().getResources();
 
     /*
      * FIXME need to decide on a better way to select a resource directory. For
@@ -77,7 +77,7 @@ public class CoreBuildFacet extends AbstractBaseFacet {
   @Override
   public boolean install() {
     final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
-    final Model pom = coreFacet.getPOM();
+    final Model pom = coreFacet.getModel();
     Build build = pom.getBuild();
     if (build == null) {
       build = new Build();
@@ -107,7 +107,7 @@ public class CoreBuildFacet extends AbstractBaseFacet {
       }
     }
 
-    coreFacet.setPOM(pom);
+    coreFacet.setModel(pom);
 
     return true;
   }
@@ -115,7 +115,7 @@ public class CoreBuildFacet extends AbstractBaseFacet {
   @Override
   public boolean isInstalled() {
     final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
-    final Model pom = coreFacet.getPOM();
+    final Model pom = coreFacet.getModel();
     final Build build = pom.getBuild();
 
     Properties properties = pom.getProperties();

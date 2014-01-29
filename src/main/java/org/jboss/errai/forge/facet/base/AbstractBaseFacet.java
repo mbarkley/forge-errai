@@ -70,7 +70,7 @@ public abstract class AbstractBaseFacet extends AbstractFacet<Faceted<ProjectFac
   protected boolean addDependenciesToProfile(final String name, final Collection<DependencyBuilder> deps,
           final VersionOracle versionOracle) {
     final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
-    final Model pom = coreFacet.getPOM();
+    final Model pom = coreFacet.getModel();
 
     Profile profile = getProfile(name, pom.getProfiles());
 
@@ -94,7 +94,7 @@ public abstract class AbstractBaseFacet extends AbstractFacet<Faceted<ProjectFac
       }
     }
 
-    coreFacet.setPOM(pom);
+    coreFacet.setModel(pom);
 
     return true;
   }

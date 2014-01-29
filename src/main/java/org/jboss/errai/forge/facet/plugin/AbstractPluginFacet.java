@@ -96,7 +96,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
   @Override
   public boolean isInstalled() {
     final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
-    final Model pom = coreFacet.getPOM();
+    final Model pom = coreFacet.getModel();
     if (pom.getBuild() == null)
       return false;
 

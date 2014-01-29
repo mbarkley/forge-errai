@@ -65,7 +65,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
       addDependenciesToProfile(entry.getKey(), entry.getValue(), oracle);
     }
 
-    final Model pom = coreFacet.getPOM();
+    final Model pom = coreFacet.getModel();
     final Map<String, Collection<DependencyBuilder>> blacklistProfileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
     for (String profileId : ArtifactVault.getBlacklistProfiles()) {
       final Profile profile = getProfile(profileId, pom.getProfiles());
@@ -103,7 +103,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     // Remove blacklisted dependencies that are no longer transitively in the
     // project
     final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
-    Model pom = coreFacet.getPOM();
+    Model pom = coreFacet.getModel();
     for (final Profile profile : pom.getProfiles()) {
       for (final DependencyArtifact artifact : ArtifactVault.getBlacklistedArtifacts(profile.getId())) {
         final DependencyBuilder dep = getDependency(artifact);
@@ -115,7 +115,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
       }
     }
 
-    pom = coreFacet.getPOM();
+    pom = coreFacet.getModel();
     for (Profile profile : pom.getProfiles()) {
       if (profileDependencies.containsKey(profile.getId())) {
         for (DependencyBuilder dep : profileDependencies.get(profile.getId())) {
@@ -129,7 +129,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
         }
       }
     }
-    coreFacet.setPOM(pom);
+    coreFacet.setModel(pom);
 
     return true;
   }
@@ -145,7 +145,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
     }
 
     final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
-    Model pom = coreFacet.getPOM();
+    Model pom = coreFacet.getModel();
     for (final String profName : profileDependencies.keySet()) {
       final Profile profile = getProfile(profName, pom.getProfiles());
       if (profile == null) {
@@ -169,7 +169,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
      * what sets the blacklisted dependencies to provided, as long as something
      * does it.
      */
-    pom = coreFacet.getPOM();
+    pom = coreFacet.getModel();
     for (final String profileId : ArtifactVault.getBlacklistProfiles()) {
       final Profile profile = getProfile(profileId, pom.getProfiles());
       for (final DependencyArtifact artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {

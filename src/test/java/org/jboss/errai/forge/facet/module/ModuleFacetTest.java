@@ -142,7 +142,7 @@ public class ModuleFacetTest extends ForgeTest {
   }
 
   private File makeBlankModuleFile(final Project project, final String body) throws IOException {
-    final File moduleFile = new File(project.getFacet(MavenFacet.class).getPOM().getBuild()
+    final File moduleFile = new File(project.getFacet(MavenFacet.class).getModel().getBuild()
             .getSourceDirectory(), "org/jboss/errai/Test.gwt.xml");
     moduleFile.getParentFile().mkdirs();
     moduleFile.createNewFile();
