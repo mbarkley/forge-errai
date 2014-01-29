@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.errai.forge.facet.plugin.BasePluginFacetTest;
 import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
@@ -30,20 +31,21 @@ public class ForgeTest {
   @Inject
   protected FacetFactory facetFactory;
 
-  @Deployment(name = "ForgeTest")
+  @Deployment
   @Dependencies({
       @AddonDependency(name = DEPENDENCY, version = VERSION),
-      @AddonDependency(name = ADDON_GROUP + ":projects"),
-      @AddonDependency(name = ADDON_GROUP + ":facets")
+      @AddonDependency(name = ADDON_GROUP + ":projects", version = FORGE_VERSION),
+      @AddonDependency(name = ADDON_GROUP + ":facets", version = FORGE_VERSION)
   })
   public static ForgeArchive getDeployment() {
     final ForgeArchive archive = ShrinkWrap.create(ForgeArchive.class)
             .addBeansXML()
+            .addClasses(ForgeTest.class, BasePluginFacetTest.class)
             .addAsAddonDependencies(
-                    AddonDependencyEntry.create("org.jboss.forge.furnace.container:cdi"),
+                    AddonDependencyEntry.create("org.jboss.forge.furnace.container:cdi", FORGE_VERSION),
                     AddonDependencyEntry.create(DEPENDENCY, VERSION),
-                    AddonDependencyEntry.create(ADDON_GROUP + ":projects"),
-                    AddonDependencyEntry.create(ADDON_GROUP + ":facets")
+                    AddonDependencyEntry.create(ADDON_GROUP + ":projects", FORGE_VERSION),
+                    AddonDependencyEntry.create(ADDON_GROUP + ":facets", FORGE_VERSION)
             );
 
     return archive;
