@@ -14,6 +14,7 @@ import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.config.SerializableSet;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.forge.addon.facets.Facet;
+import org.jboss.forge.addon.facets.MutableFacet;
 import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFacet;
@@ -25,9 +26,13 @@ import org.jboss.forge.addon.projects.ProjectFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-public abstract class BaseAggregatorFacet implements ProjectFacet {
+public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<Project> {
   
-  @Inject
+  @Override
+  public void setFaceted(Project origin) {
+    project = origin; 
+  }
+
   protected Project project;
 
   @Override
