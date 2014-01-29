@@ -9,131 +9,68 @@
   <properties>
     <forge.api.version>2.0.0.CR2</forge.api.version>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.jboss.spec</groupId>
-        <artifactId>jboss-javaee-6.0</artifactId>
-        <version>3.0.2.Final</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.forge.furnace.container</groupId>
-        <artifactId>cdi</artifactId>
-        <version>${forge.api.version}</version>
-        <classifier>forge-addon</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.forge.addon</groupId>
-        <artifactId>facets</artifactId>
-        <version>${forge.api.version}</version>
-        <classifier>forge-addon</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.forge.addon</groupId>
-        <artifactId>resources</artifactId>
-        <classifier>forge-addon</classifier>
-        <version>${forge.api.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.forge.addon</groupId>
-        <artifactId>configuration</artifactId>
-        <classifier>forge-addon</classifier>
-        <version>${forge.api.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.forge.addon</groupId>
-        <artifactId>ui</artifactId>
-        <classifier>forge-addon</classifier>
-        <version>${forge.api.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.forge.addon</groupId>
-        <artifactId>maven</artifactId>
-        <classifier>forge-addon</classifier>
-        <version>${forge.api.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.forge.addon</groupId>
-        <artifactId>projects</artifactId>
-        <classifier>forge-addon</classifier>
-        <version>${forge.api.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.forge.furnace.test</groupId>
-        <artifactId>furnace-test-harness</artifactId>
-        <version>${forge.api.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.forge.furnace.test</groupId>
-        <artifactId>arquillian-furnace-classpath</artifactId>
-        <version>${forge.api.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.jboss.forge.furnace.container</groupId>
       <artifactId>cdi</artifactId>
       <classifier>forge-addon</classifier>
       <scope>provided</scope>
+      <version>${forge.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.forge.addon</groupId>
       <artifactId>configuration</artifactId>
       <classifier>forge-addon</classifier>
       <scope>provided</scope>
+      <version>${forge.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.forge.addon</groupId>
       <artifactId>projects</artifactId>
       <classifier>forge-addon</classifier>
       <scope>provided</scope>
+      <version>${forge.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.forge.addon</groupId>
       <artifactId>ui</artifactId>
       <classifier>forge-addon</classifier>
       <scope>provided</scope>
+      <version>${forge.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.forge.addon</groupId>
       <artifactId>maven</artifactId>
       <classifier>forge-addon</classifier>
       <scope>provided</scope>
+      <version>${forge.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.forge.addon</groupId>
       <artifactId>facets</artifactId>
       <classifier>forge-addon</classifier>
       <scope>provided</scope>
+      <version>${forge.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.forge.furnace.test</groupId>
       <artifactId>furnace-test-harness</artifactId>
       <scope>test</scope>
+      <version>${forge.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.forge.furnace.test</groupId>
       <artifactId>arquillian-furnace-classpath</artifactId>
       <scope>test</scope>
+      <version>${forge.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.forge.addon</groupId>
       <artifactId>resources</artifactId>
       <classifier>forge-addon</classifier>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.spec.javax.annotation</groupId>
-      <artifactId>jboss-annotations-api_1.1_spec</artifactId>
-      <scope>provided</scope>
+      <version>${forge.api.version}</version>
     </dependency>
   </dependencies>
   <repositories>
