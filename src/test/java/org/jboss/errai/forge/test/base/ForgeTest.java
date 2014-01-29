@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
 public abstract class ForgeTest {
-  
+
   public static final String DEPENDENCY = "org.jboss.errai.forge:errai-forge-plugin";
   public static final String VERSION = "1.0.0-SNAPSHOT";
   public static final String FORGE_VERSION = "2.0.0.CR2";
@@ -24,28 +24,32 @@ public abstract class ForgeTest {
 
   @Inject
   protected ProjectFactory projectFactory;
-  
+
   @Inject
   protected FacetFactory facetFactory;
-  
+
   @Deployment(name = "ForgeTest")
   @Dependencies({
-    @AddonDependency(name = DEPENDENCY, version = VERSION)
+      @AddonDependency(name = DEPENDENCY, version = VERSION),
+      @AddonDependency(name = ADDON_GROUP + ":projects"),
+      @AddonDependency(name = ADDON_GROUP + ":facets")
   })
   public static ForgeArchive getDeployment() {
-    final ForgeArchive archive = ShrinkWrap.create(ForgeArchive.class);
-    
-    archive.addBeansXML()
-    .addAsAddonDependencies(
-            AddonDependencyEntry.create(DEPENDENCY, VERSION)
-    );
-    
+    final ForgeArchive archive = ShrinkWrap.create(ForgeArchive.class)
+            .addBeansXML()
+            .addAsAddonDependencies(
+                    AddonDependencyEntry.create("org.jboss.forge.furnace.container:cdi"),
+                    AddonDependencyEntry.create(DEPENDENCY, VERSION),
+                    AddonDependencyEntry.create(ADDON_GROUP + ":projects"),
+                    AddonDependencyEntry.create(ADDON_GROUP + ":facets")
+            );
+
     return archive;
   }
-  
+
   protected Project initializeJavaProject() {
     final Project project = projectFactory.createTempProject();
-    
+
     return project;
   }
 
