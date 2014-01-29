@@ -12,10 +12,12 @@ import org.jboss.forge.arquillian.Dependencies;
 import org.jboss.forge.arquillian.archive.ForgeArchive;
 import org.jboss.forge.furnace.repositories.AddonDependencyEntry;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
-public abstract class ForgeTest {
+public class ForgeTest {
 
   public static final String DEPENDENCY = "org.jboss.errai.forge:errai-forge-plugin";
   public static final String VERSION = "1.0.0-SNAPSHOT";
@@ -51,6 +53,12 @@ public abstract class ForgeTest {
     final Project project = projectFactory.createTempProject();
 
     return project;
+  }
+  
+  @Test
+  public void testArquillianTestSetup() throws Exception {
+    Assert.assertNotNull(projectFactory);
+    Assert.assertNotNull(facetFactory);
   }
 
 }
