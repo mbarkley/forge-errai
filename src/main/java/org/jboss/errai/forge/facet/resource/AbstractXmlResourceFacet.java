@@ -253,7 +253,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
   protected File getResFile(final String relPath) {
     File file = new File(relPath);
     if (!file.isAbsolute())
-      file = new File(getProject().getProjectRoot().getUnderlyingResourceObject(), file.getPath());
+      file = new File(getProject().getRootDirectory().getUnderlyingResourceObject(), file.getPath());
 
     return file;
   }
