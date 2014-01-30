@@ -2,6 +2,7 @@ package org.jboss.errai.forge.facet.plugin;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collection;
@@ -67,8 +68,7 @@ public abstract class BasePluginFacetTest extends ForgeTest {
 
   protected void checkHasPlugin(Project project, AbstractPluginFacet facet, String artifactDef) {
     final MavenPluginFacet pluginFacet = project.getFacet(MavenPluginFacet.class);
-    final MavenPlugin plugin = pluginFacet.getPlugin(DependencyBuilder.create(artifactDef).getCoordinate());
-    assertNotNull(plugin);
+    assertTrue(pluginFacet.hasPlugin(DependencyBuilder.create(artifactDef).getCoordinate()));
   }
 
   protected void checkConfigurations(final Configuration config, Collection<ConfigurationElement> configurations) {

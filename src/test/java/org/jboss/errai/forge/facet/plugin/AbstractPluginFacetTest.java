@@ -85,39 +85,6 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     }
   }
 
-  @Dependent
-  public static class DummyDependencyHavingPlugin extends DependencyHavingPlugin {
-    public boolean isInstalled() {
-      return false;
-    };
-
-    public boolean uninstall() {
-      return true;
-    };
-  };
-
-  @Dependent
-  public static class DummyConfigHavingPlugin extends ConfigHavingPlugin {
-    public boolean isInstalled() {
-      return false;
-    };
-
-    public boolean uninstall() {
-      return true;
-    };
-  };
-
-  @Dependent
-  public static class DummyExecutionHavingPlugin extends ExecutionHavingPlugin {
-    public boolean isInstalled() {
-      return false;
-    };
-
-    public boolean uninstall() {
-      return true;
-    };
-  };
-
   @Test
   public void testEmptyPluginDefinition() throws Exception {
     final Project project = initializeJavaProject();
@@ -138,13 +105,13 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testIsInstalledWithDependencies() throws Exception {
     final Project project = initializeJavaProject();
-    final DependencyHavingPlugin facet = facetFactory.install(project,
-            DummyDependencyHavingPlugin.class);
     final DependencyHavingPlugin testFacet = facetFactory.create(project,
             DependencyHavingPlugin.class);
 
     assertFalse(testFacet.isInstalled());
 
+    final DependencyHavingPlugin facet = facetFactory.install(project,
+            DependencyHavingPlugin.class);
     // Precondition
     checkPlugin(project, facet);
 
@@ -164,13 +131,13 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testIsInstalledWithConfigurations() throws Exception {
     final Project project = initializeJavaProject();
-    final ConfigHavingPlugin facet = facetFactory.install(project,
-            DummyConfigHavingPlugin.class);
     final ConfigHavingPlugin testFacet = facetFactory.create(project,
             ConfigHavingPlugin.class);
 
     assertFalse(testFacet.isInstalled());
 
+    final ConfigHavingPlugin facet = facetFactory.install(project,
+            ConfigHavingPlugin.class);
     // Precondition
     checkPlugin(project, facet);
 
@@ -189,13 +156,11 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testIsInstalledWithExecutions() throws Exception {
     final Project project = initializeJavaProject();
-    final ExecutionHavingPlugin facet = facetFactory.create(project,
-            DummyExecutionHavingPlugin.class);
-    final ExecutionHavingPlugin testFacet = new ExecutionHavingPlugin();
-    testFacet.setFaceted(project);
+    final ExecutionHavingPlugin testFacet = facetFactory.create(project, ExecutionHavingPlugin.class);
 
     assertFalse(testFacet.isInstalled());
 
+    final ExecutionHavingPlugin facet = facetFactory.install(project, ExecutionHavingPlugin.class);
     // Precondition
     checkPlugin(project, facet);
 
@@ -211,23 +176,25 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     // Precondition
     assertTrue(facet.isInstalled());
 
+    facet.uninstall();
+
     final MavenPluginFacet pluginFacet = project.getFacet(MavenPluginFacet.class);
-    assertFalse(pluginFacet.hasPlugin(DependencyBuilder.create(facet.pluginArtifact.toString()).getCoordinate()));
+    assertFalse(pluginFacet.hasPlugin(DependencyBuilder.create(facet.getPluginArtifact().toString()).getCoordinate()));
   }
 
   private void checkPlugin(Project project, AbstractPluginFacet facet) {
-    final String artifactDef = facet.pluginArtifact.toString();
+    final String artifactDef = facet.getPluginArtifact().toString();
     final MavenPluginFacet pluginFacet = project.getFacet(MavenPluginFacet.class);
     final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
     checkHasPlugin(project, facet, artifactDef);
-    checkExecutions(pluginFacet.getPlugin(DependencyBuilder.create(artifactDef).getCoordinate()), facet.executions);
+    checkExecutions(pluginFacet.getPlugin(DependencyBuilder.create(artifactDef).getCoordinate()), facet.getExecutions());
     Build build = coreFacet.getModel().getBuild();
     if (build == null)
       build = new Build();
-    checkDependencies(build, facet.dependencies, build.getPluginsAsMap().get(facet.pluginArtifact.toString())
-            .getDependencies(), facet.pluginArtifact.toString());
+    checkDependencies(build, facet.getDependencies(), build.getPluginsAsMap().get(facet.getPluginArtifact().toString())
+            .getDependencies(), facet.getPluginArtifact().toString());
     checkConfigurations(pluginFacet.getPlugin(DependencyBuilder.create(artifactDef).getCoordinate()).getConfig(),
-            facet.configurations);
+            facet.getConfigurations());
   }
 
 }
