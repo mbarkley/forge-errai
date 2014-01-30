@@ -16,7 +16,6 @@ import org.apache.maven.model.Profile;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
-import org.jboss.forge.addon.facets.Faceted;
 import org.jboss.forge.addon.maven.plugins.ConfigurationBuilder;
 import org.jboss.forge.addon.maven.plugins.ConfigurationElement;
 import org.jboss.forge.addon.maven.plugins.ConfigurationElementBuilder;
@@ -26,7 +25,6 @@ import org.jboss.forge.addon.maven.plugins.MavenPluginAdapter;
 import org.jboss.forge.addon.maven.plugins.MavenPluginBuilder;
 import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.projects.ProjectFacet;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -91,7 +89,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testEmptyPlugin() throws Exception {
     final Project project = initializeJavaProject();
-    final DefinitionOnly facet = facetFactory.install((Faceted<ProjectFacet>) project, DefinitionOnly.class);
+    final DefinitionOnly facet = facetFactory.install(project, DefinitionOnly.class);
 
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
   }
@@ -99,7 +97,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testDependencyHavingPlugin() throws Exception {
     final Project project = initializeJavaProject();
-    final DependencyHavingPlugin facet = facetFactory.install((Faceted<ProjectFacet>) project,
+    final DependencyHavingPlugin facet = facetFactory.install(project,
             DependencyHavingPlugin.class);
 
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
@@ -108,9 +106,9 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testDependencyHavingPluginIsInstalled() throws Exception {
     final Project project = initializeJavaProject();
-    final DependencyHavingPlugin facet = facetFactory.install((Faceted<ProjectFacet>) project,
+    final DependencyHavingPlugin facet = facetFactory.install(project,
             DependencyHavingPlugin.class);
-    final DependencyHavingPlugin testFacet = facetFactory.create((Faceted<ProjectFacet>) project,
+    final DependencyHavingPlugin testFacet = facetFactory.create(project,
             DependencyHavingPlugin.class);
 
     assertFalse(testFacet.isInstalled());
@@ -123,7 +121,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testUninstall() throws Exception {
     final Project project = initializeJavaProject();
-    final DependencyHavingPlugin facet = facetFactory.install((Faceted<ProjectFacet>) project,
+    final DependencyHavingPlugin facet = facetFactory.install(project,
             DependencyHavingPlugin.class);
 
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
@@ -134,7 +132,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testConfigHavingPlugin() throws Exception {
     final Project project = initializeJavaProject();
-    final ConfigHavingPlugin facet = facetFactory.install((Faceted<ProjectFacet>) project, ConfigHavingPlugin.class);
+    final ConfigHavingPlugin facet = facetFactory.install(project, ConfigHavingPlugin.class);
 
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
   }
@@ -142,8 +140,8 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testConfigHavingPluginIsInstalled() throws Exception {
     final Project project = initializeJavaProject();
-    final ConfigHavingPlugin facet = facetFactory.install((Faceted<ProjectFacet>) project, ConfigHavingPlugin.class);
-    final ConfigHavingPlugin testFacet = facetFactory.create((Faceted<ProjectFacet>) project, ConfigHavingPlugin.class);
+    final ConfigHavingPlugin facet = facetFactory.install(project, ConfigHavingPlugin.class);
+    final ConfigHavingPlugin testFacet = facetFactory.create(project, ConfigHavingPlugin.class);
 
     assertFalse(testFacet.isInstalled());
 
@@ -155,7 +153,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testExecutionHavingPlugin() throws Exception {
     final Project project = initializeJavaProject();
-    final ExecutionHavingPlugin facet = facetFactory.install((Faceted<ProjectFacet>) project,
+    final ExecutionHavingPlugin facet = facetFactory.install(project,
             ExecutionHavingPlugin.class);
 
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
@@ -164,9 +162,9 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testExecutionHavingPluginIsInstalled() throws Exception {
     final Project project = initializeJavaProject();
-    final ExecutionHavingPlugin facet = facetFactory.install((Faceted<ProjectFacet>) project,
+    final ExecutionHavingPlugin facet = facetFactory.install(project,
             ExecutionHavingPlugin.class);
-    final ExecutionHavingPlugin testFacet = facetFactory.create((Faceted<ProjectFacet>) project,
+    final ExecutionHavingPlugin testFacet = facetFactory.create(project,
             ExecutionHavingPlugin.class);
 
     assertFalse(testFacet.isInstalled());

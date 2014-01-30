@@ -13,7 +13,6 @@ import org.jboss.errai.forge.util.MavenConverter;
 import org.jboss.errai.forge.util.VersionOracle;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.facets.AbstractFacet;
-import org.jboss.forge.addon.facets.Faceted;
 import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFacet;
@@ -23,7 +22,7 @@ import org.jboss.forge.addon.projects.ProjectFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-public abstract class AbstractBaseFacet extends AbstractFacet<Faceted<ProjectFacet>> {
+public abstract class AbstractBaseFacet extends AbstractFacet<Project> implements ProjectFacet {
 
   /**
    * The name of the primary profile used to configure an Errai project.

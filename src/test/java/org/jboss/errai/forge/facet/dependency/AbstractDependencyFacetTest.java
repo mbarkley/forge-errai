@@ -21,7 +21,6 @@ import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.test.base.ForgeTest;
 import org.jboss.errai.forge.util.MavenConverter;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
-import org.jboss.forge.addon.facets.Faceted;
 import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFacet;
@@ -55,6 +54,11 @@ public class AbstractDependencyFacetTest extends ForgeTest {
       coreDependencies = Arrays.asList(new DependencyBuilder[] { DependencyBuilder.create(DependencyArtifact.ErraiTools
               .toString()) });
     }
+    @Override
+    public void setProfileDependencies(String name, DependencyBuilder... deps) {
+      // TODO Auto-generated method stub
+      super.setProfileDependencies(name, deps);
+    }
   }
   
   @Test
@@ -63,7 +67,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
 
     prepareProjectPom(project);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, NoProfileDependencyFacet.class);
+    facetFactory.install(project, NoProfileDependencyFacet.class);
 
     assertTrue(project.hasFacet(NoProfileDependencyFacet.class.asSubclass(ProjectFacet.class)));
     assertTrue(project.getFacet(DependencyFacet.class).hasDirectDependency(
@@ -75,7 +79,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
     final Project project = initializeJavaProject();
     prepareProjectPom(project);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, ProfileDependencyFacet.class);
+    facetFactory.install(project, ProfileDependencyFacet.class);
 
     assertTrue(project.hasFacet(ProfileDependencyFacet.class.asSubclass(ProjectFacet.class)));
     List<Profile> profiles = project.getFacet(MavenFacet.class).getModel().getProfiles();
@@ -100,7 +104,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
     pom.addProfile(profile);
     coreFacet.setModel(pom);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, ProfileDependencyFacet.class);
+    facetFactory.install(project, ProfileDependencyFacet.class);
 
     assertTrue(project.hasFacet(ProfileDependencyFacet.class.asSubclass(ProjectFacet.class)));
     List<Profile> profiles = coreFacet.getModel().getProfiles();
@@ -126,7 +130,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
     pom.addProfile(profile);
     coreFacet.setModel(pom);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, ProfileDependencyFacet.class);
+    facetFactory.install(project, ProfileDependencyFacet.class);
 
     assertTrue(project.hasFacet(ProfileDependencyFacet.class.asSubclass(ProjectFacet.class)));
     List<Profile> profiles = coreFacet.getModel().getProfiles();
@@ -145,7 +149,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
     final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
     depFacet.addDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString() + ":2.4.2.Final"));
 
-    facetFactory.install((Faceted<ProjectFacet>) project, NoProfileDependencyFacet.class);
+    facetFactory.install(project, NoProfileDependencyFacet.class);
 
     assertTrue(project.hasFacet(NoProfileDependencyFacet.class.asSubclass(ProjectFacet.class)));
     assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString())
@@ -162,7 +166,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
 
     prepareProjectPom(project);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, NoProfileDependencyFacet.class);
+    facetFactory.install(project, NoProfileDependencyFacet.class);
 
     assertTrue("Precondition failed.", project.hasFacet(NoProfileDependencyFacet.class.asSubclass(ProjectFacet.class)));
     assertTrue(
@@ -183,7 +187,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
     final Project project = initializeJavaProject();
     prepareProjectPom(project);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, ProfileDependencyFacet.class);
+    facetFactory.install(project, ProfileDependencyFacet.class);
 
     assertTrue(project.hasFacet(ProfileDependencyFacet.class.asSubclass(ProjectFacet.class)));
     List<Profile> profiles = project.getFacet(MavenFacet.class).getModel().getProfiles();
@@ -204,14 +208,14 @@ public class AbstractDependencyFacetTest extends ForgeTest {
   public void testNoProfileIsInstalled() throws Exception {
     // Setup
     final Project project = initializeJavaProject();
-    NoProfileDependencyFacet facet = facetFactory.create((Faceted<ProjectFacet>) project,
+    NoProfileDependencyFacet facet = facetFactory.create(project,
             NoProfileDependencyFacet.class);
 
     prepareProjectPom(project);
 
     assertFalse(facet.isInstalled());
 
-    facetFactory.install((Faceted<ProjectFacet>) project, NoProfileDependencyFacet.class);
+    facetFactory.install(project, NoProfileDependencyFacet.class);
 
     assertTrue("Precondition failed.", project.hasFacet(NoProfileDependencyFacet.class.asSubclass(ProjectFacet.class)));
     assertTrue(
@@ -220,7 +224,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
                     DependencyBuilder.create(DependencyArtifact.ErraiCommon.toString())));
 
     // Actual test
-    facet = facetFactory.create((Faceted<ProjectFacet>) project, NoProfileDependencyFacet.class);
+    facet = facetFactory.create(project, NoProfileDependencyFacet.class);
     assertTrue(facet.isInstalled());
   }
 
@@ -228,12 +232,12 @@ public class AbstractDependencyFacetTest extends ForgeTest {
   public void testProfileIsInstalled() throws Exception {
     // Setup
     final Project project = initializeJavaProject();
-    ProfileDependencyFacet facet = facetFactory.create((Faceted<ProjectFacet>) project, ProfileDependencyFacet.class);
+    ProfileDependencyFacet facet = facetFactory.create(project, ProfileDependencyFacet.class);
     prepareProjectPom(project);
 
     assertFalse(facet.isInstalled());
 
-    facetFactory.install((Faceted<ProjectFacet>) project, ProfileDependencyFacet.class);
+    facetFactory.install(project, ProfileDependencyFacet.class);
 
     assertTrue(project.hasFacet(ProfileDependencyFacet.class.asSubclass(ProjectFacet.class)));
     List<Profile> profiles = project.getFacet(MavenFacet.class).getModel().getProfiles();
@@ -244,7 +248,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
             .getDependencies().get(0).getArtifactId());
 
     // Actual test
-    facet = facetFactory.create((Faceted<ProjectFacet>) project, ProfileDependencyFacet.class);
+    facet = facetFactory.create(project, ProfileDependencyFacet.class);
     assertTrue(facet.isInstalled());
   }
 
@@ -257,7 +261,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
 
     final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, BlacklistedDependencyFacet.class);
+    facetFactory.install(project, BlacklistedDependencyFacet.class);
     pom = coreFacet.getModel();
 
     assertTrue(project.hasFacet(BlacklistedDependencyFacet.class.asSubclass(ProjectFacet.class)));
@@ -285,7 +289,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
   @Test
   public void testBlacklistedDependencyNonDuplication1() throws Exception {
     final Project project = initializeJavaProject();
-    final BlacklistedDependencyFacet facet = facetFactory.create((Faceted<ProjectFacet>) project,
+    final BlacklistedDependencyFacet facet = facetFactory.create(project,
             BlacklistedDependencyFacet.class);
     final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
     prepareProjectPom(project);
@@ -303,7 +307,6 @@ public class AbstractDependencyFacetTest extends ForgeTest {
     facet.install();
     pom = coreFacet.getModel();
 
-    assertTrue(project.hasFacet(BlacklistedDependencyFacet.class.asSubclass(ProjectFacet.class)));
     assertTrue(depFacet.hasDirectDependency(DependencyBuilder.create(DependencyArtifact.ErraiTools.toString())
             .setVersion(Property.ErraiVersion.invoke())));
     // This dependency should have been transitively included through
@@ -346,7 +349,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
     pom.addProfile(profile);
     coreFacet.setModel(pom);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, BlacklistedDependencyFacet.class);
+    facetFactory.install(project, BlacklistedDependencyFacet.class);
     pom = coreFacet.getModel();
 
     assertTrue(project.hasFacet(BlacklistedDependencyFacet.class.asSubclass(ProjectFacet.class)));
@@ -377,7 +380,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
     prepareProjectPom(project);
     Model pom = coreFacet.getModel();
 
-    facetFactory.install((Faceted<ProjectFacet>) project,
+    facetFactory.install(project,
             BlacklistedDependencyFacet.class);
     pom = coreFacet.getModel();
 
@@ -404,7 +407,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
     /*
      * Actual Test
      */
-    final BlacklistedDependencyFacet facet = facetFactory.create((Faceted<ProjectFacet>) project,
+    final BlacklistedDependencyFacet facet = facetFactory.create(project,
             BlacklistedDependencyFacet.class);
     facet.uninstall();
     pom = coreFacet.getModel();
@@ -417,7 +420,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
   @Test
   public void testBlacklistedDependencyIsInstalledNegative() throws Exception {
     final Project project = initializeJavaProject();
-    final BlacklistedDependencyFacet testFacet = facetFactory.create((Faceted<ProjectFacet>) project,
+    final BlacklistedDependencyFacet testFacet = facetFactory.create(project,
             BlacklistedDependencyFacet.class);
     final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
     Model pom = coreFacet.getModel();
@@ -428,7 +431,7 @@ public class AbstractDependencyFacetTest extends ForgeTest {
     /*
      * Setup
      */
-    facetFactory.install((Faceted<ProjectFacet>) project, BlacklistedDependencyFacet.class);
+    facetFactory.install(project, BlacklistedDependencyFacet.class);
     pom = coreFacet.getModel();
 
     assertTrue(project.hasFacet(BlacklistedDependencyFacet.class.asSubclass(ProjectFacet.class)));

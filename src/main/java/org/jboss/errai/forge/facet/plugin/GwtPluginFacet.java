@@ -2,8 +2,7 @@ package org.jboss.errai.forge.facet.plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import javax.annotation.PostConstruct;
+import java.util.Collection;
 
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
@@ -68,14 +67,19 @@ public class GwtPluginFacet extends AbstractPluginFacet {
             });
   }
 
-  @PostConstruct
-  public void init() {
+  private void init() {
     for (final ConfigurationElement elem : configurations) {
       if (elem.getName().equals("hostedWebapp")) {
         ConfigurationElementBuilder.class.cast(elem).setText(WarPluginFacet.getWarSourceDirectory(getProject()));
         break;
       }
     }
+  }
+  
+  @Override
+  protected Collection<ConfigurationElement> getConfigurations() {
+    init();
+    return super.getConfigurations();
   }
 
 }

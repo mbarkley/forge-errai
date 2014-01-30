@@ -2,8 +2,7 @@ package org.jboss.errai.forge.facet.plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import javax.annotation.PostConstruct;
+import java.util.Collection;
 
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
@@ -47,13 +46,18 @@ public class CleanPluginFacet extends AbstractPluginFacet {
     });
   }
 
-  @PostConstruct
-  public void init() {
+  private void init() {
     final String moduleName = getProject().getFacet(ProjectConfig.class).getProjectProperty(
             ProjectProperty.MODULE_NAME,
             String.class);
     ((ConfigurationElementBuilder) configurations.iterator().next().getChildByName("includes"))
             .addChild(ConfigurationElementBuilder.create().setName("include")
                     .setText("src/main/webapp/" + moduleName + "/"));
+  }
+  
+  @Override
+  protected Collection<ConfigurationElement> getConfigurations() {
+    init();
+    return super.getConfigurations();
   }
 }

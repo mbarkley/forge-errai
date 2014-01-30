@@ -17,10 +17,8 @@ import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.constant.ModuleVault;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.jboss.errai.forge.test.base.ForgeTest;
-import org.jboss.forge.addon.facets.Faceted;
 import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.projects.ProjectFacet;
 import org.junit.Test;
 
 public class ModuleFacetTest extends ForgeTest {
@@ -37,7 +35,7 @@ public class ModuleFacetTest extends ForgeTest {
     final File moduleFile = makeBlankModuleFile(project, ModuleCoreFacet.emptyModuleContents);
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, SimpleModuleFacet.class);
+    facetFactory.install(project, SimpleModuleFacet.class);
 
     final String moduleContent = getFileContentAsString(moduleFile);
     assertTrue(moduleContent, moduleContent.contains("<inherits name=\"org.jboss.errai.common.ErraiCommon\"/>"));
@@ -53,7 +51,7 @@ public class ModuleFacetTest extends ForgeTest {
     final File moduleFile = makeBlankModuleFile(project, body);
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, SimpleModuleFacet.class);
+    facetFactory.install(project, SimpleModuleFacet.class);
 
     final String moduleContent = getFileContentAsString(moduleFile);
     assertTrue(moduleContent, moduleContent.contains("<inherits name=\"org.jboss.errai.common.Logging\"/>"));
@@ -68,7 +66,7 @@ public class ModuleFacetTest extends ForgeTest {
     final File moduleFile = makeBlankModuleFile(project, ModuleCoreFacet.emptyModuleContents);
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, ModuleCoreFacet.class);
+    facetFactory.install(project, ModuleCoreFacet.class);
 
     final String moduleContent = getFileContentAsString(moduleFile);
     assertTrue(moduleContent, moduleContent.contains("<inherits name=\"com.google.gwt.user.User\"/>"));
@@ -82,7 +80,7 @@ public class ModuleFacetTest extends ForgeTest {
     moduleFile.delete();
     config.setProjectProperty(ProjectProperty.MODULE_FILE, moduleFile);
 
-    facetFactory.install((Faceted<ProjectFacet>) project, ModuleCoreFacet.class);
+    facetFactory.install(project, ModuleCoreFacet.class);
 
     final String moduleContent = getFileContentAsString(moduleFile);
     assertTrue(moduleContent, moduleContent.contains("<inherits name=\"com.google.gwt.user.User\"/>"));

@@ -32,7 +32,7 @@ import org.jboss.forge.addon.projects.facets.DependencyFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-abstract class AbstractDependencyFacet extends AbstractBaseFacet {
+public abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
   /**
    * Dependencies to be added to the build in the Maven pom file. Versions of

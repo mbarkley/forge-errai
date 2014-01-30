@@ -26,11 +26,13 @@ public class MavenConverter {
     retVal.setClassifier(coord.getClassifier());
     retVal.setType(coord.getPackaging());
 
-    for (final Coordinate dep : forgeDep.getExcludedCoordinates()) {
-      Exclusion exclude = new Exclusion();
-      exclude.setArtifactId(dep.getArtifactId());
-      exclude.setGroupId(dep.getGroupId());
-      retVal.addExclusion(exclude);
+    if (forgeDep.getExcludedCoordinates() != null) {
+      for (final Coordinate dep : forgeDep.getExcludedCoordinates()) {
+        Exclusion exclude = new Exclusion();
+        exclude.setArtifactId(dep.getArtifactId());
+        exclude.setGroupId(dep.getGroupId());
+        retVal.addExclusion(exclude);
+      }
     }
 
     return retVal;

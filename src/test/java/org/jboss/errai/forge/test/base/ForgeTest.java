@@ -35,7 +35,8 @@ public class ForgeTest {
   @Dependencies({
       @AddonDependency(name = DEPENDENCY, version = VERSION),
       @AddonDependency(name = ADDON_GROUP + ":projects", version = FORGE_VERSION),
-      @AddonDependency(name = ADDON_GROUP + ":facets", version = FORGE_VERSION)
+      @AddonDependency(name = ADDON_GROUP + ":facets", version = FORGE_VERSION),
+      @AddonDependency(name = ADDON_GROUP + ":maven", version = FORGE_VERSION)
   })
   public static ForgeArchive getDeployment() {
     final ForgeArchive archive = ShrinkWrap.create(ForgeArchive.class)
@@ -45,7 +46,8 @@ public class ForgeTest {
                     AddonDependencyEntry.create("org.jboss.forge.furnace.container:cdi", FORGE_VERSION),
                     AddonDependencyEntry.create(DEPENDENCY, VERSION),
                     AddonDependencyEntry.create(ADDON_GROUP + ":projects", FORGE_VERSION),
-                    AddonDependencyEntry.create(ADDON_GROUP + ":facets", FORGE_VERSION)
+                    AddonDependencyEntry.create(ADDON_GROUP + ":facets", FORGE_VERSION),
+                    AddonDependencyEntry.create(ADDON_GROUP + ":maven", FORGE_VERSION)
             );
 
     return archive;

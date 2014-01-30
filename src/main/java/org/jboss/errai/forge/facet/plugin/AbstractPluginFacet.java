@@ -42,6 +42,19 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
    * Configurations for the plugin.
    */
   protected Collection<ConfigurationElement> configurations;
+
+  protected Collection<ConfigurationElement> getConfigurations() {
+    return configurations;
+  }
+
+  protected Collection<DependencyBuilder> getDependencies() {
+    return dependencies;
+  }
+
+  protected Collection<Execution> getExecutions() {
+    return executions;
+  }
+
   /**
    * Dependencies for the plugin.
    */
@@ -71,11 +84,11 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     }
 
     Configuration config = plugin.getConfig();
-    for (final ConfigurationElement configElem : configurations) {
+    for (final ConfigurationElement configElem : getConfigurations()) {
       mergeConfigurationElement(config, configElem);
     }
 
-    for (final DependencyBuilder dep : dependencies) {
+    for (final DependencyBuilder dep : getDependencies()) {
       if (dep.getCoordinate().getVersion() == null || dep.getCoordinate().getVersion().equals("")) {
         if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
           dep.setVersion(Property.ErraiVersion.invoke());
@@ -85,7 +98,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
       plugin.addPluginDependency(dep);
     }
 
-    for (final Execution exec : executions) {
+    for (final Execution exec : getExecutions()) {
       plugin.addExecution(exec);
     }
     pluginFacet.addPlugin(plugin);
@@ -105,7 +118,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     if (plugin == null)
       return false;
 
-    outer: for (final DependencyBuilder dep : dependencies) {
+    outer: for (final DependencyBuilder dep : getDependencies()) {
       for (final org.apache.maven.model.Dependency pluginDep : plugin.getDependencies()) {
         if (dep.getCoordinate().getArtifactId().equals(pluginDep.getArtifactId())
                 && dep.getGroupId().equals(pluginDep.getGroupId()))
@@ -118,7 +131,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     final MavenPlugin mPlugin = pluginFacet.getPlugin(DependencyBuilder.create(pluginArtifact.toString())
             .getCoordinate());
 
-    outer: for (final Execution exec : executions) {
+    outer: for (final Execution exec : getExecutions()) {
       for (final Execution pluginExec : mPlugin.listExecutions()) {
         // TODO check more than just id
         if (exec.getId().equals(pluginExec.getId()))
@@ -127,7 +140,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
       return false;
     }
 
-    if (!isMatchingConfiguration(mPlugin.getConfig(), configurations))
+    if (!isMatchingConfiguration(mPlugin.getConfig(), getConfigurations()))
       return false;
 
     return true;
