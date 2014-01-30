@@ -34,12 +34,22 @@ import org.jboss.forge.addon.projects.facets.DependencyFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
+public abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
+  // TODO Refactor AbstractProfilePluginFacet and AbstractPluginFacet to have common base class
 
   /**
    * Executions for the installed plugin.
    */
   protected Collection<PluginExecution> executions;
+  
+  public Collection<PluginExecution> getPluginExecutions() {
+    return executions;
+  }
+
+  protected boolean isExtensions() {
+    return extensions;
+  }
+
   protected boolean extensions = true;
 
   /**
@@ -65,12 +75,12 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
       profile.setBuild(new BuildBase());
     }
 
-    Plugin plugin = getPlugin(pluginArtifact, profile.getBuild().getPlugins());
+    Plugin plugin = getPlugin(getPluginArtifact(), profile.getBuild().getPlugins());
 
     if (plugin == null) {
       plugin = new Plugin();
-      plugin.setArtifactId(pluginArtifact.getArtifactId());
-      plugin.setGroupId(pluginArtifact.getGroupId());
+      plugin.setArtifactId(getPluginArtifact().getArtifactId());
+      plugin.setGroupId(getPluginArtifact().getGroupId());
       if (ArtifactVault.ERRAI_GROUP_ID.equals(plugin.getGroupId()))
         plugin.setVersion(Property.ErraiVersion.invoke());
       else
@@ -80,12 +90,12 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
     final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
     final Configuration config = adapter.getConfig();
-    for (final ConfigurationElement elem : configurations) {
+    for (final ConfigurationElement elem : getConfigurations()) {
       mergeConfigurationElement(config, elem);
     }
     adapter.setConfig(config);
 
-    for (final DependencyBuilder depBuilder : dependencies) {
+    for (final DependencyBuilder depBuilder : getDependencies()) {
       if (depBuilder.getCoordinate().getVersion() == null || depBuilder.getCoordinate().getVersion().equals("")) {
         if (ArtifactVault.ERRAI_GROUP_ID.equals(depBuilder.getGroupId())) {
           depBuilder.setVersion(Property.ErraiVersion.invoke());
@@ -98,10 +108,10 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
       adapter.addDependency(MavenConverter.convert(depBuilder));
     }
 
-    for (final PluginExecution exec : executions) {
+    for (final PluginExecution exec : getPluginExecutions()) {
       adapter.addExecution(exec);
     }
-    adapter.setExtensions(extensions);
+    adapter.setExtensions(isExtensions());
 
     // Changes are not committed from adapter to original plugin
     plugin.setConfiguration(adapter.getConfiguration());
@@ -122,9 +132,9 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
     if (profile == null || profile.getBuild() == null)
       return false;
 
-    final Plugin plugin = profile.getBuild().getPluginsAsMap().get(pluginArtifact.toString());
+    final Plugin plugin = profile.getBuild().getPluginsAsMap().get(getPluginArtifact().toString());
 
-    outer: for (final DependencyBuilder dep : dependencies) {
+    outer: for (final DependencyBuilder dep : getDependencies()) {
       for (final Dependency pluginDep : plugin.getDependencies()) {
         if (pluginDep.getArtifactId().equals(dep.getCoordinate().getArtifactId())
                 && pluginDep.getGroupId().equals(dep.getGroupId()))
@@ -133,7 +143,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
       return false;
     }
 
-    outer: for (final PluginExecution exec : executions) {
+    outer: for (final PluginExecution exec : getPluginExecutions()) {
       for (final PluginExecution pluginExec : plugin.getExecutions()) {
         if (pluginExec.getId().equals(exec.getId()))
           continue outer;
@@ -143,7 +153,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
     final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
 
-    if (!isMatchingConfiguration(adapter.getConfig(), configurations))
+    if (!isMatchingConfiguration(adapter.getConfig(), getConfigurations()))
       return false;
 
     return true;
@@ -162,7 +172,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
     if (build == null)
       return false;
 
-    final Plugin plugin = build.getPluginsAsMap().get(pluginArtifact.toString());
+    final Plugin plugin = build.getPluginsAsMap().get(getPluginArtifact().toString());
     if (plugin == null)
       return false;
 

@@ -77,7 +77,7 @@ public class GwtPluginFacet extends AbstractPluginFacet {
   }
   
   @Override
-  protected Collection<ConfigurationElement> getConfigurations() {
+  public Collection<ConfigurationElement> getConfigurations() {
     init();
     return super.getConfigurations();
   }

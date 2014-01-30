@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import javax.enterprise.context.Dependent;
+
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -30,7 +32,23 @@ import org.junit.Test;
 
 public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
 
-  public static class DefinitionOnly extends AbstractProfilePluginFacet {
+  public static abstract class BaseTestAbstractProfilePluginFacet extends AbstractProfilePluginFacet {
+    public DependencyArtifact getPluginArtifact() {
+      return pluginArtifact;
+    }
+    public Collection<ConfigurationElement> getConfigurations() {
+      return configurations;
+    }
+    public Collection<DependencyBuilder> getDependencies() {
+      return dependencies;
+    }
+    public Collection<PluginExecution> getPluginExecutions() {
+      return executions;
+    }
+  }
+
+  @Dependent
+  public static class DefinitionOnly extends BaseTestAbstractProfilePluginFacet {
     public DefinitionOnly() {
       pluginArtifact = DependencyArtifact.Clean;
       configurations = Collections.emptyList();
@@ -39,7 +57,8 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
     }
   }
 
-  public static class DependencyHavingPlugin extends AbstractProfilePluginFacet {
+  @Dependent
+  public static class DependencyHavingPlugin extends BaseTestAbstractProfilePluginFacet {
     public DependencyHavingPlugin() {
       pluginArtifact = DependencyArtifact.Clean;
       configurations = Collections.emptyList();
@@ -51,7 +70,8 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
     }
   }
 
-  public static class ConfigHavingPlugin extends AbstractProfilePluginFacet {
+  @Dependent
+  public static class ConfigHavingPlugin extends BaseTestAbstractProfilePluginFacet {
     public ConfigHavingPlugin() {
       pluginArtifact = DependencyArtifact.Clean;
       configurations = Arrays.asList(new ConfigurationElement[] {
@@ -63,7 +83,8 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
     }
   }
 
-  public static class ExecutionHavingPlugin extends AbstractProfilePluginFacet {
+  @Dependent
+  public static class ExecutionHavingPlugin extends BaseTestAbstractProfilePluginFacet {
     public ExecutionHavingPlugin() {
       pluginArtifact = DependencyArtifact.Clean;
       configurations = Collections.emptyList();
@@ -106,13 +127,13 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testDependencyHavingPluginIsInstalled() throws Exception {
     final Project project = initializeJavaProject();
-    final DependencyHavingPlugin facet = facetFactory.install(project,
-            DependencyHavingPlugin.class);
     final DependencyHavingPlugin testFacet = facetFactory.create(project,
             DependencyHavingPlugin.class);
 
     assertFalse(testFacet.isInstalled());
 
+    final DependencyHavingPlugin facet = facetFactory.install(project,
+            DependencyHavingPlugin.class);
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
 
     assertTrue(testFacet.isInstalled());
@@ -125,6 +146,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
             DependencyHavingPlugin.class);
 
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
+    facet.uninstall();
 
     checkUninstalled(project, facet, AbstractBaseFacet.MAIN_PROFILE);
   }
@@ -140,11 +162,11 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testConfigHavingPluginIsInstalled() throws Exception {
     final Project project = initializeJavaProject();
-    final ConfigHavingPlugin facet = facetFactory.install(project, ConfigHavingPlugin.class);
     final ConfigHavingPlugin testFacet = facetFactory.create(project, ConfigHavingPlugin.class);
 
     assertFalse(testFacet.isInstalled());
 
+    final ConfigHavingPlugin facet = facetFactory.install(project, ConfigHavingPlugin.class);
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
 
     assertTrue(testFacet.isInstalled());
@@ -162,13 +184,13 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
   @Test
   public void testExecutionHavingPluginIsInstalled() throws Exception {
     final Project project = initializeJavaProject();
-    final ExecutionHavingPlugin facet = facetFactory.install(project,
-            ExecutionHavingPlugin.class);
     final ExecutionHavingPlugin testFacet = facetFactory.create(project,
             ExecutionHavingPlugin.class);
 
     assertFalse(testFacet.isInstalled());
 
+    final ExecutionHavingPlugin facet = facetFactory.install(project,
+            ExecutionHavingPlugin.class);
     checkPlugin(project, facet, AbstractBaseFacet.MAIN_PROFILE);
 
     assertTrue(testFacet.isInstalled());
@@ -186,7 +208,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
     Assert.assertNotNull("Could not find profile with matching id, " + profileId, profile);
     final BuildBase build = profile.getBuild();
     Assert.assertNotNull("No build for profile " + profileId, build);
-    final Plugin plugin = build.getPluginsAsMap().get(facet.pluginArtifact.toString());
+    final Plugin plugin = build.getPluginsAsMap().get(facet.getPluginArtifact().toString());
     final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
 
     // This is hack to go from maven to forge configurations
@@ -194,7 +216,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
             DependencyBuilder.create("maven-clean-plugin").getCoordinate()));
 
     final Collection<Execution> executions = new ArrayList<Execution>();
-    for (final PluginExecution plugExec : facet.executions) {
+    for (final PluginExecution plugExec : facet.getPluginExecutions()) {
       configAdapter.setConfiguration(plugExec.getConfiguration());
       ExecutionBuilder newExec = ExecutionBuilder.create().setId(plugExec.getId()).setPhase(plugExec.getPhase())
               .setConfig(configAdapter.getConfig());
@@ -203,8 +225,8 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
       executions.add(newExec);
     }
     checkExecutions(adapter, executions);
-    checkDependencies(build, facet.dependencies, plugin.getDependencies(), facet.pluginArtifact.toString());
-    checkConfigurations(adapter.getConfig(), facet.configurations);
+    checkDependencies(build, facet.getDependencies(), plugin.getDependencies(), facet.getPluginArtifact().toString());
+    checkConfigurations(adapter.getConfig(), facet.getConfigurations());
   }
 
   private void checkUninstalled(Project project, AbstractProfilePluginFacet facet, String profileId) {
@@ -220,7 +242,7 @@ public class AbstractProfilePluginFacetTest extends BasePluginFacetTest {
     final BuildBase build = profile.getBuild();
     Assert.assertNotNull("No build for profile " + profileId, build);
 
-    final Plugin plugin = build.getPluginsAsMap().get(facet.pluginArtifact.toString());
+    final Plugin plugin = build.getPluginsAsMap().get(facet.getPluginArtifact().toString());
     assertNull("Plugin was not uninstalled.", plugin);
   }
 

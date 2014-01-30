@@ -56,7 +56,7 @@ public class CleanPluginFacet extends AbstractPluginFacet {
   }
   
   @Override
-  protected Collection<ConfigurationElement> getConfigurations() {
+  public Collection<ConfigurationElement> getConfigurations() {
     init();
     return super.getConfigurations();
   }

@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.enterprise.context.Dependent;
+
 import org.apache.maven.model.Build;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
@@ -21,6 +23,7 @@ import org.junit.Test;
 
 public class AbstractPluginFacetTest extends BasePluginFacetTest {
 
+  @Dependent
   public static class DefinitionOnly extends AbstractPluginFacet {
     public DefinitionOnly() {
       pluginArtifact = DependencyArtifact.Clean;
@@ -30,6 +33,7 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     }
   }
 
+  @Dependent
   public static class DependencyHavingPlugin extends AbstractPluginFacet {
     public DependencyHavingPlugin() {
       pluginArtifact = DependencyArtifact.Clean;
@@ -42,6 +46,7 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     }
   }
 
+  @Dependent
   public static class ConfigHavingPlugin extends AbstractPluginFacet {
     public ConfigHavingPlugin() {
       pluginArtifact = DependencyArtifact.Clean;
@@ -55,6 +60,7 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     }
   }
 
+  @Dependent
   public static class ExecutionHavingPlugin extends AbstractPluginFacet {
     public ExecutionHavingPlugin() {
       pluginArtifact = DependencyArtifact.Clean;
@@ -79,6 +85,7 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     }
   }
 
+  @Dependent
   public static class DummyDependencyHavingPlugin extends DependencyHavingPlugin {
     public boolean isInstalled() {
       return false;
@@ -89,6 +96,7 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     };
   };
 
+  @Dependent
   public static class DummyConfigHavingPlugin extends ConfigHavingPlugin {
     public boolean isInstalled() {
       return false;
@@ -99,6 +107,7 @@ public class AbstractPluginFacetTest extends BasePluginFacetTest {
     };
   };
 
+  @Dependent
   public static class DummyExecutionHavingPlugin extends ExecutionHavingPlugin {
     public boolean isInstalled() {
       return false;
