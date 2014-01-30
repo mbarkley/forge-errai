@@ -15,6 +15,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.codehaus.plexus.util.cli.shell.Shell;
+import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.w3c.dom.Document;
@@ -54,7 +55,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
 
   @Override
   public boolean install() {
-    final File module = configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE_FILE,
+    final File module = getProject().getFacet(ProjectConfig.class).getProjectProperty(ProjectProperty.MODULE_FILE,
             File.class);
     if (!module.exists()) {
       module.getParentFile().mkdirs();
@@ -100,7 +101,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
 
     String name = ((Element) moduleTags.item(0)).getAttribute("rename-to");
     if (name.equals("")) {
-      name = configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE_LOGICAL,
+      name = getProject().getFacet(ProjectConfig.class).getProjectProperty(ProjectProperty.MODULE_LOGICAL,
               String.class);
     }
 

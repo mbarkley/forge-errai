@@ -4,19 +4,22 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Singleton;
-
 import org.jboss.forge.addon.configuration.Configuration;
 import org.jboss.forge.addon.configuration.facets.ConfigurationFacet;
+import org.jboss.forge.addon.facets.AbstractFacet;
+import org.jboss.forge.addon.facets.MutableFacet;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.ProjectFacet;
 
 /**
  * A singleton class for accessing project-wide plugin settings.
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@Singleton
-public final class ProjectConfig {
+@FacetConstraint({ ConfigurationFacet.class })
+public final class ProjectConfig extends AbstractFacet<Project> implements
+        MutableFacet<Project>, ProjectFacet {
 
   /**
    * An enumeration of project properties stored in a {@link ProjectConfig}.
@@ -48,10 +51,22 @@ public final class ProjectConfig {
 
   private final Map<ProjectProperty, Object> properties = new ConcurrentHashMap<ProjectProperty, Object>();
 
-  private final Project project;
+  private Project project;
 
-  ProjectConfig(final Project project) {
-    this.project = project;
+  @Override
+  public Project getFaceted() {
+    return project;
+  }
+
+  @Override
+  public void setFaceted(final Project origin) {
+    project = origin;
+
+    if (isInstalled())
+      load();
+  }
+
+  private void load() {
     final Configuration config = project.getFacet(ConfigurationFacet.class).getConfiguration();
     for (final ProjectProperty prop : ProjectProperty.values()) {
       String val = config.getString(getProjectAttribute(prop));
@@ -122,4 +137,35 @@ public final class ProjectConfig {
     return PREFIX + prop.name();
   }
 
+  @Override
+  public boolean install() {
+    load();
+
+    return true;
+  }
+
+  @Override
+  public boolean isInstalled() {
+    return project != null && project.hasFacet(ConfigurationFacet.class);
+  }
+
+  @Override
+  public boolean uninstall() {
+    if (isInstalled()) {
+      final ConfigurationFacet configFacet = project.getFacet(ConfigurationFacet.class);
+      final Configuration config = configFacet.getConfiguration();
+
+      for (final ProjectProperty property : properties.keySet()) {
+        if (config.containsKey(getProjectAttribute(property))) {
+          config.clearProperty(getProjectAttribute(property));
+        }
+      }
+      properties.clear();
+
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 }

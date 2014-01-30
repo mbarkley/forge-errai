@@ -5,15 +5,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import javax.inject.Inject;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
+import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
-import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.DefaultVault.DefaultValue;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.projects.Project;
 
@@ -23,16 +22,14 @@ import org.jboss.forge.addon.projects.Project;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
+@FacetConstraint({ ProjectConfig.class })
 public class CoreBuildFacet extends AbstractBaseFacet {
 
   public static final String DEV_CONTEXT = "${project.artifactId}";
   public static final String JBOSS_HOME = "${project.build.directory}/jboss-as-7.1.1.Final";
 
-  @Inject
-  private ProjectConfigFactory configFactory;
-
   private String getErraiVersion() {
-    return configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.ERRAI_VERSION, String.class);
+    return getFaceted().getFacet(ProjectConfig.class).getProjectProperty(ProjectProperty.ERRAI_VERSION, String.class);
   }
 
   public static String getSourceDirectory(final Project project) {
@@ -40,11 +37,11 @@ public class CoreBuildFacet extends AbstractBaseFacet {
 
     return coreFacet.getModel().getBuild().getSourceDirectory();
   }
-  
+
   public String getSourceDirectory() {
     return getSourceDirectory(getProject());
   }
-  
+
   public String getResourceDirectory() {
     return getResourceDirectory(getProject());
   }
@@ -58,14 +55,14 @@ public class CoreBuildFacet extends AbstractBaseFacet {
      * now, sort by directory paths and return the first path that is not the
      * source folder (so that the result is at least consistent).
      */
-    
+
     final List<String> directories = new ArrayList<String>(resources.size());
     for (final Resource res : resources) {
       if (!res.getDirectory().equals(getSourceDirectory(project))) {
         directories.add(res.getDirectory());
       }
     }
-    
+
     if (directories.isEmpty())
       return null;
 
@@ -87,7 +84,7 @@ public class CoreBuildFacet extends AbstractBaseFacet {
     pom.addProperty(Property.JbossHome.getName(), JBOSS_HOME);
     pom.addProperty(Property.DevContext.getName(), DEV_CONTEXT);
     pom.addProperty(Property.ErraiVersion.getName(), getErraiVersion());
-    
+
     if (build.getSourceDirectory() == null)
       build.setSourceDirectory(DefaultValue.SourceDirectory.getDefaultValue());
 

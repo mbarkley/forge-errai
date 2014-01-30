@@ -10,7 +10,6 @@ import javax.inject.Inject;
 
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
-import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.config.SerializableSet;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.forge.addon.facets.Facet;
@@ -65,9 +64,6 @@ public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<
   @Inject
   private AggregatorFacetReflections reflections;
 
-  @Inject
-  private ProjectConfigFactory configFactory;
-
   @Override
   public boolean install() {
     return true;
@@ -110,7 +106,7 @@ public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<
    *           Thrown if this class is still required by another facet.
    */
   public boolean uninstallRequirements() throws UninstallationExecption {
-    final ProjectConfig config = configFactory.getProjectConfig(getProject());
+    final ProjectConfig config = getProject().getFacet(ProjectConfig.class);
     final SerializableSet installedFeatureNames = config.getProjectProperty(ProjectProperty.INSTALLED_FEATURES,
             SerializableSet.class);
     final Set<Class<? extends ProjectFacet>> directlyInstalled = new HashSet<Class<? extends ProjectFacet>>();

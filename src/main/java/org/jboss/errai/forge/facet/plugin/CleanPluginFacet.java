@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
+import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
-import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.base.CoreBuildFacet;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
@@ -24,9 +23,6 @@ import org.jboss.forge.addon.maven.plugins.Execution;
  */
 @FacetConstraint({ CoreBuildFacet.class })
 public class CleanPluginFacet extends AbstractPluginFacet {
-
-  private @Inject
-  ProjectConfigFactory factory;
 
   public CleanPluginFacet() {
     pluginArtifact = DependencyArtifact.Clean;
@@ -53,7 +49,7 @@ public class CleanPluginFacet extends AbstractPluginFacet {
 
   @PostConstruct
   public void init() {
-    final String moduleName = factory.getProjectConfig(getProject()).getProjectProperty(
+    final String moduleName = getProject().getFacet(ProjectConfig.class).getProjectProperty(
             ProjectProperty.MODULE_NAME,
             String.class);
     ((ConfigurationElementBuilder) configurations.iterator().next().getChildByName("includes"))
