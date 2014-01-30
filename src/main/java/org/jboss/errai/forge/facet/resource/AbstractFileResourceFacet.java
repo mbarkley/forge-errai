@@ -21,7 +21,7 @@ import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
+public abstract class AbstractFileResourceFacet extends AbstractBaseFacet {
 
   /**
    * The path (relative to the project root directory) of the file resource to

@@ -4,10 +4,11 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Singleton;
+
 import org.jboss.forge.addon.configuration.Configuration;
 import org.jboss.forge.addon.configuration.facets.ConfigurationFacet;
 import org.jboss.forge.addon.facets.AbstractFacet;
-import org.jboss.forge.addon.facets.MutableFacet;
 import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFacet;
@@ -18,8 +19,8 @@ import org.jboss.forge.addon.projects.ProjectFacet;
  * @author Max Barkley <mbarkley@redhat.com>
  */
 @FacetConstraint({ ConfigurationFacet.class })
-public final class ProjectConfig extends AbstractFacet<Project> implements
-        MutableFacet<Project>, ProjectFacet {
+@Singleton
+public class ProjectConfig extends AbstractFacet<Project> implements ProjectFacet {
 
   /**
    * An enumeration of project properties stored in a {@link ProjectConfig}.

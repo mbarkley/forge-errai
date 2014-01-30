@@ -29,7 +29,7 @@ import org.w3c.dom.Node;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
+public abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
 
   /**
    * A collection of GWT modules to inherit in this project.

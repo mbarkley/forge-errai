@@ -53,9 +53,9 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     try {
       final File file = getResFile(getRelPath());
       if (!file.exists()) {
-        file.getParentFile().mkdirs();
-        file.createNewFile();
+        throw new IllegalStateException(String.format("The given xml file %s does not exist.", file.getAbsolutePath()));
       }
+
       final DocumentBuilder builder = docBuilderFactory.newDocumentBuilder();
       final Document doc = builder.parse(file);
       final XPath xPath = xPathFactory.newXPath();

@@ -48,7 +48,10 @@ public class CoreBuildFacet extends AbstractBaseFacet {
 
   public static String getResourceDirectory(final Project project) {
     final MavenFacet coreFacet = project.getFacet(MavenFacet.class);
-    final List<Resource> resources = coreFacet.getModel().getBuild().getResources();
+    final Model model = coreFacet.getModel();
+    if (model.getBuild() == null)
+      model.setBuild(new Build());
+    final List<Resource> resources = model.getBuild().getResources();
 
     /*
      * FIXME need to decide on a better way to select a resource directory. For
