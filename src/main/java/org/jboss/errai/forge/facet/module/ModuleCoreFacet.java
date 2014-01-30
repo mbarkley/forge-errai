@@ -18,6 +18,7 @@ import org.codehaus.plexus.util.cli.shell.Shell;
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -29,6 +30,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
+@FacetConstraint({ ProjectConfig.class })
 public class ModuleCoreFacet extends AbstractModuleFacet {
 
   private final TransformerFactory transFactory = TransformerFactory.newInstance();
