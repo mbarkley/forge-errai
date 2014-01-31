@@ -14,6 +14,7 @@ import org.jboss.errai.forge.config.SerializableSet;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.forge.addon.facets.Facet;
 import org.jboss.forge.addon.facets.MutableFacet;
+import org.jboss.forge.addon.facets.MutableFaceted;
 import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFacet;
@@ -26,10 +27,10 @@ import org.jboss.forge.addon.projects.ProjectFacet;
  * @author Max Barkley <mbarkley@redhat.com>
  */
 public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<Project> {
-  
+
   @Override
   public void setFaceted(Project origin) {
-    project = origin; 
+    project = origin;
   }
 
   protected Project project;
@@ -68,7 +69,7 @@ public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<
   public boolean install() {
     return true;
   }
-  
+
   protected Project getProject() {
     return project;
   }
@@ -88,7 +89,7 @@ public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<
       if (!getProject().hasFacet((Class<? extends ProjectFacet>) constraints[i]))
         return false;
     }
-    
+
     return true;
   }
 
@@ -105,6 +106,7 @@ public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<
    * @throws UninstallationExecption
    *           Thrown if this class is still required by another facet.
    */
+  @SuppressWarnings("unchecked")
   public boolean uninstallRequirements() throws UninstallationExecption {
     final ProjectConfig config = getProject().getFacet(ProjectConfig.class);
     final SerializableSet installedFeatureNames = config.getProjectProperty(ProjectProperty.INSTALLED_FEATURES,
@@ -122,10 +124,14 @@ public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<
     keepRequired(directlyInstalled, toUninstall);
 
     for (final Class<? extends ProjectFacet> facetType : toUninstall) {
-        // FIXME Figure out how to remove facets from project in new API
-      throw new UnsupportedOperationException();
-//      if (getProject().hasFacet(facetType))
-//        getProject().removeFacet(getProject().getFacet(facetType));
+      if (getProject().hasFacet(facetType)) {
+        if (getProject() instanceof MutableFaceted)
+          ((MutableFaceted<ProjectFacet>) getProject()).uninstall(getProject().getFacet(facetType));
+        else
+          throw new IllegalStateException(String.format(
+                  "Cannont uninstall facets from project type %s that does not implement %s", getProject().getClass()
+                          .getCanonicalName(), MutableFaceted.class.getCanonicalName()));
+      }
     }
 
     return true;
@@ -172,7 +178,8 @@ public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<
    * ignore required facets in the intentionally installed facet.
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  private Set<Class<? extends ProjectFacet>> traverseUninstallable(final Set<Class<? extends ProjectFacet>> intentionallyInstalled) {
+  private Set<Class<? extends ProjectFacet>> traverseUninstallable(
+          final Set<Class<? extends ProjectFacet>> intentionallyInstalled) {
     final Set<Class<? extends ProjectFacet>> traversed = new HashSet<Class<? extends ProjectFacet>>();
 
     final Queue<Class<? extends ProjectFacet>> toVisit = new LinkedList<Class<? extends ProjectFacet>>();
