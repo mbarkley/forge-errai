@@ -9,6 +9,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -107,7 +108,7 @@ public class AbstractXmlResourceFacetTest extends ForgeTest {
 
     final Project project = initializeJavaProject();
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
-            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), insertMap, empty, empty);
+            writeResourceToFile("org/jboss/errai/forge/facet/resource/AbstractXmlResourceFacetTest-1.xml"), insertMap, empty, empty);
     testFacet.setFaceted(project);
 
     assertTrue(testFacet.isInstalled());
@@ -131,7 +132,7 @@ public class AbstractXmlResourceFacetTest extends ForgeTest {
 
     final Project project = initializeJavaProject();
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
-            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), insertMap, empty, empty);
+            writeResourceToFile("org/jboss/errai/forge/facet/resource/AbstractXmlResourceFacetTest-1.xml"), insertMap, empty, empty);
     testFacet.setFaceted(project);
 
     assertFalse(testFacet.isInstalled());
@@ -148,7 +149,7 @@ public class AbstractXmlResourceFacetTest extends ForgeTest {
 
     final Project project = initializeJavaProject();
     final TestXmlResourceFacet testFacet = new TestXmlResourceFacet(
-            writeResourceToFile("AbstractXmlResourceFacetTest-1.xml"), new HashMap<String, Collection<Node>>(0),
+            writeResourceToFile("org/jboss/errai/forge/facet/resource/AbstractXmlResourceFacetTest-1.xml"), new HashMap<String, Collection<Node>>(0),
             replacements, new HashMap<String, Node>(0));
     testFacet.setFaceted(project);
 
@@ -164,7 +165,9 @@ public class AbstractXmlResourceFacetTest extends ForgeTest {
   private String writeResourceToFile(final String res) throws IOException {
     final File file = File.createTempFile(getClass().getSimpleName(), ".xml");
     file.deleteOnExit();
-    final BufferedInputStream stream = new BufferedInputStream(getClass().getResourceAsStream(res));
+
+    final InputStream resourceAsStream = ClassLoader.getSystemClassLoader().getResourceAsStream(res);
+    final BufferedInputStream stream = new BufferedInputStream(resourceAsStream);
     final BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(file));
 
     final byte[] buf = new byte[256];
