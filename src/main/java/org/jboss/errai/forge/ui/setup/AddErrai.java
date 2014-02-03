@@ -1,43 +1,37 @@
 package org.jboss.errai.forge.ui.setup;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.inject.Inject;
 
-import org.apache.maven.project.MavenProject;
 import org.jboss.errai.forge.util.Condition;
 import org.jboss.forge.addon.projects.Project;
-import org.jboss.forge.addon.ui.command.AbstractUICommand;
+import org.jboss.forge.addon.projects.ProjectFactory;
+import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
-import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.context.UINavigationContext;
-import org.jboss.forge.addon.ui.input.UIInput;
-import org.jboss.forge.addon.ui.metadata.WithAttributes;
 import org.jboss.forge.addon.ui.result.NavigationResult;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
 import org.jboss.forge.addon.ui.wizard.UIWizard;
 
-public class ProjectVerification extends AbstractUICommand implements UIWizard {
+public class AddErrai extends AbstractProjectCommand implements UIWizard {
 
   @Inject
-  private Project project;
+  private ProjectFactory factory;
   
-  private boolean error;
-
   @Inject
-  @WithAttributes(label = "Confirm Errai Installation")
-  private UIInput<Boolean> confirmation;
-
+  private ProjectHolder holder;
+  
   @SuppressWarnings("unchecked")
   private final Condition<Project>[] conditions = new Condition[] {
       new Condition<Project>() {
         @Override
         public boolean isSatisfied(final Project subject) {
-          return subject instanceof MavenProject;
+          // Class is package private
+          return subject.getClass().getCanonicalName().equals("org.jboss.forge.addon.maven.projects.MavenProject");
         }
 
         @Override
@@ -49,41 +43,35 @@ public class ProjectVerification extends AbstractUICommand implements UIWizard {
 
   @Override
   public Result execute(final UIExecutionContext context) throws Exception {
-    return (isSuccessful(context.getUIContext())) ?
-            Results.success() : Results.fail();
+    return verifyProject(holder.getProject());
   }
 
   @Override
   public void initializeUI(final UIBuilder builder) throws Exception {
-    final Collection<String> problems = getProblems();
+    final Project selectedProject = getSelectedProject(builder.getUIContext());
+    holder.setProject(selectedProject);
+  }
+  
+  private Result verifyProject(final Project project) {
+    final Collection<String> problems = getProblems(project);
 
     if (problems.isEmpty()) {
-      confirmation.setDefaultValue(true);
-      builder.add(confirmation);
+      return Results.success();
     }
     else {
-      final PrintStream err = builder.getUIContext().getProvider().getOutput().err();
-      err.println(String.format(
+      final StringBuilder messageBuilder = new StringBuilder();
+      messageBuilder.append(String.format(
               "There are some problems with your project (%s) preventing the installation of Errai with this Addon.",
               project.getRootDirectory().getUnderlyingResourceObject().getAbsolutePath()));
       for (final String problem : problems) {
-        err.println(problem);
+        messageBuilder.append(problem);
       }
-      error = true;
+      
+      return Results.fail(messageBuilder.toString());
     }
   }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public NavigationResult next(final UINavigationContext context) throws Exception {
-    return (isSuccessful(context.getUIContext())) ? context.navigateTo(VersionSelect.class) : null;
-  }
   
-  private boolean isSuccessful(final UIContext context) {
-    return !error && confirmation.getValue();
-  }
-
-  private Collection<String> getProblems() {
+  private Collection<String> getProblems(final Project project) {
     final Collection<String> problems = new ArrayList<String>();
 
     for (int i = 0; i < conditions.length; i++) {
@@ -92,6 +80,27 @@ public class ProjectVerification extends AbstractUICommand implements UIWizard {
     }
 
     return problems;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public NavigationResult next(UINavigationContext context) throws Exception {
+    if (holder.getProject() != null) {
+      return context.navigateTo(VersionSelect.class);
+    }
+    else {
+      return null;
+    }
+  }
+
+  @Override
+  protected boolean isProjectRequired() {
+    return true;
+  }
+
+  @Override
+  protected ProjectFactory getProjectFactory() {
+    return factory;
   }
 
 }

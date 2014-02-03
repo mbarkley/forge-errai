@@ -13,7 +13,6 @@ import org.jboss.forge.addon.dependencies.Coordinate;
 import org.jboss.forge.addon.dependencies.Dependency;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.facets.FacetFactory;
-import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
@@ -29,7 +28,7 @@ import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 public class VersionSelect extends AbstractUICommand implements UIWizardStep {
 
   @Inject
-  private Project project;
+  private ProjectHolder holder;
   
   @Inject
   private FacetFactory facetFactory;
@@ -48,18 +47,20 @@ public class VersionSelect extends AbstractUICommand implements UIWizardStep {
   @Override
   public void initializeUI(UIBuilder builder) throws Exception {
     versionSelect.setValueChoices(getValidErraiVersions());
+    
+    builder.add(versionSelect);
   }
 
   @Override
   public Result execute(UIExecutionContext context) throws Exception {
-    final ProjectConfig projectConfig = facetFactory.install(project, ProjectConfig.class);
+    final ProjectConfig projectConfig = facetFactory.install(holder.getProject(), ProjectConfig.class);
     projectConfig.setProjectProperty(ProjectProperty.ERRAI_VERSION, versionSelect.getValue());
 
     return Results.success();
   }
 
   private Collection<String> getValidErraiVersions() {
-    final DependencyFacet depFacet = project.getFacet(DependencyFacet.class);
+    final DependencyFacet depFacet = holder.getProject().getFacet(DependencyFacet.class);
     final Dependency erraiDep = DependencyBuilder.create(DependencyArtifact.ErraiParent.toString());
 
     final List<String> versions = new ArrayList<String>();

@@ -31,11 +31,10 @@ public class ModuleSelect extends AbstractUICommand implements UIWizardStep {
   private static final String CREATE_A_NEW_MODULE = "Create a new module...";
 
   @Inject
-  private Project project;
-
+  private ProjectHolder holder;
+  
   @Inject
-  @WithAttributes(label = "Select a GWT module for Errai", required = true,
-          requiredMessage = "A GWT module is required to use Errai.")
+  @WithAttributes(label = "Select a GWT module for Errai")
   private UISelectOne<String> moduleSelect;
 
   @Override
@@ -49,6 +48,7 @@ public class ModuleSelect extends AbstractUICommand implements UIWizardStep {
   public void initializeUI(UIBuilder builder) throws Exception {
     final List<String> choices = getExistingModules();
     choices.add(CREATE_A_NEW_MODULE);
+    moduleSelect.setValueChoices(choices);
 
     builder.add(moduleSelect);
   }
@@ -56,10 +56,10 @@ public class ModuleSelect extends AbstractUICommand implements UIWizardStep {
   @Override
   public Result execute(UIExecutionContext context) throws Exception {
     if (!moduleSelect.getValue().equals(CREATE_A_NEW_MODULE)) {
-      final ProjectConfig projectConfig = project.getFacet(ProjectConfig.class);
+      final ProjectConfig projectConfig = holder.getProject().getFacet(ProjectConfig.class);
       projectConfig.setProjectProperty(ProjectProperty.MODULE_LOGICAL, moduleSelect.getValue());
       projectConfig.setProjectProperty(ProjectProperty.MODULE_FILE,
-              moduleLogicalNameToFile(moduleSelect.getValue(), project));
+              moduleLogicalNameToFile(moduleSelect.getValue(), holder.getProject()));
     }
 
     return Results.success();
@@ -111,7 +111,7 @@ public class ModuleSelect extends AbstractUICommand implements UIWizardStep {
   }
 
   private File getSourceFolder() {
-    final MavenFacet mavenFacet = project.getFacet(MavenFacet.class);
+    final MavenFacet mavenFacet = holder.getProject().getFacet(MavenFacet.class);
     final Model model = mavenFacet.getModel();
 
     Build build = model.getBuild();
@@ -126,7 +126,7 @@ public class ModuleSelect extends AbstractUICommand implements UIWizardStep {
       srcDir = DefaultValue.SourceDirectory.getDefaultValue();
     }
 
-    return new File(project.getRootDirectory().getUnderlyingResourceObject(), srcDir);
+    return new File(holder.getProject().getRootDirectory().getUnderlyingResourceObject(), srcDir);
   }
 
   public static File moduleLogicalNameToFile(final String moduleName, final Project project) {

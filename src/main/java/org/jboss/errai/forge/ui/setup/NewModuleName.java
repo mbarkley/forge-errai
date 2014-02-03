@@ -4,7 +4,6 @@ import javax.inject.Inject;
 
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
-import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
@@ -25,7 +24,7 @@ public class NewModuleName extends AbstractUICommand implements UIWizardStep {
                   + " have the logical name org.jboss.errai.App";
 
   @Inject
-  private Project project;
+  private ProjectHolder holder;
 
   @Inject
   @WithAttributes(label = "Enter a Logical Module Name",
@@ -45,10 +44,10 @@ public class NewModuleName extends AbstractUICommand implements UIWizardStep {
 
   @Override
   public Result execute(UIExecutionContext context) throws Exception {
-    final ProjectConfig projectConfig = project.getFacet(ProjectConfig.class);
+    final ProjectConfig projectConfig = holder.getProject().getFacet(ProjectConfig.class);
     projectConfig.setProjectProperty(ProjectProperty.MODULE_LOGICAL, logicalModuleName.getValue());
     projectConfig.setProjectProperty(ProjectProperty.MODULE_FILE,
-            ModuleSelect.moduleLogicalNameToFile(logicalModuleName.getValue(), project));
+            ModuleSelect.moduleLogicalNameToFile(logicalModuleName.getValue(), holder.getProject()));
 
     return Results.success();
   }

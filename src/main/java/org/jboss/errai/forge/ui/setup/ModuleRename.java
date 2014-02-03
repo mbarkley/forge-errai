@@ -19,8 +19,8 @@ import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 public class ModuleRename extends AbstractUICommand implements UIWizardStep {
 
   @Inject
-  private Project project;
-
+  private ProjectHolder holder;
+  
   @Inject
   @WithAttributes(label = "Enter a Short Name for the GWT Module", required = false, defaultValue = "",
           description = "This option can be used to give the module a shorter more convenient name than the logical name.")
@@ -40,7 +40,7 @@ public class ModuleRename extends AbstractUICommand implements UIWizardStep {
 
   @Override
   public Result execute(UIExecutionContext context) throws Exception {
-    final ProjectConfig projectConfig = project.getFacet(ProjectConfig.class);
+    final ProjectConfig projectConfig = holder.getProject().getFacet(ProjectConfig.class);
     final String logicalName = projectConfig.getProjectProperty(ProjectProperty.MODULE_LOGICAL, String.class);
 
     String newName = moduleName.getValue();
