@@ -12,7 +12,6 @@ import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.forge.addon.dependencies.Coordinate;
 import org.jboss.forge.addon.dependencies.Dependency;
 import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
-import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
@@ -29,9 +28,6 @@ public class VersionSelect extends AbstractUICommand implements UIWizardStep {
 
   @Inject
   private ProjectHolder holder;
-  
-  @Inject
-  private FacetFactory facetFactory;
 
   @Inject
   @WithAttributes(label = "Select an Errai Version", required = true,
@@ -53,7 +49,7 @@ public class VersionSelect extends AbstractUICommand implements UIWizardStep {
 
   @Override
   public Result execute(UIExecutionContext context) throws Exception {
-    final ProjectConfig projectConfig = facetFactory.install(holder.getProject(), ProjectConfig.class);
+    final ProjectConfig projectConfig = holder.getProject().getFacet(ProjectConfig.class);
     projectConfig.setProjectProperty(ProjectProperty.ERRAI_VERSION, versionSelect.getValue());
 
     return Results.success();

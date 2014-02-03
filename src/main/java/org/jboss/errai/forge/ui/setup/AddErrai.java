@@ -5,13 +5,16 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 
+import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.util.Condition;
+import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.context.UINavigationContext;
+import org.jboss.forge.addon.ui.result.Failed;
 import org.jboss.forge.addon.ui.result.NavigationResult;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
@@ -20,7 +23,10 @@ import org.jboss.forge.addon.ui.wizard.UIWizard;
 public class AddErrai extends AbstractProjectCommand implements UIWizard {
 
   @Inject
-  private ProjectFactory factory;
+  private ProjectFactory projectFactory;
+  
+  @Inject
+  private FacetFactory facetFactory;
   
   @Inject
   private ProjectHolder holder;
@@ -43,7 +49,13 @@ public class AddErrai extends AbstractProjectCommand implements UIWizard {
 
   @Override
   public Result execute(final UIExecutionContext context) throws Exception {
-    return verifyProject(holder.getProject());
+    final Result result = verifyProject(holder.getProject());
+    
+    if (!(result instanceof Failed)) {
+      facetFactory.install(holder.getProject(), ProjectConfig.class);
+    }
+    
+    return result;
   }
 
   @Override
@@ -100,7 +112,7 @@ public class AddErrai extends AbstractProjectCommand implements UIWizard {
 
   @Override
   protected ProjectFactory getProjectFactory() {
-    return factory;
+    return projectFactory;
   }
 
 }

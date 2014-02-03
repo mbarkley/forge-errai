@@ -4,7 +4,8 @@ import javax.inject.Inject;
 
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
-import org.jboss.forge.addon.projects.Project;
+import org.jboss.errai.forge.facet.aggregate.CoreFacet;
+import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
@@ -22,12 +23,15 @@ public class ModuleRename extends AbstractUICommand implements UIWizardStep {
   private ProjectHolder holder;
   
   @Inject
+  private FacetFactory factory;
+  
+  @Inject
   @WithAttributes(label = "Enter a Short Name for the GWT Module", required = false, defaultValue = "",
           description = "This option can be used to give the module a shorter more convenient name than the logical name.")
   private UIInput<String> moduleName;
 
   @Override
-  @SuppressWarnings("unchecked")
+//  @SuppressWarnings("unchecked")
   public NavigationResult next(UINavigationContext context) throws Exception {
 //    return context.navigateTo(FeatureSelect.class);
     return null;
@@ -44,12 +48,12 @@ public class ModuleRename extends AbstractUICommand implements UIWizardStep {
     final String logicalName = projectConfig.getProjectProperty(ProjectProperty.MODULE_LOGICAL, String.class);
 
     String newName = moduleName.getValue();
-
     if (newName == null || newName.equals("")) {
       newName = logicalName;
     }
-    
     projectConfig.setProjectProperty(ProjectProperty.MODULE_NAME, newName);
+    
+    factory.install(holder.getProject(), CoreFacet.class);
 
     return Results.success();
   }
