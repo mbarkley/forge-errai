@@ -1,35 +1,31 @@
 package org.jboss.errai.forge.ui.features;
 
-import org.jboss.forge.addon.projects.ProjectFactory;
+import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections.Feature;
+import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.ui.command.UICommand;
-import org.jboss.forge.addon.ui.context.UIBuilder;
-import org.jboss.forge.addon.ui.context.UIExecutionContext;
-import org.jboss.forge.addon.ui.result.Result;
 
-public class AddErraiFeatures extends AbstractFeatureCommand implements UICommand {
+public class AddErraiFeatures extends AbstractFeatureCommand implements
+    UICommand {
 
   @Override
-  public void initializeUI(UIBuilder builder) throws Exception {
-    // TODO Auto-generated method stub
-
+  protected FeatureFilter getFilter() {
+    return new FeatureFilter() {
+      @Override
+      public boolean filter(Feature feature, Project project) {
+        return project.hasFacet(feature.getFeatureClass());
+      }
+    };
   }
 
   @Override
-  public Result execute(UIExecutionContext context) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+  protected String getSelectionDescription() {
+    return "The selected Errai Features will be added to your project,"
+        + " including any necessary configurations and other required features.";
   }
 
   @Override
-  protected boolean isProjectRequired() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  protected ProjectFactory getProjectFactory() {
-    // TODO Auto-generated method stub
-    return null;
+  protected String getSelectionLabel() {
+    return "Select Errai Features to Add";
   }
 
 }

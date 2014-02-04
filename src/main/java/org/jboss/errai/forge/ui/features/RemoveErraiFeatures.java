@@ -1,36 +1,40 @@
 package org.jboss.errai.forge.ui.features;
 
-import org.jboss.forge.addon.projects.ProjectFactory;
-import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
+import org.jboss.errai.forge.config.ProjectConfig;
+import org.jboss.errai.forge.config.SerializableSet;
+import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
+import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections.Feature;
+import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.ui.command.UICommand;
-import org.jboss.forge.addon.ui.context.UIBuilder;
-import org.jboss.forge.addon.ui.context.UIExecutionContext;
-import org.jboss.forge.addon.ui.result.Result;
 
-public class RemoveErraiFeatures extends AbstractFeatureCommand implements UICommand {
+public class RemoveErraiFeatures extends AbstractFeatureCommand implements
+    UICommand {
 
   @Override
-  public void initializeUI(UIBuilder builder) throws Exception {
-    // TODO Auto-generated method stub
+  protected FeatureFilter getFilter() {
+    return new FeatureFilter() {
+      @Override
+      public boolean filter(Feature feature, Project project) {
+        final ProjectConfig projectConfig = project
+            .getFacet(ProjectConfig.class);
 
+        return project.hasFacet(feature.getFeatureClass())
+            && projectConfig.getProjectProperty(
+                ProjectProperty.INSTALLED_FEATURES, SerializableSet.class)
+                .contains(feature.toString());
+      }
+    };
   }
 
   @Override
-  public Result execute(UIExecutionContext context) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+  protected String getSelectionDescription() {
+    return "The selected Errai features will be removed from your project."
+        + " Any additional features which were not explicitly installed and are no longer needed will also be removed.";
   }
 
   @Override
-  protected boolean isProjectRequired() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  protected ProjectFactory getProjectFactory() {
-    // TODO Auto-generated method stub
-    return null;
+  protected String getSelectionLabel() {
+    return "Select Errai Features to Remove";
   }
 
 }
