@@ -5,25 +5,19 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.jboss.errai.forge.config.ProjectConfig;
-import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
-import org.jboss.errai.forge.config.SerializableSet;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections.Feature;
 import org.jboss.forge.addon.convert.Converter;
-import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
-import org.jboss.forge.addon.ui.command.UICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.input.UISelectMany;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
 
-abstract class AbstractFeatureCommand extends AbstractProjectCommand implements
-    UICommand {
+public abstract class AbstractFeatureCommand extends AbstractProjectCommand {
 
   protected static interface FeatureFilter {
     /**
@@ -43,9 +37,6 @@ abstract class AbstractFeatureCommand extends AbstractProjectCommand implements
 
   @Inject
   private ProjectFactory projectFactory;
-
-  @Inject
-  private FacetFactory facetFactory;
 
   @Inject
   private UISelectMany<Feature> featureSelect;
@@ -70,6 +61,7 @@ abstract class AbstractFeatureCommand extends AbstractProjectCommand implements
 
     featureSelect.setValueChoices(features);
     featureSelect.setValueConverter(new FeatureConverter());
+    builder.add(featureSelect);
   }
 
   protected abstract FeatureFilter getFilter();
@@ -85,25 +77,16 @@ abstract class AbstractFeatureCommand extends AbstractProjectCommand implements
 
     for (final Feature feature : features) {
       try {
-        install(project, feature);
-      } catch(IllegalStateException e) {
-        return Results.fail(String.format("Could not install %s",
-            feature.getShortName()), e);
+        performOperation(project, feature);
+      } catch(Exception e) {
+        return Results.fail(e.getMessage(), e);
       }
     }
 
     return Results.success();
   }
 
-  private void install(final Project project, final Feature feature) {
-    facetFactory.install(project, feature.getFeatureClass());
-
-    final ProjectConfig projectConfig = project.getFacet(ProjectConfig.class);
-    final SerializableSet installed = projectConfig.getProjectProperty(ProjectProperty.INSTALLED_FEATURES, SerializableSet.class);
-    installed.add(feature.toString());
-    
-    projectConfig.setProjectProperty(ProjectProperty.INSTALLED_FEATURES, installed);
-  }
+  protected abstract void performOperation(Project project, Feature feature) throws Exception;
 
   @Override
   protected boolean isProjectRequired() {
@@ -111,7 +94,7 @@ abstract class AbstractFeatureCommand extends AbstractProjectCommand implements
   }
 
   @Override
-  protected ProjectFactory getProjectFactory() {
+  public ProjectFactory getProjectFactory() {
     return projectFactory;
   }
 

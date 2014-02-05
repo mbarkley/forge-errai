@@ -132,7 +132,17 @@ public abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
     if (profile == null || profile.getBuild() == null)
       return false;
 
-    final Plugin plugin = profile.getBuild().getPluginsAsMap().get(getPluginArtifact().toString());
+    Plugin plugin = profile.getBuild().getPluginsAsMap().get(getPluginArtifact().toString());
+    if (plugin == null) {
+      plugin = new Plugin();
+      plugin.setGroupId(pluginArtifact.getGroupId());
+      plugin.setArtifactId(pluginArtifact.getArtifactId());
+      
+      final VersionOracle oracle = new VersionOracle(getFaceted().getFacet(DependencyFacet.class));
+      plugin.setVersion(oracle.resolveVersion(pluginArtifact));
+      
+      profile.getBuild().addPlugin(plugin);
+    }
 
     outer: for (final DependencyBuilder dep : getDependencies()) {
       for (final Dependency pluginDep : plugin.getDependencies()) {

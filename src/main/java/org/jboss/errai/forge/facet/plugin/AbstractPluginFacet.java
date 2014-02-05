@@ -38,7 +38,7 @@ public abstract class AbstractPluginFacet extends AbstractBaseFacet {
    * The Maven artifact of the plugin to be installed.
    */
   protected DependencyArtifact pluginArtifact;
-  
+
   public DependencyArtifact getPluginArtifact() {
     return pluginArtifact;
   }
@@ -171,7 +171,8 @@ public abstract class AbstractPluginFacet extends AbstractBaseFacet {
   protected static boolean isMatchingConfiguration(final Configuration config,
           final Collection<ConfigurationElement> elements) {
     for (final ConfigurationElement elem : elements) {
-      if (!isMatchingElement(config.getConfigurationElement(elem.getName()), elem))
+      if (!config.hasConfigurationElement(elem.getName())
+              || !isMatchingElement(config.getConfigurationElement(elem.getName()), elem))
         return false;
     }
 
