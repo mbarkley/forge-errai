@@ -107,7 +107,7 @@ public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<
    *           Thrown if this class is still required by another facet.
    */
   @SuppressWarnings("unchecked")
-  public boolean uninstallRequirements() throws UninstallationExecption {
+  public boolean uninstallRequirements() throws UninstallationExecption, IllegalStateException {
     final ProjectConfig config = getProject().getFacet(ProjectConfig.class);
     final SerializableSet installedFeatureNames = config.getProjectProperty(ProjectProperty.INSTALLED_FEATURES,
             SerializableSet.class);
@@ -129,7 +129,7 @@ public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<
           ((MutableFaceted<ProjectFacet>) getProject()).uninstall(getProject().getFacet(facetType));
         else
           throw new IllegalStateException(String.format(
-                  "Cannont uninstall facets from project type %s that does not implement %s", getProject().getClass()
+                  "Cannot uninstall facets from project type %s that does not implement %s", getProject().getClass()
                           .getCanonicalName(), MutableFaceted.class.getCanonicalName()));
       }
     }

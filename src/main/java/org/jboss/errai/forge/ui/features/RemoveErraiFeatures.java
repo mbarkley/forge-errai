@@ -45,7 +45,7 @@ public class RemoveErraiFeatures extends AbstractFeatureCommand {
       final MutableFaceted<ProjectFacet> mutable = (MutableFaceted<ProjectFacet>) project;
       final BaseAggregatorFacet facet = mutable.getFacet(feature.getFeatureClass());
 
-      if (!mutable.uninstall(facet))
+      if (!facet.uninstallRequirements() || !mutable.uninstall(facet))
         throw new Exception(String.format("Could not uninstall %s from %s.", facet.getClass(), project));
 
       final ProjectConfig projectConfig = project.getFacet(ProjectConfig.class);
