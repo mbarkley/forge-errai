@@ -3,8 +3,6 @@ package org.jboss.errai.forge.facet.base;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -13,27 +11,27 @@ import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.util.MavenConverter;
 import org.jboss.errai.forge.util.VersionOracle;
-import org.jboss.forge.maven.MavenCoreFacet;
-import org.jboss.forge.maven.profiles.ProfileBuilder;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.project.facets.BaseFacet;
-import org.jboss.forge.shell.Shell;
-import org.jboss.forge.shell.ShellColor;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.facets.AbstractFacet;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
+import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.ProjectFacet;
 
 /**
  * A base class for Errai-related facets providing some basic routines.
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-public abstract class AbstractBaseFacet extends BaseFacet {
+public abstract class AbstractBaseFacet extends AbstractFacet<Project> implements ProjectFacet {
 
   /**
    * The name of the primary profile used to configure an Errai project.
    */
   public static final String MAIN_PROFILE = "jboss7";
-
-  @Inject
-  protected Shell shell;
+  
+  protected Project getProject() {
+    return Project.class.cast(getFaceted());
+  }
 
   /**
    * Get a Maven {@link Profile} by name from a {@link List}.
@@ -55,25 +53,6 @@ public abstract class AbstractBaseFacet extends BaseFacet {
   }
 
   /**
-   * Print an error message to the {@link Shell}.
-   * 
-   * @param message
-   *          A message to print to the shell.
-   * @param throwable
-   *          A stack trace from this will be printed iff
-   *          {@link Shell#isVerbose()} is {@literal true}.
-   */
-  protected void printError(final String message, final Throwable throwable) {
-    shell.println(ShellColor.RED, message);
-    if (shell.isVerbose() && throwable != null) {
-      shell.println(throwable.toString());
-      for (final StackTraceElement trace : throwable.getStackTrace()) {
-        shell.println(trace.toString());
-      }
-    }
-  }
-
-  /**
    * Add dependencies to a Maven profile.
    * 
    * @param name
@@ -89,31 +68,32 @@ public abstract class AbstractBaseFacet extends BaseFacet {
    */
   protected boolean addDependenciesToProfile(final String name, final Collection<DependencyBuilder> deps,
           final VersionOracle versionOracle) {
-    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    final Model pom = coreFacet.getPOM();
+    final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
+    final Model pom = coreFacet.getModel();
 
     Profile profile = getProfile(name, pom.getProfiles());
 
     if (profile == null) {
-      profile = ProfileBuilder.create().setId(name).getAsMavenProfile();
+      profile = new Profile();
+      profile.setId(name);
       pom.addProfile(profile);
     }
 
     for (DependencyBuilder dep : deps) {
       if (!hasDependency(profile, dep)) {
         if (!versionOracle.isManaged(dep)) {
-          if (dep.getVersion() == null || dep.getVersion().equals("")) {
+          if (dep.getCoordinate().getVersion() == null || dep.getCoordinate().getVersion().equals("")) {
             if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
               dep.setVersion(Property.ErraiVersion.invoke());
             else
-              dep.setVersion(versionOracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+              dep.setVersion(versionOracle.resolveVersion(dep.getGroupId(), dep.getCoordinate().getArtifactId()));
           }
         }
         profile.addDependency(MavenConverter.convert(dep));
       }
     }
 
-    coreFacet.setPOM(pom);
+    coreFacet.setModel(pom);
 
     return true;
   }
@@ -158,5 +138,13 @@ public abstract class AbstractBaseFacet extends BaseFacet {
       dep.setClassifier(artifact.getClassifier());
     
     return dep;
+  }
+  
+  protected void error(final String message, final Throwable throwable) {
+    // TODO implement
+  }
+  
+  protected void warning(final String message, final Throwable throwable) {
+    // TODO implement
   }
 }

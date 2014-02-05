@@ -6,8 +6,6 @@ import java.util.Map;
 
 import javax.inject.Singleton;
 
-import org.jboss.errai.forge.plugin.Main;
-
 /**
  * A class for querying meta-data on of top-level aggregator facets.
  * 

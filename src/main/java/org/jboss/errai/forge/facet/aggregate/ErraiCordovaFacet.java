@@ -3,9 +3,9 @@ package org.jboss.errai.forge.facet.aggregate;
 import org.jboss.errai.forge.facet.dependency.ErraiCordovaDependencyFacet;
 import org.jboss.errai.forge.facet.module.ErraiCordovaModuleFacet;
 import org.jboss.errai.forge.facet.plugin.CordovaPluginFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 
-@RequiresFacet({ ErraiCordovaDependencyFacet.class, ErraiCordovaModuleFacet.class, CordovaPluginFacet.class })
+@FacetConstraint({ ErraiCordovaDependencyFacet.class, ErraiCordovaModuleFacet.class, CordovaPluginFacet.class })
 public class ErraiCordovaFacet extends BaseAggregatorFacet {
 
   @Override

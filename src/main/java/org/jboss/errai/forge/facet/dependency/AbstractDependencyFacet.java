@@ -13,17 +13,16 @@ import javax.inject.Inject;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
+import org.codehaus.plexus.util.cli.shell.Shell;
 import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.util.MavenConverter;
 import org.jboss.errai.forge.util.VersionOracle;
-import org.jboss.forge.maven.MavenCoreFacet;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.project.dependencies.ScopeType;
-import org.jboss.forge.project.facets.DependencyFacet;
-import org.jboss.forge.shell.Shell;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
+import org.jboss.forge.addon.projects.facets.DependencyFacet;
 
 /**
  * A base class for all facets that install Maven dependencies. Concrete
@@ -33,7 +32,7 @@ import org.jboss.forge.shell.Shell;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-abstract class AbstractDependencyFacet extends AbstractBaseFacet {
+public abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
   /**
    * Dependencies to be added to the build in the Maven pom file. Versions of
@@ -55,7 +54,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
   @Override
   public boolean install() {
     final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
-    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
+    final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
     final VersionOracle oracle = new VersionOracle(depFacet);
 
     for (DependencyBuilder dep : coreDependencies) {
@@ -66,7 +65,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
       addDependenciesToProfile(entry.getKey(), entry.getValue(), oracle);
     }
 
-    final Model pom = coreFacet.getPOM();
+    final Model pom = coreFacet.getModel();
     final Map<String, Collection<DependencyBuilder>> blacklistProfileDependencies = new HashMap<String, Collection<DependencyBuilder>>();
     for (String profileId : ArtifactVault.getBlacklistProfiles()) {
       final Profile profile = getProfile(profileId, pom.getProfiles());
@@ -74,10 +73,10 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
         final DependencyBuilder dep = getDependency(artifact);
         if (depFacet.hasEffectiveDependency(dep)
                 && !hasProvidedDependency(profile, dep)) {
-          final org.jboss.forge.project.dependencies.Dependency existing = depFacet.getEffectiveDependency(dep);
+          final org.jboss.forge.addon.dependencies.Dependency existing = depFacet.getEffectiveDependency(dep);
           if (!oracle.isManaged(dep))
-            dep.setVersion(existing.getVersion());
-          dep.setScopeType(ScopeType.PROVIDED);
+            dep.setVersion(existing.getCoordinate().getVersion());
+          dep.setScopeType("provided");
           if (!blacklistProfileDependencies.containsKey(profileId))
             blacklistProfileDependencies.put(profileId, new ArrayList<DependencyBuilder>());
           blacklistProfileDependencies.get(profileId).add(dep);
@@ -103,20 +102,20 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
 
     // Remove blacklisted dependencies that are no longer transitively in the
     // project
-    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    Model pom = coreFacet.getPOM();
+    final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
+    Model pom = coreFacet.getModel();
     for (final Profile profile : pom.getProfiles()) {
       for (final DependencyArtifact artifact : ArtifactVault.getBlacklistedArtifacts(profile.getId())) {
         final DependencyBuilder dep = getDependency(artifact);
         if (!depFacet.hasEffectiveDependency(dep)) {
           if (!profileDependencies.containsKey(profile.getId()))
             profileDependencies.put(profile.getId(), new ArrayList<DependencyBuilder>());
-          profileDependencies.get(profile.getId()).add(dep.setScopeType(ScopeType.PROVIDED));
+          profileDependencies.get(profile.getId()).add(dep.setScopeType("provided"));
         }
       }
     }
 
-    pom = coreFacet.getPOM();
+    pom = coreFacet.getModel();
     for (Profile profile : pom.getProfiles()) {
       if (profileDependencies.containsKey(profile.getId())) {
         for (DependencyBuilder dep : profileDependencies.get(profile.getId())) {
@@ -130,7 +129,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
         }
       }
     }
-    coreFacet.setPOM(pom);
+    coreFacet.setModel(pom);
 
     return true;
   }
@@ -145,8 +144,8 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
       }
     }
 
-    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    Model pom = coreFacet.getPOM();
+    final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
+    Model pom = coreFacet.getModel();
     for (final String profName : profileDependencies.keySet()) {
       final Profile profile = getProfile(profName, pom.getProfiles());
       if (profile == null) {
@@ -170,7 +169,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
      * what sets the blacklisted dependencies to provided, as long as something
      * does it.
      */
-    pom = coreFacet.getPOM();
+    pom = coreFacet.getModel();
     for (final String profileId : ArtifactVault.getBlacklistProfiles()) {
       final Profile profile = getProfile(profileId, pom.getProfiles());
       for (final DependencyArtifact artifact : ArtifactVault.getBlacklistedArtifacts(profileId)) {
@@ -188,7 +187,7 @@ abstract class AbstractDependencyFacet extends AbstractBaseFacet {
       if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
         dep.setVersion(Property.ErraiVersion.invoke());
       else
-        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getCoordinate().getArtifactId()));
     }
 
     return dep;

@@ -16,12 +16,12 @@ import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.util.MavenConverter;
 import org.jboss.errai.forge.util.VersionOracle;
-import org.jboss.forge.maven.MavenCoreFacet;
-import org.jboss.forge.maven.plugins.Configuration;
-import org.jboss.forge.maven.plugins.ConfigurationElement;
-import org.jboss.forge.maven.plugins.MavenPluginAdapter;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.project.facets.DependencyFacet;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.maven.plugins.Configuration;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElement;
+import org.jboss.forge.addon.maven.plugins.MavenPluginAdapter;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
+import org.jboss.forge.addon.projects.facets.DependencyFacet;
 
 /**
  * A base class for facets that install Maven plugins within the given profile
@@ -34,12 +34,22 @@ import org.jboss.forge.project.facets.DependencyFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
+public abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
+  // TODO Refactor AbstractProfilePluginFacet and AbstractPluginFacet to have common base class
 
   /**
    * Executions for the installed plugin.
    */
   protected Collection<PluginExecution> executions;
+  
+  public Collection<PluginExecution> getPluginExecutions() {
+    return executions;
+  }
+
+  protected boolean isExtensions() {
+    return extensions;
+  }
+
   protected boolean extensions = true;
 
   /**
@@ -50,14 +60,14 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
   @Override
   public boolean install() {
-    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    Model pom = coreFacet.getPOM();
+    final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
+    Model pom = coreFacet.getModel();
     Profile profile = getProfile(profileId, pom.getProfiles());
     final VersionOracle oracle = new VersionOracle(getProject().getFacet(DependencyFacet.class));
 
     if (profile == null) {
       addDependenciesToProfile(profileId, Collections.<DependencyBuilder> emptyList(), oracle);
-      pom = coreFacet.getPOM();
+      pom = coreFacet.getModel();
       profile = getProfile(profileId, pom.getProfiles());
     }
 
@@ -65,12 +75,12 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
       profile.setBuild(new BuildBase());
     }
 
-    Plugin plugin = getPlugin(pluginArtifact, profile.getBuild().getPlugins());
+    Plugin plugin = getPlugin(getPluginArtifact(), profile.getBuild().getPlugins());
 
     if (plugin == null) {
       plugin = new Plugin();
-      plugin.setArtifactId(pluginArtifact.getArtifactId());
-      plugin.setGroupId(pluginArtifact.getGroupId());
+      plugin.setArtifactId(getPluginArtifact().getArtifactId());
+      plugin.setGroupId(getPluginArtifact().getGroupId());
       if (ArtifactVault.ERRAI_GROUP_ID.equals(plugin.getGroupId()))
         plugin.setVersion(Property.ErraiVersion.invoke());
       else
@@ -80,59 +90,70 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
     final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
     final Configuration config = adapter.getConfig();
-    for (final ConfigurationElement elem : configurations) {
+    for (final ConfigurationElement elem : getConfigurations()) {
       mergeConfigurationElement(config, elem);
     }
     adapter.setConfig(config);
 
-    for (final DependencyBuilder depBuilder : dependencies) {
-      if (depBuilder.getVersion() == null || depBuilder.getVersion().equals("")) {
+    for (final DependencyBuilder depBuilder : getDependencies()) {
+      if (depBuilder.getCoordinate().getVersion() == null || depBuilder.getCoordinate().getVersion().equals("")) {
         if (ArtifactVault.ERRAI_GROUP_ID.equals(depBuilder.getGroupId())) {
           depBuilder.setVersion(Property.ErraiVersion.invoke());
         }
         else {
           depBuilder.setVersion(new VersionOracle(getProject().getFacet(DependencyFacet.class)).resolveVersion(
-                  depBuilder.getGroupId(), depBuilder.getArtifactId()));
+                  depBuilder.getGroupId(), depBuilder.getCoordinate().getArtifactId()));
         }
       }
       adapter.addDependency(MavenConverter.convert(depBuilder));
     }
 
-    for (final PluginExecution exec : executions) {
+    for (final PluginExecution exec : getPluginExecutions()) {
       adapter.addExecution(exec);
     }
-    adapter.setExtensions(extensions);
+    adapter.setExtensions(isExtensions());
 
     // Changes are not committed from adapter to original plugin
     plugin.setConfiguration(adapter.getConfiguration());
     plugin.setExecutions(adapter.getExecutions());
     plugin.setDependencies(adapter.getDependencies());
 
-    coreFacet.setPOM(pom);
+    coreFacet.setModel(pom);
 
     return true;
   }
 
   @Override
   public boolean isInstalled() {
-    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    final Model pom = coreFacet.getPOM();
+    final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
+    final Model pom = coreFacet.getModel();
 
     final Profile profile = getProfile(profileId, pom.getProfiles());
     if (profile == null || profile.getBuild() == null)
       return false;
 
-    final Plugin plugin = profile.getBuild().getPluginsAsMap().get(pluginArtifact.toString());
+    Plugin plugin = profile.getBuild().getPluginsAsMap().get(getPluginArtifact().toString());
+    if (plugin == null) {
+      plugin = new Plugin();
+      plugin.setGroupId(pluginArtifact.getGroupId());
+      plugin.setArtifactId(pluginArtifact.getArtifactId());
+      
+      final VersionOracle oracle = new VersionOracle(getFaceted().getFacet(DependencyFacet.class));
+      plugin.setVersion(oracle.resolveVersion(pluginArtifact));
+      
+      profile.getBuild().addPlugin(plugin);
+    }
 
-    outer: for (final DependencyBuilder dep : dependencies) {
+    outer: for (final DependencyBuilder dep : getDependencies()) {
       for (final Dependency pluginDep : plugin.getDependencies()) {
-        if (pluginDep.getArtifactId().equals(dep.getArtifactId()) && pluginDep.getGroupId().equals(dep.getGroupId()))
+        if (pluginDep.getArtifactId().equals(dep.getCoordinate().getArtifactId())
+                && pluginDep.getGroupId().equals(dep.getGroupId()))
           continue outer;
       }
       return false;
     }
 
-    outer: for (final PluginExecution exec : executions) {
+    outer: for (final PluginExecution exec : getPluginExecutions()) {
       for (final PluginExecution pluginExec : plugin.getExecutions()) {
         if (pluginExec.getId().equals(exec.getId()))
           continue outer;
@@ -142,7 +163,7 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
     final MavenPluginAdapter adapter = new MavenPluginAdapter(plugin);
 
-    if (!isMatchingConfiguration(adapter.getConfig(), configurations))
+    if (!isMatchingConfiguration(adapter.getConfig(), getConfigurations()))
       return false;
 
     return true;
@@ -150,8 +171,8 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
 
   @Override
   public boolean uninstall() {
-    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    final Model pom = coreFacet.getPOM();
+    final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
+    final Model pom = coreFacet.getModel();
 
     final Profile profile = getProfile(profileId, pom.getProfiles());
     if (profile == null)
@@ -161,13 +182,13 @@ abstract class AbstractProfilePluginFacet extends AbstractPluginFacet {
     if (build == null)
       return false;
 
-    final Plugin plugin = build.getPluginsAsMap().get(pluginArtifact.toString());
+    final Plugin plugin = build.getPluginsAsMap().get(getPluginArtifact().toString());
     if (plugin == null)
       return false;
 
     build.removePlugin(plugin);
     profile.setBuild(build);
-    coreFacet.setPOM(pom);
+    coreFacet.setModel(pom);
 
     return true;
   }

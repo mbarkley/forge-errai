@@ -18,7 +18,7 @@ public class WebXmlFacet extends AbstractFileResourceFacet {
 
   @Override
   public String getRelFilePath() {
-    return WarPluginFacet.getWarSourceDirectory(project) + "/WEB-INF/web.xml";
+    return WarPluginFacet.getWarSourceDirectory(getProject()) + "/WEB-INF/web.xml";
   }
 
 }

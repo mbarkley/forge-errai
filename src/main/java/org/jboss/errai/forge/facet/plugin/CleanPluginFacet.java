@@ -2,19 +2,17 @@ package org.jboss.errai.forge.facet.plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
-import javax.inject.Inject;
-
+import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
-import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.facet.base.CoreBuildFacet;
-import org.jboss.forge.maven.plugins.ConfigurationElement;
-import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
-import org.jboss.forge.maven.plugins.Execution;
-import org.jboss.forge.project.Project;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElement;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElementBuilder;
+import org.jboss.forge.addon.maven.plugins.Execution;
 
 /**
  * This facet configures the maven-clean-plugin in the build section of the
@@ -22,13 +20,8 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ CoreBuildFacet.class })
+@FacetConstraint({ CoreBuildFacet.class })
 public class CleanPluginFacet extends AbstractPluginFacet {
-
-  private @Inject
-  ProjectConfigFactory factory;
-
-  private boolean moduleAdded = false;
 
   public CleanPluginFacet() {
     pluginArtifact = DependencyArtifact.Clean;
@@ -53,18 +46,18 @@ public class CleanPluginFacet extends AbstractPluginFacet {
     });
   }
 
+  private void init() {
+    final String moduleName = getProject().getFacet(ProjectConfig.class).getProjectProperty(
+            ProjectProperty.MODULE_NAME,
+            String.class);
+    ((ConfigurationElementBuilder) configurations.iterator().next().getChildByName("includes"))
+            .addChild(ConfigurationElementBuilder.create().setName("include")
+                    .setText("src/main/webapp/" + moduleName + "/"));
+  }
+  
   @Override
-  public void setProject(Project project) {
-    super.setProject(project);
-
-    if (!moduleAdded) {
-      final String moduleName = factory.getProjectConfig(getProject()).getProjectProperty(
-              ProjectProperty.MODULE_NAME,
-              String.class);
-      ((ConfigurationElementBuilder) configurations.iterator().next().getChildByName("includes"))
-              .addChild(ConfigurationElementBuilder.create().setName("include")
-                      .setText("src/main/webapp/" + moduleName + "/"));
-      moduleAdded = true;
-    }
+  public Collection<ConfigurationElement> getConfigurations() {
+    init();
+    return super.getConfigurations();
   }
 }

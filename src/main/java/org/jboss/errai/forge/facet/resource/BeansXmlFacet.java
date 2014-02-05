@@ -13,7 +13,7 @@ public class BeansXmlFacet extends AbstractFileResourceFacet {
 
   @Override
   public String getRelFilePath() {
-    return WarPluginFacet.getWarSourceDirectory(project) + "/WEB-INF/beans.xml";
+    return WarPluginFacet.getWarSourceDirectory(getProject()) + "/WEB-INF/beans.xml";
   }
 
 }

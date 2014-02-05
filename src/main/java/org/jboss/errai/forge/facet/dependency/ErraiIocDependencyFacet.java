@@ -2,7 +2,7 @@ package org.jboss.errai.forge.facet.dependency;
 
 import static org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact.ErraiIoc;
 
-import org.jboss.forge.project.dependencies.DependencyBuilder;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 
 /**
  * This facet sets the Maven dependencies needed to use the errai-ioc project.

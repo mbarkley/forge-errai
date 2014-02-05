@@ -11,7 +11,7 @@ public class ConfigXmlFacet extends AbstractFileResourceFacet {
 
   @Override
   public String getRelFilePath() {
-    return WarPluginFacet.getWarSourceDirectory(project) + "/config.xml";
+    return WarPluginFacet.getWarSourceDirectory(getProject()) + "/config.xml";
   }
 
 }

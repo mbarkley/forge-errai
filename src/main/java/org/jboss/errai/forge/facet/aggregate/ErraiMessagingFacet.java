@@ -4,7 +4,7 @@ import org.jboss.errai.forge.facet.dependency.ErraiBuildDependencyFacet;
 import org.jboss.errai.forge.facet.dependency.ErraiBusDependencyFacet;
 import org.jboss.errai.forge.facet.module.ErraiBusModuleFacet;
 import org.jboss.errai.forge.facet.resource.ErraiBusServletConfigFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 
 /**
  * Aggregator facet for Errai Messaging. Installing this facet adds the
@@ -13,7 +13,7 @@ import org.jboss.forge.shell.plugins.RequiresFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@RequiresFacet({ CoreFacet.class, ErraiBusDependencyFacet.class, ErraiBuildDependencyFacet.class,
+@FacetConstraint({ CoreFacet.class, ErraiBusDependencyFacet.class, ErraiBuildDependencyFacet.class,
     ErraiBusModuleFacet.class, ErraiBusServletConfigFacet.class })
 public class ErraiMessagingFacet extends BaseAggregatorFacet {
 

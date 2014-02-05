@@ -14,9 +14,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.codehaus.plexus.util.cli.shell.Shell;
+import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
-import org.jboss.forge.shell.Shell;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -28,6 +30,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
+@FacetConstraint({ ProjectConfig.class })
 public class ModuleCoreFacet extends AbstractModuleFacet {
 
   private final TransformerFactory transFactory = TransformerFactory.newInstance();
@@ -54,7 +57,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
 
   @Override
   public boolean install() {
-    final File module = configFactory.getProjectConfig(project).getProjectProperty(ProjectProperty.MODULE_FILE,
+    final File module = getProject().getFacet(ProjectConfig.class).getProjectProperty(ProjectProperty.MODULE_FILE,
             File.class);
     if (!module.exists()) {
       module.getParentFile().mkdirs();
@@ -62,7 +65,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
         module.createNewFile();
       }
       catch (IOException e) {
-        printError("Could not create module at " + module.getAbsolutePath(), e);
+        error("Could not create module at " + module.getAbsolutePath(), e);
         return false;
       }
 
@@ -72,7 +75,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
         writer.append(emptyModuleContents);
       }
       catch (IOException e) {
-        printError("Cannot write to module at " + module.getAbsolutePath(), e);
+        error("Cannot write to module at " + module.getAbsolutePath(), e);
         return false;
       }
 
@@ -81,7 +84,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
           writer.close();
       }
       catch (IOException e) {
-        shell.println("warning: could not close module file " + module.getAbsolutePath());
+        warning("Could not close module file " + module.getAbsolutePath(), null);
       }
 
     }
@@ -100,7 +103,7 @@ public class ModuleCoreFacet extends AbstractModuleFacet {
 
     String name = ((Element) moduleTags.item(0)).getAttribute("rename-to");
     if (name.equals("")) {
-      name = configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE_LOGICAL,
+      name = getProject().getFacet(ProjectConfig.class).getProjectProperty(ProjectProperty.MODULE_LOGICAL,
               String.class);
     }
 

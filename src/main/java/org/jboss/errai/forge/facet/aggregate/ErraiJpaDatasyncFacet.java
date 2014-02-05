@@ -2,9 +2,9 @@ package org.jboss.errai.forge.facet.aggregate;
 
 import org.jboss.errai.forge.facet.dependency.ErraiJpaDatasyncDependencyFacet;
 import org.jboss.errai.forge.facet.module.ErraiJpaDatasyncModuleFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 
-@RequiresFacet({ CoreFacet.class, ErraiJpaClientFacet.class, ErraiCdiClientFacet.class,
+@FacetConstraint({ CoreFacet.class, ErraiJpaClientFacet.class, ErraiCdiClientFacet.class,
     ErraiJpaDatasyncDependencyFacet.class, ErraiJpaDatasyncModuleFacet.class })
 public class ErraiJpaDatasyncFacet extends BaseAggregatorFacet {
 

@@ -12,11 +12,11 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.codehaus.plexus.util.cli.shell.Shell;
+import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
-import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.constant.ModuleVault.Module;
 import org.jboss.errai.forge.facet.resource.AbstractXmlResourceFacet;
-import org.jboss.forge.shell.Shell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,7 +29,7 @@ import org.w3c.dom.Node;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
+public abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
 
   /**
    * A collection of GWT modules to inherit in this project.
@@ -37,8 +37,6 @@ abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
   protected Collection<Module> modules;
   @Inject
   protected Shell shell;
-  @Inject
-  protected ProjectConfigFactory configFactory;
 
   protected final String xPathRootExpression = "/module";
 
@@ -95,12 +93,12 @@ abstract class AbstractModuleFacet extends AbstractXmlResourceFacet {
    * @return The absolute path of the GWT module used in this project.
    */
   public File getModuleFile() {
-    return configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE_FILE, File.class);
+    return getProject().getFacet(ProjectConfig.class).getProjectProperty(ProjectProperty.MODULE_FILE, File.class);
   }
 
   @Override
   protected String getRelPath() {
-    final File module = configFactory.getProjectConfig(getProject()).getProjectProperty(ProjectProperty.MODULE_FILE,
+    final File module = getProject().getFacet(ProjectConfig.class).getProjectProperty(ProjectProperty.MODULE_FILE,
             File.class);
     if (module != null)
       return module.getPath();

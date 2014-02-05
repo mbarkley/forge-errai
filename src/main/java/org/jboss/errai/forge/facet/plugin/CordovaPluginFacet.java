@@ -5,9 +5,9 @@ import java.util.Arrays;
 
 import org.apache.maven.model.PluginExecution;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
-import org.jboss.forge.maven.plugins.ConfigurationElement;
-import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElement;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElementBuilder;
 
 public class CordovaPluginFacet extends AbstractProfilePluginFacet {
 

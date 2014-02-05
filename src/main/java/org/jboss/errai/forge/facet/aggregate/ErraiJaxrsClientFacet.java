@@ -2,9 +2,9 @@ package org.jboss.errai.forge.facet.aggregate;
 
 import org.jboss.errai.forge.facet.dependency.ErraiJaxrsClientDependencyFacet;
 import org.jboss.errai.forge.facet.module.ErraiJaxrsClientModuleFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 
-@RequiresFacet({ CoreFacet.class, ErraiJaxrsClientDependencyFacet.class, ErraiJaxrsClientModuleFacet.class })
+@FacetConstraint({ CoreFacet.class, ErraiJaxrsClientDependencyFacet.class, ErraiJaxrsClientModuleFacet.class })
 public class ErraiJaxrsClientFacet extends BaseAggregatorFacet {
 
   @Override

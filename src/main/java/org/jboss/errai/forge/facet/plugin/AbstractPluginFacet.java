@@ -9,18 +9,18 @@ import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.facet.base.AbstractBaseFacet;
 import org.jboss.errai.forge.util.VersionOracle;
-import org.jboss.forge.maven.MavenCoreFacet;
-import org.jboss.forge.maven.MavenPluginFacet;
-import org.jboss.forge.maven.plugins.Configuration;
-import org.jboss.forge.maven.plugins.ConfigurationElement;
-import org.jboss.forge.maven.plugins.ConfigurationElementBuilder;
-import org.jboss.forge.maven.plugins.Execution;
-import org.jboss.forge.maven.plugins.MavenPlugin;
-import org.jboss.forge.maven.plugins.MavenPluginBuilder;
-import org.jboss.forge.maven.plugins.PluginElement;
-import org.jboss.forge.project.dependencies.Dependency;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.project.facets.DependencyFacet;
+import org.jboss.forge.addon.dependencies.Dependency;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.maven.plugins.Configuration;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElement;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElementBuilder;
+import org.jboss.forge.addon.maven.plugins.Execution;
+import org.jboss.forge.addon.maven.plugins.MavenPlugin;
+import org.jboss.forge.addon.maven.plugins.MavenPluginBuilder;
+import org.jboss.forge.addon.maven.plugins.PluginElement;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
+import org.jboss.forge.addon.maven.projects.MavenPluginFacet;
+import org.jboss.forge.addon.projects.facets.DependencyFacet;
 
 /**
  * This is a base class for facets that add Maven plugins to the build section
@@ -32,16 +32,34 @@ import org.jboss.forge.project.facets.DependencyFacet;
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-abstract class AbstractPluginFacet extends AbstractBaseFacet {
+public abstract class AbstractPluginFacet extends AbstractBaseFacet {
 
   /**
    * The Maven artifact of the plugin to be installed.
    */
   protected DependencyArtifact pluginArtifact;
+
+  public DependencyArtifact getPluginArtifact() {
+    return pluginArtifact;
+  }
+
   /**
    * Configurations for the plugin.
    */
   protected Collection<ConfigurationElement> configurations;
+
+  public Collection<ConfigurationElement> getConfigurations() {
+    return configurations;
+  }
+
+  public Collection<DependencyBuilder> getDependencies() {
+    return dependencies;
+  }
+
+  public Collection<Execution> getExecutions() {
+    return executions;
+  }
+
   /**
    * Dependencies for the plugin.
    */
@@ -56,36 +74,36 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     final MavenPluginFacet pluginFacet = getProject().getFacet(MavenPluginFacet.class);
     final DependencyFacet depFacet = getProject().getFacet(DependencyFacet.class);
     final VersionOracle oracle = new VersionOracle(depFacet);
-    final Dependency pluginDep = DependencyBuilder.create(pluginArtifact.toString()).setVersion(
-            oracle.resolveVersion(pluginArtifact));
+    final Dependency pluginDep = DependencyBuilder.create(getPluginArtifact().toString()).setVersion(
+            oracle.resolveVersion(getPluginArtifact()));
     final MavenPluginBuilder plugin;
 
-    if (pluginFacet.hasPlugin(pluginDep)) {
-      plugin = MavenPluginBuilder.create(pluginFacet.getPlugin(pluginDep));
+    if (pluginFacet.hasPlugin(pluginDep.getCoordinate())) {
+      plugin = MavenPluginBuilder.create(pluginFacet.getPlugin(pluginDep.getCoordinate()));
       // So that it is not duplicated when added later on
-      pluginFacet.removePlugin(pluginDep);
+      pluginFacet.removePlugin(pluginDep.getCoordinate());
     }
     else {
       plugin = MavenPluginBuilder.create();
-      plugin.setDependency(pluginDep);
+      plugin.setCoordinate(pluginDep.getCoordinate());
     }
 
     Configuration config = plugin.getConfig();
-    for (final ConfigurationElement configElem : configurations) {
+    for (final ConfigurationElement configElem : getConfigurations()) {
       mergeConfigurationElement(config, configElem);
     }
 
-    for (final DependencyBuilder dep : dependencies) {
-      if (dep.getVersion() == null || dep.getVersion().equals("")) {
+    for (final DependencyBuilder dep : getDependencies()) {
+      if (dep.getCoordinate().getVersion() == null || dep.getCoordinate().getVersion().equals("")) {
         if (dep.getGroupId().equals(ArtifactVault.ERRAI_GROUP_ID))
           dep.setVersion(Property.ErraiVersion.invoke());
         else
-          dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+          dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getCoordinate().getArtifactId()));
       }
       plugin.addPluginDependency(dep);
     }
 
-    for (final Execution exec : executions) {
+    for (final Execution exec : getExecutions()) {
       plugin.addExecution(exec);
     }
     pluginFacet.addPlugin(plugin);
@@ -95,28 +113,30 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
 
   @Override
   public boolean isInstalled() {
-    final MavenCoreFacet coreFacet = getProject().getFacet(MavenCoreFacet.class);
-    final Model pom = coreFacet.getPOM();
+    final MavenFacet coreFacet = getProject().getFacet(MavenFacet.class);
+    final Model pom = coreFacet.getModel();
     if (pom.getBuild() == null)
       return false;
 
-    final Plugin plugin = pom.getBuild().getPluginsAsMap().get(pluginArtifact.toString());
+    final Plugin plugin = pom.getBuild().getPluginsAsMap().get(getPluginArtifact().toString());
 
     if (plugin == null)
       return false;
 
-    outer: for (final DependencyBuilder dep : dependencies) {
+    outer: for (final DependencyBuilder dep : getDependencies()) {
       for (final org.apache.maven.model.Dependency pluginDep : plugin.getDependencies()) {
-        if (dep.getArtifactId().equals(pluginDep.getArtifactId()) && dep.getGroupId().equals(pluginDep.getGroupId()))
+        if (dep.getCoordinate().getArtifactId().equals(pluginDep.getArtifactId())
+                && dep.getGroupId().equals(pluginDep.getGroupId()))
           continue outer;
       }
       return false;
     }
 
     final MavenPluginFacet pluginFacet = getProject().getFacet(MavenPluginFacet.class);
-    final MavenPlugin mPlugin = pluginFacet.getPlugin(DependencyBuilder.create(pluginArtifact.toString()));
+    final MavenPlugin mPlugin = pluginFacet.getPlugin(DependencyBuilder.create(getPluginArtifact().toString())
+            .getCoordinate());
 
-    outer: for (final Execution exec : executions) {
+    outer: for (final Execution exec : getExecutions()) {
       for (final Execution pluginExec : mPlugin.listExecutions()) {
         // TODO check more than just id
         if (exec.getId().equals(pluginExec.getId()))
@@ -125,7 +145,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
       return false;
     }
 
-    if (!isMatchingConfiguration(mPlugin.getConfig(), configurations))
+    if (!isMatchingConfiguration(mPlugin.getConfig(), getConfigurations()))
       return false;
 
     return true;
@@ -151,7 +171,8 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
   protected static boolean isMatchingConfiguration(final Configuration config,
           final Collection<ConfigurationElement> elements) {
     for (final ConfigurationElement elem : elements) {
-      if (!isMatchingElement(config.getConfigurationElement(elem.getName()), elem))
+      if (!config.hasConfigurationElement(elem.getName())
+              || !isMatchingElement(config.getConfigurationElement(elem.getName()), elem))
         return false;
     }
 
@@ -174,7 +195,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
     if (given == null)
       return false;
 
-    if (expected.hasChilderen()) {
+    if (expected.hasChildren()) {
       for (final PluginElement pluginElem : expected.getChildren()) {
         if (pluginElem instanceof ConfigurationElement) {
           final ConfigurationElement elem = ConfigurationElement.class.cast(pluginElem);
@@ -201,7 +222,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
   @Override
   public boolean uninstall() {
     final MavenPluginFacet pluginFacet = getProject().getFacet(MavenPluginFacet.class);
-    pluginFacet.removePlugin(DependencyBuilder.create(pluginArtifact.toString()));
+    pluginFacet.removePlugin(DependencyBuilder.create(getPluginArtifact().toString()).getCoordinate());
 
     return true;
   }
@@ -242,7 +263,7 @@ abstract class AbstractPluginFacet extends AbstractBaseFacet {
    */
   protected ConfigurationElement merge(ConfigurationElement prev, ConfigurationElement configElem) {
     // Replace text-only elements
-    if (!prev.hasChilderen()) {
+    if (!prev.hasChildren()) {
       return configElem;
     }
     else {

@@ -6,23 +6,22 @@ import java.util.Collection;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
 import org.jboss.errai.forge.constant.PomPropertyVault.Property;
 import org.jboss.errai.forge.util.VersionOracle;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.project.dependencies.ScopeType;
-import org.jboss.forge.project.facets.DependencyFacet;
-import org.jboss.forge.shell.plugins.RequiresFacet;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
+import org.jboss.forge.addon.projects.facets.DependencyFacet;
 
-@RequiresFacet({ CoreBuildFacet.class })
+@FacetConstraint({ CoreBuildFacet.class })
 public class DependencyManagementFacet extends AbstractBaseFacet {
 
   protected Collection<DependencyBuilder> dependencies = new ArrayList<DependencyBuilder>();
 
   public DependencyManagementFacet() {
     dependencies.add(DependencyBuilder.create(DependencyArtifact.ErraiBom.toString())
-            .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
+            .setVersion(Property.ErraiVersion.invoke()).setScopeType("import").setPackaging("pom"));
     dependencies.add(DependencyBuilder.create(DependencyArtifact.ErraiVersionMaster.toString())
-            .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
+            .setVersion(Property.ErraiVersion.invoke()).setScopeType("import").setPackaging("pom"));
     dependencies.add(DependencyBuilder.create(DependencyArtifact.ErraiParent.toString())
-            .setVersion(Property.ErraiVersion.invoke()).setScopeType(ScopeType.IMPORT).setPackagingType("pom"));
+            .setVersion(Property.ErraiVersion.invoke()).setScopeType("import").setPackaging("pom"));
   }
 
   @Override
@@ -31,8 +30,8 @@ public class DependencyManagementFacet extends AbstractBaseFacet {
     final VersionOracle oracle = new VersionOracle(depFacet);
 
     for (final DependencyBuilder dep : dependencies) {
-      if (dep.getVersion() == null || dep.getVersion().equals("")) {
-        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getArtifactId()));
+      if (dep.getCoordinate().getVersion() == null || dep.getCoordinate().getVersion().equals("")) {
+        dep.setVersion(oracle.resolveVersion(dep.getGroupId(), dep.getCoordinate().getArtifactId()));
       }
       if (!depFacet.hasDirectManagedDependency(dep)) {
         depFacet.addDirectManagedDependency(dep);

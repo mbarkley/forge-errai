@@ -1,22 +1,22 @@
 package org.jboss.errai.forge.config;
 
 import java.io.File;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
 
-import javax.inject.Singleton;
-
-import org.jboss.forge.env.Configuration;
-import org.jboss.forge.env.ConfigurationFactory;
-import org.jboss.forge.project.Project;
+import org.jboss.forge.addon.configuration.Configuration;
+import org.jboss.forge.addon.configuration.facets.ConfigurationFacet;
+import org.jboss.forge.addon.facets.AbstractFacet;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
+import org.jboss.forge.addon.projects.Project;
+import org.jboss.forge.addon.projects.ProjectFacet;
 
 /**
  * A singleton class for accessing project-wide plugin settings.
  * 
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@Singleton
-public final class ProjectConfig {
+@FacetConstraint({ ConfigurationFacet.class })
+public class ProjectConfig extends AbstractFacet<Project> implements ProjectFacet {
 
   /**
    * An enumeration of project properties stored in a {@link ProjectConfig}.
@@ -46,30 +46,16 @@ public final class ProjectConfig {
 
   public static final String PREFIX = "errai-forge-";
 
-  private final Map<ProjectProperty, Object> properties = new ConcurrentHashMap<ProjectProperty, Object>();
+  private Project project;
 
-  private final ConfigurationFactory configFactory;
+  @Override
+  public Project getFaceted() {
+    return project;
+  }
 
-  private final Project project;
-
-  ProjectConfig(final ConfigurationFactory factory, final Project project) {
-    this.project = project;
-    final Configuration config = factory.getProjectConfig(project);
-    for (final ProjectProperty prop : ProjectProperty.values()) {
-      String val = config.getString(getProjectAttribute(prop));
-      if (val != null && !val.equals("")) {
-        if (prop.valueType.equals(File.class)) {
-          properties.put(prop, new File(val));
-        }
-        else if (prop.valueType.equals(SerializableSet.class)) {
-          properties.put(prop, SerializableSet.deserialize(val));
-        }
-        else {
-          properties.put(prop, val);
-        }
-      }
-    }
-    configFactory = factory;
+  @Override
+  public void setFaceted(final Project origin) {
+    project = origin;
   }
 
   /**
@@ -82,8 +68,30 @@ public final class ProjectConfig {
    * @return The value associated with the given {@link ProjectProperty}, or
    *         null if none exists.
    */
-  public <T> T getProjectProperty(ProjectProperty property, Class<T> type) {
-    return type.cast(properties.get(property));
+  @SuppressWarnings("unchecked")
+  public <T> T getProjectProperty(final ProjectProperty property, final Class<T> type) {
+    final ConfigurationFacet config = project.getFacet(ConfigurationFacet.class);
+    final Object rawPropertyValue = config.getConfiguration().getProperty(getProjectAttribute(property));
+
+    if (rawPropertyValue != null) {
+      if (!type.equals(property.valueType))
+        throw new RuntimeException(String.format("Expected type %s for property %s. Found type %s.",
+                property.valueType, property.name(), type));
+      
+      // Special cases
+      if (type.equals(File.class)) {
+        return (T) new File(rawPropertyValue.toString());
+      }
+      else if (type.equals(SerializableSet.class)) {
+        return (T) SerializableSet.deserialize(rawPropertyValue.toString());
+      }
+      else {
+        return (T) rawPropertyValue;
+      }
+    }
+    else {
+      return null;
+    }
   }
 
   /**
@@ -104,8 +112,7 @@ public final class ProjectConfig {
               + property.valueType + ", not " + value.getClass());
     }
 
-    final Configuration config = configFactory.getProjectConfig(project);
-    properties.put(property, value);
+    final Configuration config = project.getFacet(ConfigurationFacet.class).getConfiguration();
     if (property.valueType.equals(File.class)) {
       config.setProperty(getProjectAttribute(property), File.class.cast(value).getAbsolutePath());
     }
@@ -125,4 +132,32 @@ public final class ProjectConfig {
     return PREFIX + prop.name();
   }
 
+  @Override
+  public boolean install() {
+    return true;
+  }
+
+  @Override
+  public boolean isInstalled() {
+    return project != null && project.hasFacet(ConfigurationFacet.class);
+  }
+
+  @Override
+  public boolean uninstall() {
+    if (isInstalled()) {
+      final ConfigurationFacet configFacet = project.getFacet(ConfigurationFacet.class);
+      final Configuration config = configFacet.getConfiguration();
+
+      for (final ProjectProperty property : Arrays.asList(ProjectProperty.values())) {
+        if (config.containsKey(getProjectAttribute(property))) {
+          config.clearProperty(getProjectAttribute(property));
+        }
+      }
+
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 }

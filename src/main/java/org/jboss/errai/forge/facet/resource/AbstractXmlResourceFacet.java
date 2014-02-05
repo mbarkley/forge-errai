@@ -53,9 +53,9 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     try {
       final File file = getResFile(getRelPath());
       if (!file.exists()) {
-        file.getParentFile().mkdirs();
-        file.createNewFile();
+        throw new IllegalStateException(String.format("The given xml file %s does not exist.", file.getAbsolutePath()));
       }
+
       final DocumentBuilder builder = docBuilderFactory.newDocumentBuilder();
       final Document doc = builder.parse(file);
       final XPath xPath = xPathFactory.newXPath();
@@ -87,7 +87,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       transformer.transform(source, res);
     }
     catch (Exception e) {
-      printError("Error: failed to add required inheritance to module.", e);
+      error("Error: failed to add required inheritance to module.", e);
       return false;
     }
 
@@ -132,7 +132,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
 
     }
     catch (Exception e) {
-      printError("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
+      error("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
       return false;
     }
 
@@ -230,7 +230,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
       transformer.transform(source, res);
     }
     catch (Exception e) {
-      printError("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
+      error("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
       return false;
     }
 
@@ -253,7 +253,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
   protected File getResFile(final String relPath) {
     File file = new File(relPath);
     if (!file.isAbsolute())
-      file = new File(getProject().getProjectRoot().getUnderlyingResourceObject(), file.getPath());
+      file = new File(getProject().getRootDirectory().getUnderlyingResourceObject(), file.getPath());
 
     return file;
   }

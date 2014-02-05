@@ -2,11 +2,8 @@ package org.jboss.errai.forge.facet.resource;
 
 import java.io.File;
 
-import javax.inject.Inject;
-
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
-import org.jboss.errai.forge.config.ProjectConfigFactory;
 import org.jboss.errai.forge.facet.plugin.WarPluginFacet;
 
 /**
@@ -19,13 +16,10 @@ public class GwtHostPageFacet extends AbstractFileResourceFacet {
   private final String templateName = "host_page_template.html";
   private final String FILLER_VALUE = "$$_MODULE_JS_FILE_$$";
 
-  @Inject
-  private ProjectConfigFactory configFactory;
-
   @Override
   protected String getResourceContent() throws Exception {
     final StringBuilder builder = readResource(templateName);
-    final ProjectConfig config = configFactory.getProjectConfig(getProject());
+    final ProjectConfig config = getProject().getFacet(ProjectConfig.class);
     final String moduleName = config.getProjectProperty(ProjectProperty.MODULE_NAME, String.class);
     // Replace filler with actual module js file
     replace(builder, FILLER_VALUE, getJsFilePath(moduleName));
@@ -39,7 +33,7 @@ public class GwtHostPageFacet extends AbstractFileResourceFacet {
 
   @Override
   public String getRelFilePath() {
-    return WarPluginFacet.getWarSourceDirectory(project) + "/index.html";
+    return WarPluginFacet.getWarSourceDirectory(getProject()) + "/index.html";
   }
 
 }

@@ -7,9 +7,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.maven.project.artifact.PluginArtifact;
 import org.jboss.errai.forge.constant.ArtifactVault;
 import org.jboss.errai.forge.constant.ArtifactVault.DependencyArtifact;
-import org.jboss.forge.project.dependencies.Dependency;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.project.facets.DependencyFacet;
+import org.jboss.forge.addon.dependencies.Coordinate;
+import org.jboss.forge.addon.dependencies.Dependency;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.projects.facets.DependencyFacet;
 
 /**
  * Provides versions for Maven dependencies.
@@ -64,13 +65,13 @@ public class VersionOracle {
 
   private String getHighestStableVersion(String groupId, String artifactId) {
     final Dependency dep = DependencyBuilder.create(groupId + ":" + artifactId);
-    final List<Dependency> availVersions = depFacet.resolveAvailableVersions(dep);
+    final List<Coordinate> availVersions = depFacet.resolveAvailableVersions(dep);
     
     String maxVersion = null;
-    for (final Dependency versionDep : availVersions) {
+    for (final Coordinate versionCoord : availVersions) {
       // FIXME needs a more reliable way of comparing versions
-      if (!versionDep.isSnapshot() && (maxVersion == null || versionDep.getVersion().compareTo(maxVersion) > 0)) {
-        maxVersion = versionDep.getVersion();
+      if (!versionCoord.isSnapshot() && (maxVersion == null || versionCoord.getVersion().compareTo(maxVersion) > 0)) {
+        maxVersion = versionCoord.getVersion();
       }
     }
     

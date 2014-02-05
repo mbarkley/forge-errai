@@ -2,24 +2,24 @@ package org.jboss.errai.forge.facet.plugin;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.HashSet;
 
 import org.apache.maven.model.BuildBase;
-import org.jboss.forge.maven.MavenPluginFacet;
-import org.jboss.forge.maven.plugins.Configuration;
-import org.jboss.forge.maven.plugins.ConfigurationElement;
-import org.jboss.forge.maven.plugins.Execution;
-import org.jboss.forge.maven.plugins.MavenPlugin;
-import org.jboss.forge.maven.plugins.PluginElement;
-import org.jboss.forge.project.Project;
-import org.jboss.forge.project.dependencies.DependencyBuilder;
-import org.jboss.forge.project.dependencies.ScopeType;
-import org.jboss.forge.test.AbstractShellTest;
+import org.jboss.errai.forge.test.base.ForgeTest;
+import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
+import org.jboss.forge.addon.maven.plugins.Configuration;
+import org.jboss.forge.addon.maven.plugins.ConfigurationElement;
+import org.jboss.forge.addon.maven.plugins.Execution;
+import org.jboss.forge.addon.maven.plugins.MavenPlugin;
+import org.jboss.forge.addon.maven.plugins.PluginElement;
+import org.jboss.forge.addon.maven.projects.MavenPluginFacet;
+import org.jboss.forge.addon.projects.Project;
 
-public abstract class BasePluginFacetTest extends AbstractShellTest {
+public abstract class BasePluginFacetTest extends ForgeTest {
 
   protected void checkExecutions(MavenPlugin plugin, Collection<Execution> executions) {
     assertEquals(executions.size(), plugin.listExecutions().size());
@@ -50,13 +50,14 @@ public abstract class BasePluginFacetTest extends AbstractShellTest {
     Outer: for (final DependencyBuilder expected : expectedDependencies) {
       for (final org.apache.maven.model.Dependency outcome : actualDependencies) {
         if (expected.getGroupId().equals(outcome.getGroupId())
-                && expected.getArtifactId().equals(outcome.getArtifactId())) {
+                && expected.getCoordinate().getArtifactId().equals(outcome.getArtifactId())) {
           assertEquals(expected.getGroupId(), outcome.getGroupId());
-          assertEquals(expected.getArtifactId(), outcome.getArtifactId());
-          assertEquals((expected.getPackagingType() != null) ? expected.getPackagingType() : "jar", outcome.getType());
+          assertEquals(expected.getCoordinate().getArtifactId(), outcome.getArtifactId());
+          assertEquals((expected.getCoordinate().getPackaging() != null) ? expected.getCoordinate().getPackaging()
+                  : "jar", outcome.getType());
           assertEquals(expected.getScopeType(), outcome.getScope());
-          if (ScopeType.SYSTEM.equals(expected.getScopeTypeEnum()))
-            assertEquals(expected.getSystemPath(), outcome.getSystemPath());
+          if ("system".equalsIgnoreCase(expected.getScopeType()))
+            assertEquals(expected.getCoordinate().getSystemPath(), outcome.getSystemPath());
 
           continue Outer;
         }
@@ -67,8 +68,7 @@ public abstract class BasePluginFacetTest extends AbstractShellTest {
 
   protected void checkHasPlugin(Project project, AbstractPluginFacet facet, String artifactDef) {
     final MavenPluginFacet pluginFacet = project.getFacet(MavenPluginFacet.class);
-    final MavenPlugin plugin = pluginFacet.getPlugin(DependencyBuilder.create(artifactDef));
-    assertNotNull(plugin);
+    assertTrue(pluginFacet.hasPlugin(DependencyBuilder.create(artifactDef).getCoordinate()));
   }
 
   protected void checkConfigurations(final Configuration config, Collection<ConfigurationElement> configurations) {
@@ -83,7 +83,7 @@ public abstract class BasePluginFacetTest extends AbstractShellTest {
     assertNotNull(outcome);
     assertEquals(expected.getChildren().size(), outcome.getChildren().size());
 
-    if (expected.hasChilderen()) {
+    if (expected.hasChildren()) {
       for (final PluginElement raw : expected.getChildren()) {
         final ConfigurationElement expectedChild = ConfigurationElement.class.cast(raw);
         ConfigurationElement outcomeChild;
