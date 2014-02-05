@@ -1,10 +1,7 @@
 package org.jboss.errai.forge.config;
 
 import java.io.File;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Singleton;
+import java.util.Arrays;
 
 import org.jboss.forge.addon.configuration.Configuration;
 import org.jboss.forge.addon.configuration.facets.ConfigurationFacet;
@@ -19,7 +16,6 @@ import org.jboss.forge.addon.projects.ProjectFacet;
  * @author Max Barkley <mbarkley@redhat.com>
  */
 @FacetConstraint({ ConfigurationFacet.class })
-@Singleton
 public class ProjectConfig extends AbstractFacet<Project> implements ProjectFacet {
 
   /**
@@ -50,8 +46,6 @@ public class ProjectConfig extends AbstractFacet<Project> implements ProjectFace
 
   public static final String PREFIX = "errai-forge-";
 
-  private final Map<ProjectProperty, Object> properties = new ConcurrentHashMap<ProjectProperty, Object>();
-
   private Project project;
 
   @Override
@@ -62,27 +56,6 @@ public class ProjectConfig extends AbstractFacet<Project> implements ProjectFace
   @Override
   public void setFaceted(final Project origin) {
     project = origin;
-
-    if (isInstalled())
-      load();
-  }
-
-  private void load() {
-    final Configuration config = project.getFacet(ConfigurationFacet.class).getConfiguration();
-    for (final ProjectProperty prop : ProjectProperty.values()) {
-      String val = config.getString(getProjectAttribute(prop));
-      if (val != null && !val.equals("")) {
-        if (prop.valueType.equals(File.class)) {
-          properties.put(prop, new File(val));
-        }
-        else if (prop.valueType.equals(SerializableSet.class)) {
-          properties.put(prop, SerializableSet.deserialize(val));
-        }
-        else {
-          properties.put(prop, val);
-        }
-      }
-    }
   }
 
   /**
@@ -95,8 +68,30 @@ public class ProjectConfig extends AbstractFacet<Project> implements ProjectFace
    * @return The value associated with the given {@link ProjectProperty}, or
    *         null if none exists.
    */
-  public <T> T getProjectProperty(ProjectProperty property, Class<T> type) {
-    return type.cast(properties.get(property));
+  @SuppressWarnings("unchecked")
+  public <T> T getProjectProperty(final ProjectProperty property, final Class<T> type) {
+    final ConfigurationFacet config = project.getFacet(ConfigurationFacet.class);
+    final Object rawPropertyValue = config.getConfiguration().getProperty(getProjectAttribute(property));
+
+    if (rawPropertyValue != null) {
+      if (!type.equals(property.valueType))
+        throw new RuntimeException(String.format("Expected type %s for property %s. Found type %s.",
+                property.valueType, property.name(), type));
+      
+      // Special cases
+      if (type.equals(File.class)) {
+        return (T) new File(rawPropertyValue.toString());
+      }
+      else if (type.equals(SerializableSet.class)) {
+        return (T) SerializableSet.deserialize(rawPropertyValue.toString());
+      }
+      else {
+        return (T) rawPropertyValue;
+      }
+    }
+    else {
+      return null;
+    }
   }
 
   /**
@@ -118,7 +113,6 @@ public class ProjectConfig extends AbstractFacet<Project> implements ProjectFace
     }
 
     final Configuration config = project.getFacet(ConfigurationFacet.class).getConfiguration();
-    properties.put(property, value);
     if (property.valueType.equals(File.class)) {
       config.setProperty(getProjectAttribute(property), File.class.cast(value).getAbsolutePath());
     }
@@ -140,8 +134,6 @@ public class ProjectConfig extends AbstractFacet<Project> implements ProjectFace
 
   @Override
   public boolean install() {
-    load();
-
     return true;
   }
 
@@ -156,12 +148,11 @@ public class ProjectConfig extends AbstractFacet<Project> implements ProjectFace
       final ConfigurationFacet configFacet = project.getFacet(ConfigurationFacet.class);
       final Configuration config = configFacet.getConfiguration();
 
-      for (final ProjectProperty property : properties.keySet()) {
+      for (final ProjectProperty property : Arrays.asList(ProjectProperty.values())) {
         if (config.containsKey(getProjectAttribute(property))) {
           config.clearProperty(getProjectAttribute(property));
         }
       }
-      properties.clear();
 
       return true;
     }

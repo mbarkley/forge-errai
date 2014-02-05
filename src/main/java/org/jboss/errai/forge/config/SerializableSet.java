@@ -41,11 +41,11 @@ public class SerializableSet extends HashSet<String> {
    */
   public static SerializableSet deserialize(final String serialized) {
     final SerializableSet set = new SerializableSet();
-    final String[] items = serialized.split(delimeter);
+    final String[] items = serialized.replaceAll("\\[|\\]", "").split(delimeter);
 
     for (int i = 0; i < items.length; i++) {
       if (!items[i].equals(""))
-        set.add(items[i]);
+        set.add(items[i].trim());
     }
 
     return set;
