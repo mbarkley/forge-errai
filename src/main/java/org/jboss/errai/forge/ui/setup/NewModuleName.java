@@ -6,13 +6,16 @@ import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
+import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.context.UINavigationContext;
 import org.jboss.forge.addon.ui.input.UIInput;
+import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
 import org.jboss.forge.addon.ui.result.NavigationResult;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
+import org.jboss.forge.addon.ui.util.Metadata;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
 public class NewModuleName extends AbstractUICommand implements UIWizardStep {
@@ -30,6 +33,16 @@ public class NewModuleName extends AbstractUICommand implements UIWizardStep {
   @WithAttributes(label = "Enter a Logical Module Name",
           required = true, description = DESCRIPTION)
   private UIInput<String> logicalModuleName;
+
+  @Override
+  public UICommandMetadata getMetadata(UIContext context) {
+    return Metadata
+            .forCommand(NewModuleName.class)
+            .name("Enter the logical name for your new GWT module")
+            .description(
+                    "A module's logical name looks like fully qualified Java class name (for example: org.jboss.errai.App)."
+                            + " The module's package will be the root package of your GWT/Errai application.");
+  }
 
   @Override
   @SuppressWarnings("unchecked")

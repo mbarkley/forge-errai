@@ -15,13 +15,16 @@ import org.jboss.forge.addon.dependencies.builder.DependencyBuilder;
 import org.jboss.forge.addon.projects.facets.DependencyFacet;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
+import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.context.UINavigationContext;
 import org.jboss.forge.addon.ui.input.UISelectOne;
+import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
 import org.jboss.forge.addon.ui.result.NavigationResult;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
+import org.jboss.forge.addon.ui.util.Metadata;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
 public class VersionSelect extends AbstractUICommand implements UIWizardStep {
@@ -33,6 +36,13 @@ public class VersionSelect extends AbstractUICommand implements UIWizardStep {
   @WithAttributes(label = "Select an Errai Version", required = true,
           requiredMessage = "An Errai version must be given to proceed.")
   private UISelectOne<String> versionSelect;
+
+  @Override
+  public UICommandMetadata getMetadata(UIContext context) {
+    return Metadata.forCommand(VersionSelect.class)
+            .name("Select a version of Errai")
+            .description("Note that the configuration used by this plugin is only compatible with Errai 3+.");
+  }
 
   @Override
   @SuppressWarnings("unchecked")

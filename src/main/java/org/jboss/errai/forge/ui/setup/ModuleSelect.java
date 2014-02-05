@@ -17,13 +17,16 @@ import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
+import org.jboss.forge.addon.ui.context.UIContext;
 import org.jboss.forge.addon.ui.context.UIExecutionContext;
 import org.jboss.forge.addon.ui.context.UINavigationContext;
 import org.jboss.forge.addon.ui.input.UISelectOne;
+import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
 import org.jboss.forge.addon.ui.metadata.WithAttributes;
 import org.jboss.forge.addon.ui.result.NavigationResult;
 import org.jboss.forge.addon.ui.result.Result;
 import org.jboss.forge.addon.ui.result.Results;
+import org.jboss.forge.addon.ui.util.Metadata;
 import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
 public class ModuleSelect extends AbstractUICommand implements UIWizardStep {
@@ -32,16 +35,30 @@ public class ModuleSelect extends AbstractUICommand implements UIWizardStep {
 
   @Inject
   private ProjectHolder holder;
-  
+
   @Inject
-  @WithAttributes(label = "Select a GWT module for Errai")
+  @WithAttributes(label = "Select a GWT module for Errai", required = true)
   private UISelectOne<String> moduleSelect;
+
+  @Override
+  public UICommandMetadata getMetadata(UIContext context) {
+    return Metadata.forCommand(ModuleSelect.class)
+            .name("Select a GWT Module")
+            .description("Select the GWT Module which will inherit all Errai GWT dependencies for your application.");
+  }
 
   @Override
   @SuppressWarnings("unchecked")
   public NavigationResult next(UINavigationContext context) throws Exception {
-    return (moduleSelect.getValue().equals(CREATE_A_NEW_MODULE)) ?
-            context.navigateTo(NewModuleName.class) : context.navigateTo(ModuleRename.class);
+    if (moduleSelect.getValue() == null) {
+      return null;
+    }
+    else if (moduleSelect.getValue().equals(CREATE_A_NEW_MODULE)) {
+      return context.navigateTo(NewModuleName.class);
+    }
+    else {
+      return context.navigateTo(ModuleRename.class);
+    }
   }
 
   @Override

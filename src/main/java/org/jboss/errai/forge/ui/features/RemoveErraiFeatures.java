@@ -5,10 +5,17 @@ import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.config.SerializableSet;
 import org.jboss.errai.forge.facet.aggregate.AggregatorFacetReflections.Feature;
 import org.jboss.errai.forge.facet.aggregate.BaseAggregatorFacet;
+import org.jboss.errai.forge.facet.aggregate.CoreFacet;
 import org.jboss.forge.addon.facets.MutableFaceted;
+import org.jboss.forge.addon.facets.constraints.FacetConstraint;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFacet;
+import org.jboss.forge.addon.ui.context.UIContext;
+import org.jboss.forge.addon.ui.metadata.UICommandMetadata;
+import org.jboss.forge.addon.ui.util.Categories;
+import org.jboss.forge.addon.ui.util.Metadata;
 
+@FacetConstraint({ CoreFacet.class })
 public class RemoveErraiFeatures extends AbstractFeatureCommand {
 
   @Override
@@ -27,6 +34,14 @@ public class RemoveErraiFeatures extends AbstractFeatureCommand {
     };
   }
 
+  @Override
+  public UICommandMetadata getMetadata(UIContext context) {
+    return Metadata.forCommand(RemoveErraiFeatures.class)
+            .name("Remove Errai Features")
+            .category(Categories.create("Project", "Errai"))
+            .description("Remove Errai features that have been configured with the 'Add Errai Features' command.");
+  }
+  
   @Override
   protected String getSelectionDescription() {
     return "The selected Errai features will be removed from your project."
