@@ -1,3 +1,64 @@
-# Errai Forge 2.0 Plugin
+= Errai Forge 2.0 Plugin
 
-Documentation under construction.
+== Overview
+
+=== What is Forge
+
+link:$$http://forge.jboss.org/$$[Forge] is a code framework that can generate code and configurations for Java projects. Forge 2.0 can now be used as an link:$$http://www.eclipse.org/$$[Eclipse] plugin, providing a simple interface for using Forge Addons.
+
+=== What does the Errai Forge Addon do?
+
+Currently the Errai Forge Addon has two uses:
+
+* Configuring a Maven project so that it can run in GWT Development mode or be fully compiled as a GWT/Errai application.
+
+* Adding or removing Errai features to Maven projects.
+
+Using Forge 2.0 and the Errai Forge Addon, it is now simpler than ever to get an Errai project started.
+
+== Getting Started
+
+=== Installing Eclipse
+
+===== 1. Download and Install the link:$$http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/keplersr1$$[Eclipse IDE]
+
+.. Follow the link above and download the appropriate version of Eclipse for your OS and hardware.
+
+.. Run the Eclipse installer.
+
+===== 2. Install the link:$$http://www.eclipse.org/m2e/download/$$[Eclipse Maven Plugin]
+
+.. If you have downloaded Eclipse following step (1), you already have the plugin and may skip this step.
+
+.. Otherwise, follow the Eclipse Maven Plugin link and drag the _Install_ icon into your running instance of Eclipse.
+
+
+=== Installing Forge 2.0 and the Errai Forge Addon
+
+===== 3. Install the link:$$http://download.jboss.org/jbosstools/builds/staging/jbosstools-forge_master/all/repo/$$[Forge 2.0 Eclipse Plugin]
+
+.. In the Eclipse menu, go to _Help_ > _Install New Software..._
+
+.. Paste the link Forge Eclipse Plugin link into the text field and press _Enter_.
+
+.. Select _Jboss Tools Forge Nightly Build Update Site_ and click _Next_.
+
+.. Review the installation details and then click _Next_.
+
+.. Review and accept the licensing information, then click _Finish_.
+
+===== 4. Install the Errai Forge Addon
+
+.. In Eclipse, press _Ctrl_ + _5_ to activate the Forge Plugin. It may take a few moments to load when first called.
+
+.. In the Forge text field, type _install_ and select _Install an Addon_.
+
+.. In the prompt, enter the following values for each field and then click _Finish_:
+
+** _Group ID_: org.jboss.errai.forge
+
+** _Name_: errai-forge-addon
+
+** _Version_: 2.0.0.Beta1
+
+
