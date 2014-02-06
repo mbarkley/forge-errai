@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.inject.Singleton;
 
+import org.jboss.forge.addon.configuration.Configuration;
+
 /**
  * A class for querying meta-data on of top-level aggregator facets.
  * 
@@ -14,11 +16,14 @@ import javax.inject.Singleton;
 @Singleton
 public class AggregatorFacetReflections {
 
-  private final Map<String, Feature> features =
+  private final Map<String, Feature> shortFeatureMap =
+          new LinkedHashMap<String, Feature>();
+
+  private final Map<String, Feature> longFeatureMap =
           new LinkedHashMap<String, Feature>();
 
   /**
-   * Represents a feature that can be installed with the {@link Main plugin}.
+   * Represents a feature that can be installed.
    * 
    * @author Max Barkley <mbarkley@redhat.com>
    */
@@ -30,7 +35,7 @@ public class AggregatorFacetReflections {
 
     /**
      * @return The short name of this feature, used for referencing this feature
-     *         in the forge command line.
+     *         in the forge command line or in the forge persistent {@link Configuration}.
      */
     public String getShortName() {
       return shortName;
@@ -39,7 +44,7 @@ public class AggregatorFacetReflections {
     /**
      * @return The full descriptive name of this feature.
      */
-    public String getName() {
+    public String getLongName() {
       return name;
     }
 
@@ -60,7 +65,7 @@ public class AggregatorFacetReflections {
 
     @Override
     public String toString() {
-      return getShortName();
+      return getLongName();
     }
 
     private Feature(final String shortName, final String name, final String description,
@@ -93,7 +98,9 @@ public class AggregatorFacetReflections {
 
     for (int i = 0; i < types.length; i++) {
       final BaseAggregatorFacet instance = types[i].newInstance();
-      features.put(instance.getShortName(), new Feature(instance));
+      final Feature feature = new Feature(instance);
+      shortFeatureMap.put(instance.getShortName(), feature);
+      longFeatureMap.put(instance.getFeatureName(), feature);
     }
   }
 
@@ -107,8 +114,8 @@ public class AggregatorFacetReflections {
    * @return The {@link Feature} with a short name matching the one given, or
    *         {@literal null} if none exists.
    */
-  public Feature getFeature(final String shortName) {
-    return features.get(shortName);
+  public Feature getFeatureShort(final String shortName) {
+    return shortFeatureMap.get(shortName);
   }
 
   /**
@@ -118,14 +125,39 @@ public class AggregatorFacetReflections {
    *          The {@linkplain Feature#getShortName() short name} of a feature.
    * @return True iff there is a feature matching the given short name.
    */
-  public boolean hasFeature(final String shortName) {
-    return getFeature(shortName) != null;
+  public boolean hasFeatureShort(final String shortName) {
+    return getFeatureShort(shortName) != null;
+  }
+
+  /**
+   * Get a {@link Feature} by it's {@linkplain Feature#getLongName() long
+   * name}.
+   * 
+   * @param shortName
+   *          The {@linkplain Feature#getLongName() long name} of the feature
+   *          to retrieve.
+   * @return The {@link Feature} with a long name matching the one given, or
+   *         {@literal null} if none exists.
+   */
+  public Feature getFeatureLong(final String longName) {
+    return longFeatureMap.get(longName);
+  }
+
+  /**
+   * Check if a feature exists.
+   * 
+   * @param longName
+   *          The {@linkplain Feature#getLongName() long name} of a feature.
+   * @return True iff there is a feature matching the given long name.
+   */
+  public boolean hasFeatureLong(final String longName) {
+    return getFeatureLong(longName) != null;
   }
 
   /**
    * @return An {@link Iterable} object with all the {@link Feature Features}.
    */
   public Iterable<Feature> iterable() {
-    return Collections.unmodifiableCollection(features.values());
+    return Collections.unmodifiableCollection(shortFeatureMap.values());
   }
 }

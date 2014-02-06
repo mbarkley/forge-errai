@@ -49,12 +49,12 @@ public class AddErraiFeatures extends AbstractFeatureCommand {
       if (installed == null)
         installed = new SerializableSet();
 
-      installed.add(feature.toString());
+      installed.add(feature.getShortName());
 
       projectConfig.setProjectProperty(ProjectProperty.INSTALLED_FEATURES, installed);
     }
     catch (Exception e) {
-      throw new Exception("Could not install " + feature.getName(), e);
+      throw new Exception("Could not install " + feature.getLongName(), e);
     }
   }
 

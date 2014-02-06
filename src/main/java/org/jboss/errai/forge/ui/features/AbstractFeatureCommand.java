@@ -29,8 +29,8 @@ public abstract class AbstractFeatureCommand extends AbstractProjectCommand {
   protected class FeatureConverter implements Converter<String, Feature> {
 
     @Override
-    public Feature convert(final String shortName) {
-      return facetReflections.getFeature(shortName);
+    public Feature convert(final String longName) {
+      return facetReflections.getFeatureLong(longName);
     }
 
   }

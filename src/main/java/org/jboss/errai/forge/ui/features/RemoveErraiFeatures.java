@@ -29,7 +29,7 @@ public class RemoveErraiFeatures extends AbstractFeatureCommand {
                 ProjectProperty.INSTALLED_FEATURES, SerializableSet.class);
 
         return project.hasFacet(feature.getFeatureClass())
-                && installed != null && installed.contains(feature.toString());
+                && installed != null && installed.contains(feature.getShortName());
       }
     };
   }
@@ -69,12 +69,12 @@ public class RemoveErraiFeatures extends AbstractFeatureCommand {
       if (installed == null)
         installed = new SerializableSet();
       
-      installed.remove(feature.toString());
+      installed.remove(feature.getShortName());
       
       projectConfig.setProjectProperty(ProjectProperty.INSTALLED_FEATURES, installed);
     }
     catch (Exception e) {
-      throw new Exception("Could not remove " + feature.getName(), e);
+      throw new Exception("Could not remove " + feature.getLongName(), e);
     }
   }
 

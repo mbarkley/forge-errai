@@ -114,7 +114,7 @@ public abstract class BaseAggregatorFacet implements ProjectFacet, MutableFacet<
     final Set<Class<? extends ProjectFacet>> directlyInstalled = new HashSet<Class<? extends ProjectFacet>>();
 
     for (final String featureName : installedFeatureNames) {
-      directlyInstalled.add(reflections.getFeature(featureName).getFeatureClass());
+      directlyInstalled.add(reflections.getFeatureShort(featureName).getFeatureClass());
     }
     directlyInstalled.remove(getClass());
     directlyInstalled.add(CoreFacet.class);
