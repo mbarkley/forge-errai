@@ -4,7 +4,7 @@
   xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jboss.errai.forge</groupId>
-  <artifactId>errai-forge-plugin</artifactId>
+  <artifactId>errai-forge-addon</artifactId>
   <version>2.0.0-SNAPSHOT</version>
   <properties>
     <forge.api.version>2.0.0.Final</forge.api.version>
@@ -80,7 +80,7 @@
     </repository>
   </repositories>
   <build>
-    <finalName>errai-forge-plugin</finalName>
+    <finalName>errai-forge-addon</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
