@@ -16,7 +16,7 @@ import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
 
 @FacetConstraint({ CoreFacet.class })
-public class RemoveErraiFeatures extends AbstractFeatureCommand {
+public class RemoveErraiFeatureCommand extends AbstractFeatureCommand {
 
   @Override
   protected FeatureFilter getFilter() {
@@ -36,7 +36,7 @@ public class RemoveErraiFeatures extends AbstractFeatureCommand {
 
   @Override
   public UICommandMetadata getMetadata(UIContext context) {
-    return Metadata.forCommand(RemoveErraiFeatures.class)
+    return Metadata.forCommand(RemoveErraiFeatureCommand.class)
             .name("Remove Errai Features")
             .category(Categories.create("Project", "Errai"))
             .description("Remove Errai features that have been configured with the 'Add Errai Features' command.");

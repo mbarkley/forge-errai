@@ -5,7 +5,7 @@ import javax.inject.Inject;
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
-import org.jboss.errai.forge.ui.features.AddErraiFeatures;
+import org.jboss.errai.forge.ui.features.AddErraiFeatureCommand;
 import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
 import org.jboss.forge.addon.ui.context.UIBuilder;
@@ -45,7 +45,7 @@ public class ModuleRename extends AbstractUICommand implements UIWizardStep {
   @Override
   @SuppressWarnings("unchecked")
   public NavigationResult next(UINavigationContext context) throws Exception {
-    return context.navigateTo(AddErraiFeatures.class);
+    return context.navigateTo(AddErraiFeatureCommand.class);
   }
 
   @Override

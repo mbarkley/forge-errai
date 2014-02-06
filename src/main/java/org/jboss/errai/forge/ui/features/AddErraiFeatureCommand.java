@@ -16,7 +16,7 @@ import org.jboss.forge.addon.ui.util.Categories;
 import org.jboss.forge.addon.ui.util.Metadata;
 
 @FacetConstraint({ CoreFacet.class })
-public class AddErraiFeatures extends AbstractFeatureCommand {
+public class AddErraiFeatureCommand extends AbstractFeatureCommand {
 
   @Inject
   private FacetFactory facetFactory;
@@ -33,7 +33,7 @@ public class AddErraiFeatures extends AbstractFeatureCommand {
   
   @Override
   public UICommandMetadata getMetadata(UIContext context) {
-    return Metadata.forCommand(AddErraiFeatures.class)
+    return Metadata.forCommand(AddErraiFeatureCommand.class)
             .name("Add Errai Features")
             .category(Categories.create("Project", "Errai"))
             .description("Add the necessary configurations for using Errai features in a Maven project.");
