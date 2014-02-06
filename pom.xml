@@ -10,6 +10,42 @@
     <forge.api.version>2.0.0.Final</forge.api.version>
   </properties>
 
+  <url>https://github.com/errai/forge-errai</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <description>
+    A Forge 2.0 Addon for configuring Errai projects.
+  </description>
+
+  <developers>
+    <developer>
+      <name>Max Barkley</name>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git@github.com:errai/forge-errai.git</connection>
+    <developerConnection>scm:git:git@github.com:errai/forge-errai.git</developerConnection>
+    <url>scm:git:git@github.com:errai/forge-errai.git</url>
+  </scm>
+
+  <organization>
+    <name>JBoss, a division of Red Hat</name>
+    <url>http://www.jboss.org</url>
+  </organization>
+
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.jboss.org/jira/browse/ERRAI</url>
+  </issueManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.jboss.forge.furnace.container</groupId>
