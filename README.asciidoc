@@ -61,4 +61,56 @@ Using Forge 2.0 and the Errai Forge Addon, it is now simpler than ever to get an
 
 ** _Version_: 2.0.0.Beta1
 
+=== Setting up an Errai Project
 
+===== 5. Make a new Project with the Forge Plugin
+
+.. Activate the Forge Plugin again and type _project_, selecting _Project: New_.
+
+.. Fill in the fields with your new project's information.
+
+** For _Project Type_ select _Java Web Application_.
+
+** For _Build System_ select _Maven_.
+
+===== 6. Setup Errai in the New Project
+
+.. In the Eclipse _Package Explorer_, select your new project and then activate the Forge Plugin.
+
+.. In the Forge menu, select _Setup Errai in Project_.
+
+.. Follow the prompts until the _Add Errai Features_ prompt.
+
+.. If you wish, you can select Errai Features to install at this point. Below we will discuss how to add or remove Errai features outside of the setup wizard.
+
+=== Adding and Removing Errai Features
+
+After the above setup has been performed, it is possible to add or remove Errai features at any time:
+
+1. In Eclipse, activate the Forge Plugin.
+
+2. Select one of the commands _Add Errai Features_ or _Remove Errai Features_.
+
+3. When prompted, select the features you wish to add or remove.
+
+And that's it! The Errai Forge Addon will make any necessary configurations to your project, as well as installing any additional Errai features required.
+
+=== Errors in POM File
+
+Your version of Eclipse may complain of not having an m2e connector for the gwt-maven-plugin. In this case:
+
+1. Find the error in your POM file.
+
+2. Do a quick fix (_Ctrl_ + _1_).
+
+3. Select _Permanantly mark as ignored..._
+
+=== Running Your new Project
+
+For instructions on how to run your new project, and for setting up Eclipse Run Configurations, please see the Errai link:$$https://github.com/errai/errai/blob/master/errai-docs/src/main/asciidoc/reference.asciidoc#running-the-app-in-gwts-development-mode$$[Getting Started Documentation].
+
+Happy Coding!
+
+== Feedback
+
+If you have any feedback or would like to report a bug, please check out our link:$$https://community.jboss.org/en/errai?view=discussions$$[forum] and our link:$$https://issues.jboss.org/browse/ERRAI$$[Jira].
