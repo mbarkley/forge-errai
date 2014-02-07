@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.config.ProjectConfig.ProjectProperty;
 import org.jboss.errai.forge.facet.aggregate.CoreFacet;
+import org.jboss.errai.forge.facet.module.ModuleCoreFacet;
 import org.jboss.errai.forge.ui.features.AddErraiFeatureCommand;
 import org.jboss.forge.addon.facets.FacetFactory;
 import org.jboss.forge.addon.ui.command.AbstractUICommand;
@@ -65,6 +66,8 @@ public class ModuleRename extends AbstractUICommand implements UIWizardStep {
     projectConfig.setProjectProperty(ProjectProperty.MODULE_NAME, newName);
 
     factory.install(holder.getProject(), CoreFacet.class);
+    if (!newName.equals(logicalName))
+      holder.getProject().getFacet(ModuleCoreFacet.class).setModuleName(newName);
 
     return Results.success();
   }
