@@ -10,6 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -80,11 +81,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
         }
       }
 
-      final Transformer transformer = transFactory.newTransformer();
-      final DOMSource source = new DOMSource(doc);
-      final StreamResult res = new StreamResult(file);
-      transformer.setOutputProperties(xmlProperties);
-      transformer.transform(source, res);
+      writeDocument(doc, file);
     }
     catch (Exception e) {
       error("Error: failed to add required inheritance to module.", e);
@@ -92,6 +89,14 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     }
 
     return true;
+  }
+  
+  protected void writeDocument(final Document doc, final File file) throws TransformerException {
+      final Transformer transformer = transFactory.newTransformer();
+      final DOMSource source = new DOMSource(doc);
+      final StreamResult res = new StreamResult(file);
+      transformer.setOutputProperties(xmlProperties);
+      transformer.transform(source, res);
   }
 
   @Override
@@ -120,6 +125,9 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
               return false;
             }
           }
+        }
+        else {
+          return false;
         }
       }
 
@@ -223,11 +231,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
         }
       }
       
-      final Transformer transformer = transFactory.newTransformer();
-      final DOMSource source = new DOMSource(doc);
-      final StreamResult res = new StreamResult(file);
-      transformer.setOutputProperties(xmlProperties);
-      transformer.transform(source, res);
+      writeDocument(doc, file);
     }
     catch (Exception e) {
       error("Error occurred while attempting to verify xml resource " + file.getAbsolutePath(), e);
