@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import org.jboss.errai.forge.config.ProjectConfig;
 import org.jboss.errai.forge.util.Condition;
 import org.jboss.forge.addon.facets.FacetFactory;
+import org.jboss.forge.addon.maven.projects.MavenFacet;
 import org.jboss.forge.addon.projects.Project;
 import org.jboss.forge.addon.projects.ProjectFactory;
 import org.jboss.forge.addon.projects.ui.AbstractProjectCommand;
@@ -40,8 +41,7 @@ public class AddErrai extends AbstractProjectCommand implements UIWizard {
       new Condition<Project>() {
         @Override
         public boolean isSatisfied(final Project subject) {
-          // Class is package private
-          return subject.getClass().getCanonicalName().equals("org.jboss.forge.addon.maven.projects.MavenProject");
+          return subject.hasFacet(MavenFacet.class);
         }
 
         @Override
