@@ -85,6 +85,8 @@ public final class ArtifactVault {
     ErraiNavigation("errai-navigation"),
     ErraiUi("errai-ui"),
     ErraiCordova("errai-cordova"),
+    ErraiSecurityClient("errai-security-client"),
+    ErraiSecurityServer("errai-security-server"),
     CordovaPlugin("cordova-maven-plugin");
 
     private final String artifactId;
@@ -158,6 +160,7 @@ public final class ArtifactVault {
     blacklist.put(AbstractBaseFacet.MAIN_PROFILE, new HashSet<DependencyArtifact>());
     final Set<DependencyArtifact> mainProfileBlacklist = blacklist.get(AbstractBaseFacet.MAIN_PROFILE);
     mainProfileBlacklist.add(DependencyArtifact.ErraiTools);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiSecurityClient);
     mainProfileBlacklist.add(DependencyArtifact.ErraiJboss);
     mainProfileBlacklist.add(DependencyArtifact.Hsq);
     mainProfileBlacklist.add(DependencyArtifact.JUnit);

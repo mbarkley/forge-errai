@@ -22,6 +22,7 @@ public final class ModuleVault {
     ErraiJpa("org.jboss.errai.jpa.JPA"),
     ErraiJpaDatasync("org.jboss.errai.jpa.sync.DataSync"),
     ErraiJaxrs("org.jboss.errai.enterprise.Jaxrs"),
+    ErraiSecurity("org.jboss.errai.security.Security"),
     ErraiCordova("org.jboss.errai.ui.Cordova");
     
     private final String logicalName;

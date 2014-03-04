@@ -93,6 +93,7 @@ public class AggregatorFacetReflections {
         ErraiJaxrsFacet.class,
         ErraiJpaClientFacet.class,
         ErraiJpaDatasyncFacet.class,
+        ErraiSecurityFacet.class,
         ErraiCordovaFacet.class
     };
 
