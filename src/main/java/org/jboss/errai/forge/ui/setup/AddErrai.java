@@ -53,7 +53,7 @@ public class AddErrai extends AbstractProjectCommand implements UIWizard {
   
   public UICommandMetadata getMetadata(UIContext context) {
     return Metadata.forCommand(AddErrai.class)
-            .name("Setup Errai in Project")
+            .name("Errai: Setup")
             .category(Categories.create("Project", "Errai"))
             .description("Setup base configuration for developing a GWT/Errai Application.");
   };
