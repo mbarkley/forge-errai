@@ -38,6 +38,8 @@ public class CleanPluginFacet extends AbstractPluginFacet {
                                 .addChild(ConfigurationElementBuilder.create().setName("include")
                                         .setText("src/main/webapp/WEB-INF/lib/"))
                                 .addChild(ConfigurationElementBuilder.create().setName("include")
+                                        .setText("src/main/webapp/WEB-INF/classes/"))
+                                .addChild(ConfigurationElementBuilder.create().setName("include")
                                         .setText("**/gwt-unitCache/**"))
                                 .addChild(ConfigurationElementBuilder.create().setName("include")
                                         .setText(".errai/"))
