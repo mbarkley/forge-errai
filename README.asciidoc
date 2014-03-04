@@ -1,10 +1,10 @@
-= Errai Forge 2.0 Plugin
+= Errai Forge 2.1 Plugin
 
 == Overview
 
 === What is Forge
 
-link:$$http://forge.jboss.org/$$[Forge] is a code framework that can generate code and configurations for Java projects. Forge 2.0 can now be used as an link:$$http://www.eclipse.org/$$[Eclipse] plugin, providing a simple interface for using Forge Addons.
+link:$$http://forge.jboss.org/$$[Forge] is a code framework that can generate code and configurations for Java projects. Forge 2.1 can now be used as an link:$$http://www.eclipse.org/$$[Eclipse] plugin, providing a simple interface for using Forge Addons.
 
 === What does the Errai Forge Addon do?
 
@@ -14,7 +14,7 @@ Currently the Errai Forge Addon has two uses:
 
 * Adding or removing Errai features to Maven projects.
 
-Using Forge 2.0 and the Errai Forge Addon, it is now simpler than ever to get an Errai project started.
+Using Forge 2.1 and the Errai Forge Addon, it is now simpler than ever to get an Errai project started.
 
 == Getting Started
 
@@ -34,9 +34,9 @@ Using Forge 2.0 and the Errai Forge Addon, it is now simpler than ever to get an
 +
 image:images/m2e-install.png[]
 
-=== Installing Forge 2.0 and the Errai Forge Addon
+=== Installing Forge 2.1 and the Errai Forge Addon
 
-===== 3. Install the link:$$http://download.jboss.org/jbosstools/builds/staging/jbosstools-forge_master/all/repo/$$[Forge 2.0 Eclipse Plugin]
+===== 3. Install the link:$$http://download.jboss.org/jbosstools/builds/staging/jbosstools-forge_master/all/repo/$$[Forge 2.1 Eclipse Plugin]
 
 .. In the Eclipse menu, go to _Help_ > _Install New Software..._
 +
