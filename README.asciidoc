@@ -72,9 +72,23 @@ image:images/forge-install-addon.png[]
 
 ** _Name_: errai-forge-addon
 
-** _Version_: 2.0.0.Beta1
+** _Version_: 2.0.0-SNAPSHOT
 +
 image:images/enter-addon-coordinate.png[]
++
+[IMPORTANT]
+.Published Versions
+====
+Not all versions of the Errai Addon are in Maven Central. If you wish to install a version such as a SNAPSHOT you will need to build the version yourself.
+
+To download and build the latest version of this plugin, run:
+[code]
+----
+git clone https://github.com/errai/forge-errai.git
+cd forge-errai
+mvn clean install
+----
+====
 
 === Setting up an Errai Project
 
