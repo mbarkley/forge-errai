@@ -34,7 +34,7 @@ public class AddErraiFeatureCommand extends AbstractFeatureCommand {
   @Override
   public UICommandMetadata getMetadata(UIContext context) {
     return Metadata.forCommand(AddErraiFeatureCommand.class)
-            .name("Add Errai Features")
+            .name("Errai: Add Features")
             .category(Categories.create("Project", "Errai"))
             .description("Add the necessary configurations for using Errai features in a Maven project.");
   }

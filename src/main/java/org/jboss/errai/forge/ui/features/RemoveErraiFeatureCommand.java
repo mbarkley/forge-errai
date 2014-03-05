@@ -37,7 +37,7 @@ public class RemoveErraiFeatureCommand extends AbstractFeatureCommand {
   @Override
   public UICommandMetadata getMetadata(UIContext context) {
     return Metadata.forCommand(RemoveErraiFeatureCommand.class)
-            .name("Remove Errai Features")
+            .name("Errai: Remove Features")
             .category(Categories.create("Project", "Errai"))
             .description("Remove Errai features that have been configured with the 'Add Errai Features' command.");
   }
