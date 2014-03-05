@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -23,8 +24,8 @@ import org.w3c.dom.Node;
 @FacetConstraint({ ErraiBusServletConfigFacet.class })
 public class CdiWebXmlFacet extends AbstractXmlResourceFacet {
   
-  public final String erraiServletExpression = "/servlet/servlet-name[text()='ErraiServlet']/..";
-  public final String autoDiscoverParamSubExpression = "/init-param/param-name[text()='auto-discover-services']/..";
+  public final String erraiServletExpression = "/web-app/servlet[servlet-name[text()='ErraiServlet']]";
+  public final String autoDiscoverParamSubExpression = "/init-param[param-name[text()='auto-discover-services']]";
   public final String autoDiscoverParamExpression = erraiServletExpression + autoDiscoverParamSubExpression;
 
   @Override
@@ -55,6 +56,7 @@ public class CdiWebXmlFacet extends AbstractXmlResourceFacet {
   @Override
   protected Map<XPathExpression, Node> getRemovalMap(XPath xPath, Document doc) throws ParserConfigurationException,
           XPathExpressionException {
+    assert xPath.compile(erraiServletExpression).evaluate(erraiServletExpression, XPathConstants.NODE) != null;
     final XPathExpression key = xPath.compile(autoDiscoverParamExpression);
 
     final Element value = doc.createElement("init-param");

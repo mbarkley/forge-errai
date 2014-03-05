@@ -133,7 +133,7 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
 
       for (final XPathExpression expression : replacedToCheck.keySet()) {
         final Node replaced = (Node) expression.evaluate(doc, XPathConstants.NODE);
-        if (replaced != null) {
+        if (replaced == null || !matches(replacedToCheck.get(expression), replaced)) {
           return false;
         }
       }
@@ -320,11 +320,12 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
    * @return True iff {@code other} is consistent with {@code node}.
    */
   protected boolean matches(Node node, Node other) {
-    if (!(other instanceof Element)) {
-      return false;
+    if (node.getNodeType() == Node.TEXT_NODE) {
+      return other.getNodeType() == Node.TEXT_NODE && node.getNodeValue().equals(other.getNodeValue());
     }
-    if (!(node instanceof Element)) {
-      throw new IllegalArgumentException("Arguments must be instances of Element.");
+
+    if (!(other instanceof Element) || !(node instanceof Element)) {
+      return false;
     }
 
     final Element e1 = (Element) node, e2 = (Element) other;
@@ -342,11 +343,14 @@ public abstract class AbstractXmlResourceFacet extends AbstractBaseFacet {
     // children of other must be consistent with children of node
     if (e1.hasChildNodes()) {
       outer: for (Node child = e1.getFirstChild(); child != null; child = child.getNextSibling()) {
-        if (!(child instanceof Element))
+        if (child.getNodeType() == Node.ELEMENT_NODE || child.getNodeType() == Node.TEXT_NODE) {
+          for (Node otherChild = e2.getFirstChild(); otherChild != null; otherChild = otherChild.getNextSibling()) {
+            if (otherChild.getNodeType() == child.getNodeType() && matches(child, otherChild))
+              continue outer;
+          }
+        }
+        else {
           continue;
-        for (Node otherChild = e2.getFirstChild(); otherChild != null; otherChild = otherChild.getNextSibling()) {
-          if (otherChild instanceof Element && matches(child, otherChild))
-            continue outer;
         }
 
         return false;
