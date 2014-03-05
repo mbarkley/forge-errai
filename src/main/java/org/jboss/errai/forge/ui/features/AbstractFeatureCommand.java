@@ -26,11 +26,20 @@ public abstract class AbstractFeatureCommand extends AbstractProjectCommand {
     public boolean filter(final Feature feature, final Project project);
   }
 
-  protected class FeatureConverter implements Converter<String, Feature> {
+  protected class FeatureValueConverter implements Converter<String, Feature> {
 
     @Override
     public Feature convert(final String longName) {
       return facetReflections.getFeatureLong(longName);
+    }
+
+  }
+
+  protected class FeatureLabelConverter implements Converter<Feature, String> {
+
+    @Override
+    public String convert(final Feature feature) {
+      return feature.getLongName().toLowerCase().replace(' ', '-');
     }
 
   }
@@ -60,7 +69,11 @@ public abstract class AbstractFeatureCommand extends AbstractProjectCommand {
     }
 
     featureSelect.setValueChoices(features);
-    featureSelect.setValueConverter(new FeatureConverter());
+    featureSelect.setValueConverter(new FeatureValueConverter());
+    // Workaround FORGE-1639
+    if (!builder.getUIContext().getProvider().isGUI())
+      featureSelect.setItemLabelConverter(new FeatureLabelConverter());
+
     builder.add(featureSelect);
   }
 

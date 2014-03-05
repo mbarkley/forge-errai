@@ -31,7 +31,8 @@ import org.jboss.forge.addon.ui.wizard.UIWizardStep;
 
 public class ModuleSelect extends AbstractUICommand implements UIWizardStep {
 
-  private static final String CREATE_A_NEW_MODULE = "Create a new module...";
+  private static final String CREATE_A_NEW_MODULE_GUI = "Create a new module...";
+  private static final String CREATE_A_NEW_MODULE_CLI = "create-new";
 
   @Inject
   private ProjectHolder holder;
@@ -47,13 +48,17 @@ public class ModuleSelect extends AbstractUICommand implements UIWizardStep {
             .description("Select the GWT Module which will inherit all Errai GWT dependencies for your application.");
   }
 
+  private boolean isCreateNew(final String value) {
+    return CREATE_A_NEW_MODULE_CLI.equals(value) || CREATE_A_NEW_MODULE_GUI.equals(value);
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public NavigationResult next(UINavigationContext context) throws Exception {
     if (moduleSelect.getValue() == null) {
       return null;
     }
-    else if (moduleSelect.getValue().equals(CREATE_A_NEW_MODULE)) {
+    else if (isCreateNew(moduleSelect.getValue())) {
       return context.navigateTo(NewModuleName.class);
     }
     else {
@@ -64,15 +69,20 @@ public class ModuleSelect extends AbstractUICommand implements UIWizardStep {
   @Override
   public void initializeUI(UIBuilder builder) throws Exception {
     final List<String> choices = getExistingModules();
-    choices.add(CREATE_A_NEW_MODULE);
+    // Workaround FORGE-1639
+    final boolean isGui = builder.getUIContext().getProvider().isGUI();
+    final String createNew = (isGui) ? CREATE_A_NEW_MODULE_GUI : CREATE_A_NEW_MODULE_CLI;
+
+    choices.add(createNew);
     moduleSelect.setValueChoices(choices);
+    moduleSelect.setDefaultValue(createNew);
 
     builder.add(moduleSelect);
   }
 
   @Override
   public Result execute(UIExecutionContext context) throws Exception {
-    if (!moduleSelect.getValue().equals(CREATE_A_NEW_MODULE)) {
+    if (!isCreateNew(moduleSelect.getValue())) {
       final ProjectConfig projectConfig = holder.getProject().getFacet(ProjectConfig.class);
       projectConfig.setProjectProperty(ProjectProperty.MODULE_LOGICAL, moduleSelect.getValue());
       projectConfig.setProjectProperty(ProjectProperty.MODULE_FILE,
