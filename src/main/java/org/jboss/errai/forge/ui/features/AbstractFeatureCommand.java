@@ -75,11 +75,14 @@ public abstract class AbstractFeatureCommand extends AbstractProjectCommand {
     final Project project = getSelectedProject(context.getUIContext());
     final Iterable<Feature> features = featureSelect.getValue();
 
-    for (final Feature feature : features) {
-      try {
-        performOperation(project, feature);
-      } catch(Exception e) {
-        return Results.fail(e.getMessage(), e);
+    if (features != null) {
+      for (final Feature feature : features) {
+        try {
+          performOperation(project, feature);
+        }
+        catch (Exception e) {
+          return Results.fail(e.getMessage(), e);
+        }
       }
     }
 
