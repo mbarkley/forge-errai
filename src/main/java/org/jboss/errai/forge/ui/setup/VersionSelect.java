@@ -90,7 +90,7 @@ public class VersionSelect extends AbstractUICommand implements UIWizardStep {
 
     return (majorVersion > 3
     || (majorVersion == 3
-            && (version.contains("SNAPSHOT")) || version.compareTo("3.0.0.20131205-M3") > 0));
+            && (version.contains("SNAPSHOT")) || version.compareTo("3.0.0.20140214-M4") > 0));
   }
 
 }
