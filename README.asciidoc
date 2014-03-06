@@ -112,7 +112,7 @@ image:images/forge-create-new-project.png[]
 +
 image:images/select-project.png[]
 
-.. In the Forge menu, select _Setup Errai in Project_.
+.. In the Forge menu, select _Errai: Setup_.
 +
 image:images/setup-errai.png[]
 
@@ -136,7 +136,7 @@ After the above setup has been performed, it is possible to add or remove Errai 
 
 1. In Eclipse, activate the Forge Plugin.
 
-2. Select one of the commands _Add Errai Features_ or _Remove Errai Features_.
+2. Select one of the commands _Errai: Add Features_ or _Errai: Remove Features_.
 +
 image:images/add-or-remove-feature-commands.png[]
 
