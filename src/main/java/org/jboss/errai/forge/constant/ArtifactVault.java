@@ -51,6 +51,7 @@ public final class ArtifactVault {
     WeldSpi("weld-spi", "org.jboss.weld"),
     XmlApis("xml-apis", "xml-apis"),
     JettyNaming("jetty-naming", "org.mortbay.jetty"),
+    RestEasyCdi("resteasy-cdi", "org.jboss.resteasy"),
 
     // plugins
     Clean("maven-clean-plugin", "org.apache.maven.plugins"),
@@ -87,7 +88,8 @@ public final class ArtifactVault {
     ErraiCordova("errai-cordova"),
     ErraiSecurityClient("errai-security-client"),
     ErraiSecurityServer("errai-security-server"),
-    CordovaPlugin("cordova-maven-plugin");
+    CordovaPlugin("cordova-maven-plugin"),
+    ErraiHtml5("errai-html5");
 
     private final String artifactId;
     private final String groupId;
@@ -194,6 +196,9 @@ public final class ArtifactVault {
     mainProfileBlacklist.add(DependencyArtifact.WeldSpi);
     mainProfileBlacklist.add(DependencyArtifact.XmlApis);
     mainProfileBlacklist.add(DependencyArtifact.JettyNaming);
+    mainProfileBlacklist.add(DependencyArtifact.RestEasyCdi);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiCordova);
+    mainProfileBlacklist.add(DependencyArtifact.ErraiHtml5);
     // Source Dependencies
     mainProfileBlacklist.add(DependencyArtifact.JavaxValidationSources);
     mainProfileBlacklist.add(DependencyArtifact.HibernateValidatorSources);
