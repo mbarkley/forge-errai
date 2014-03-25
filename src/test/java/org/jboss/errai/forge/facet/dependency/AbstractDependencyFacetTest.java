@@ -54,9 +54,9 @@ public class AbstractDependencyFacetTest extends ForgeTest {
       coreDependencies = Arrays.asList(new DependencyBuilder[] { DependencyBuilder.create(DependencyArtifact.ErraiTools
               .toString()) });
     }
+    // Allows dependencies to be set from this class.
     @Override
     public void setProfileDependencies(String name, DependencyBuilder... deps) {
-      // TODO Auto-generated method stub
       super.setProfileDependencies(name, deps);
     }
   }
